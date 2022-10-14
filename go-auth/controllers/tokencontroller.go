@@ -18,17 +18,32 @@ func GenerateToken(context *gin.Context) {
 		return
 	}
 
+	csrf_token, _ := context.Cookie("csrf_token")
+	if csrf_token == "" {
+		context.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "CSRF token not found"})
+		return
+	}
+
 	record := database.Instance.Where("username = ?", request.Username).First(&user)
 	if record.Error != nil {
 		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
+
 	credentialError := user.CheckPassword(request.Password)
 	if credentialError != nil {
 		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
-	tokenString, err := auth.GenerateJWT(user.Username, user.InventoryUser, user.FinanceUser, user.InventoryAdmin, user.FinanceAdmin, user.SystemAdmin)
+
+	tokenString, err := auth.GenerateJWT(
+		user.Username,
+		user.InventoryUser,
+		user.FinanceUser,
+		user.InventoryAdmin,
+		user.FinanceAdmin,
+		user.SystemAdmin,
+		csrf_token)
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while generating token"})
 		return

@@ -6,6 +6,7 @@ import (
 	"go-auth/middlewares"
 	"log"
 
+	"github.com/gin-gonic/contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -29,6 +30,9 @@ func loadEnv() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
+	router.Use(gzip.Gzip(gzip.DefaultCompression))
+	router.Use(middlewares.AssignCsrf())
+	router.Use(middlewares.AssignUser())
 	api := router.Group("/api/v1/auth")
 	{
 		api.POST("/login", controllers.GenerateToken)
