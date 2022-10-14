@@ -13,7 +13,8 @@ import (
 func main() {
 	loadEnv()
 	database.Connect()
-	database.Migate()
+	database.Migrate()
+	database.InitAdminAccount()
 
 	router := initRouter()
 	router.Run(":5000")
