@@ -37,7 +37,7 @@ func GenerateJWT(username string, inv_u *bool, fin_u *bool, inv_a *bool, fin_a *
 	return
 }
 
-func ValidateToken(signedToken string, minute_to_exp int8) (err error) {
+func ValidateTokenExpired(signedToken string, minute_to_exp int8) (err error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JWTClaim{},

@@ -3,6 +3,7 @@ package main
 import (
 	"go-auth/controllers"
 	"go-auth/database"
+	"go-auth/middlewares"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -29,8 +30,11 @@ func initRouter() *gin.Engine {
 	router := gin.Default()
 	api := router.Group("/api/v1/auth")
 	{
-		api.POST("/register", controllers.RegisterUser)
 		api.POST("/login", controllers.GenerateToken)
+		secured := api.Group("/admin").Use(middlewares.Auth(1)) // 1 minute expired
+		{
+			secured.POST("/register", controllers.RegisterUser)
+		}
 	}
 	return router
 }
