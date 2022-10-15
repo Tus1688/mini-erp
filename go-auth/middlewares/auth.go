@@ -16,7 +16,7 @@ func Auth(expiredIn int8) gin.HandlerFunc {
 		}
 		cookie, _ := c.Cookie("csrf_token")
 		if cookie == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "no csrf_token cookie provided"})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "CSRF token not found"})
 			return
 		}
 		err1 := auth.ValidateCsrfToken(tokenString, cookie)
