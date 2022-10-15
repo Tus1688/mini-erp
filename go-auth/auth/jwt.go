@@ -6,9 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"io"
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -35,7 +33,7 @@ func GenerateJWT(
 	fin_a *bool,
 	sys_a *bool,
 	csrf_token string) (tokenString string, err error) {
-	encryptedCsrf, _ := Encrypt(JwtKey, []byte(csrf_token))
+	encryptedCsrf := encrypt(JwtKey, csrf_token)
 	claims := &JWTClaim{
 		Username:   username,
 		Inv_u:      inv_u,
@@ -43,7 +41,7 @@ func GenerateJWT(
 		Inv_a:      inv_a,
 		Fin_a:      fin_a,
 		Sys_a:      sys_a,
-		Csrf_token: fmt.Sprintf("%0x", encryptedCsrf),
+		Csrf_token: encryptedCsrf,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// iat give more flexibility in defining the expiration time
 			IssuedAt: jwt.NewNumericDate(time.Now()),
@@ -92,55 +90,59 @@ func ValidateCsrfToken(signedToken string, csrf_token string) (err error) {
 	if !ok {
 		err = errors.New("invalid token")
 	}
-	decryptedCsrf, err1 := Decrypt(JwtKey, []byte(claims.Csrf_token))
-	if err1 != nil {
-		err = errors.New("here")
-	}
-	if string(decryptedCsrf) != csrf_token {
+	decryptedCsrf := decrypt(JwtKey, claims.Csrf_token)
+	if decryptedCsrf != csrf_token {
 		err = errors.New("invalid csrf token")
 	}
 	return
 }
 
-func Encrypt(key, text []byte) ([]byte, error) {
+func encrypt(key []byte, text string) string {
+	// key := []byte(keyText)
+	plaintext := []byte(text)
+
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		log.Print(err)
-		return nil, err
+		panic(err)
 	}
-	b := base64.StdEncoding.EncodeToString(text)
-	ciphertext := make([]byte, aes.BlockSize+len(b))
+
+	// The IV needs to be unique, but not secure. Therefore it's common to
+	// include it at the beginning of the ciphertext.
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
 	iv := ciphertext[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		return nil, err
+		panic(err)
 	}
-	cfb := cipher.NewCFBEncrypter(block, iv)
-	cfb.XORKeyStream(ciphertext[aes.BlockSize:], []byte(b))
-	// log.Printf("%0x", ciphertext)
-	// decrypted, _ := Decrypt(key, ciphertext)
-	// log.Printf("%s", decrypted)
-	// log.Print("type of ciphertext: ", fmt.Sprintf("%T", ciphertext))
-	return ciphertext, nil
+
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
+
+	// convert to base64
+	return base64.URLEncoding.EncodeToString(ciphertext)
 }
 
-func Decrypt(key, text []byte) ([]byte, error) {
-	log.Printf("key from decrypt: %0x", key)
-	log.Printf("txt from decrypt: %0x", text)
+// decrypt from base64 to decrypted string
+func decrypt(key []byte, cryptoText string) string {
+	ciphertext, _ := base64.URLEncoding.DecodeString(cryptoText)
+
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	if len(text) < aes.BlockSize {
-		return nil, errors.New("ciphertext too short")
+
+	// The IV needs to be unique, but not secure. Therefore it's common to
+	// include it at the beginning of the ciphertext.
+	if len(ciphertext) < aes.BlockSize {
+		panic("ciphertext too short")
 	}
-	iv := text[:aes.BlockSize]
-	text = text[aes.BlockSize:]
-	cfb := cipher.NewCFBDecrypter(block, iv)
-	cfb.XORKeyStream(text, text)
-	data, err := base64.StdEncoding.DecodeString(string(text))
-	if err != nil {
-		return nil, err
-	}
-	// log.Printf("%s", data)
-	return data, nil
+	iv := ciphertext[:aes.BlockSize]
+	ciphertext = ciphertext[aes.BlockSize:]
+
+	stream := cipher.NewCFBDecrypter(block, iv)
+
+	// XORKeyStream can work in-place if the two arguments are the same.
+	stream.XORKeyStream(ciphertext, ciphertext)
+
+	// return fmt.Sprintf("%s", ciphertext)
+	return string(ciphertext)
 }
