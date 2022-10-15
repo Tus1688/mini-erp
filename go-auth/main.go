@@ -1,10 +1,12 @@
 package main
 
 import (
+	"go-auth/auth"
 	"go-auth/controllers"
 	"go-auth/database"
 	"go-auth/middlewares"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -26,6 +28,8 @@ func loadEnv() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	auth.JwtKey = []byte(os.Getenv("JWT_KEY"))
+	log.Print("Loaded env!")
 }
 
 func initRouter() *gin.Engine {
