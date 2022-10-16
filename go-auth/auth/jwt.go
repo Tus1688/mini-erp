@@ -97,6 +97,25 @@ func ValidateCsrfToken(signedToken string, csrf_token string) (err error) {
 	return
 }
 
+func GetUsernameFromToken(signedToken string) (username string, err error) {
+	token, err := jwt.ParseWithClaims(
+		signedToken,
+		&JWTClaim{},
+		func(token *jwt.Token) (interface{}, error) {
+			return JwtKey, nil
+		},
+	)
+	if err != nil {
+		return
+	}
+	claims, ok := token.Claims.(*JWTClaim)
+	if !ok {
+		err = errors.New("invalid token")
+	}
+	username = claims.Username
+	return
+}
+
 func encrypt(key []byte, text string) string {
 	// key := []byte(keyText)
 	plaintext := []byte(text)

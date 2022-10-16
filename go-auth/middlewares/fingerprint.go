@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Assign CSRF cookie to client if not exist
 func AssignCsrf() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_, err := c.Cookie("csrf_token")
@@ -22,6 +23,7 @@ func AssignCsrf() gin.HandlerFunc {
 	}
 }
 
+// Assign user fingerprint to client if not exist
 func AssignUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_, err := c.Cookie("usr")

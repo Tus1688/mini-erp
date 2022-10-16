@@ -14,8 +14,13 @@ type User struct {
 }
 
 type UserLogin struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type UserForgotPassword struct {
+	Password    string `json:"password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
 }
 
 func (user *User) HashPassword(password string) error {
