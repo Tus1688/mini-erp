@@ -33,7 +33,7 @@ func GenerateJWT(
 	fin_a *bool,
 	sys_a *bool,
 	csrf_token string) (tokenString string, err error) {
-	encryptedCsrf := encrypt(JwtKey, csrf_token)
+	encryptedCsrf := Encrypt(JwtKey, csrf_token)
 	claims := &JWTClaim{
 		Username:   username,
 		Inv_u:      inv_u,
@@ -90,7 +90,7 @@ func ValidateCsrfToken(signedToken string, csrf_token string) (err error) {
 	if !ok {
 		err = errors.New("invalid token")
 	}
-	decryptedCsrf := decrypt(JwtKey, claims.Csrf_token)
+	decryptedCsrf := Decrypt(JwtKey, claims.Csrf_token)
 	if decryptedCsrf != csrf_token {
 		err = errors.New("invalid csrf token")
 	}
@@ -116,7 +116,7 @@ func GetUsernameFromToken(signedToken string) (username string, err error) {
 	return
 }
 
-func encrypt(key []byte, text string) string {
+func Encrypt(key []byte, text string) string {
 	// key := []byte(keyText)
 	plaintext := []byte(text)
 
@@ -140,8 +140,8 @@ func encrypt(key []byte, text string) string {
 	return base64.URLEncoding.EncodeToString(ciphertext)
 }
 
-// decrypt from base64 to decrypted string
-func decrypt(key []byte, cryptoText string) string {
+// Decrypt from base64 to decrypted string
+func Decrypt(key []byte, cryptoText string) string {
 	ciphertext, _ := base64.URLEncoding.DecodeString(cryptoText)
 
 	block, err := aes.NewCipher(key)

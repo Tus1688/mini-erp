@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"crypto/sha256"
+	"go-auth/auth"
 	"math/rand"
 	"net/http"
 	"os"
@@ -15,9 +16,32 @@ func AssignCsrf() gin.HandlerFunc {
 		_, err := c.Cookie("csrf_token")
 		if err != nil {
 			csrfToken := generateRandomString(32)
+			encryptedCsrf := auth.Encrypt(auth.JwtKey, csrfToken)
 			c.SetSameSite(http.SameSiteStrictMode)
 			c.SetCookie("csrf_token", csrfToken, 60*60*12, "/", os.Getenv("DOMAIN_NAME"), false, true)
+			c.SetCookie("validate", encryptedCsrf, 60*60*12, "/", os.Getenv("DOMAIN_NAME"), false, true)
 			c.Next()
+		}
+		c.Next()
+	}
+}
+
+func ValidateCsrf() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		validate, err := c.Cookie("validate")
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+			return
+		}
+		csrf, err := c.Cookie("csrf_token")
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+			return
+		}
+		decryptedCsrf := auth.Decrypt(auth.JwtKey, validate)
+		if decryptedCsrf != csrf {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+			return
 		}
 		c.Next()
 	}
