@@ -30,7 +30,6 @@ func GenerateJWT(
 	inv_u *bool,
 	fin_u *bool,
 	inv_a *bool,
-	fin_a *bool,
 	sys_a *bool,
 	csrf_token string) (tokenString string, err error) {
 	encryptedCsrf := Encrypt(JwtKey, csrf_token)
@@ -39,7 +38,6 @@ func GenerateJWT(
 		Inv_u:      inv_u,
 		Fin_u:      fin_u,
 		Inv_a:      inv_a,
-		Fin_a:      fin_a,
 		Sys_a:      sys_a,
 		Csrf_token: encryptedCsrf,
 		RegisteredClaims: jwt.RegisteredClaims{

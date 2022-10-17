@@ -8,7 +8,6 @@ type User struct {
 	InventoryUser  *bool  `gorm:"not null" json:"inv_user" binding:"required"`
 	FinanceUser    *bool  `gorm:"not null" json:"fin_user" binding:"required"`
 	InventoryAdmin *bool  `gorm:"not null" json:"inv_admin" binding:"required"`
-	FinanceAdmin   *bool  `gorm:"not null" json:"fin_admin" binding:"required"`
 	SystemAdmin    *bool  `gorm:"not null" json:"sys_admin" binding:"required"`
 	Active         *bool  `gorm:"not null;index:active;default:true"`
 }

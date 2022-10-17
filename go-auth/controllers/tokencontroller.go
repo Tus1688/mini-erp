@@ -41,7 +41,6 @@ func GenerateToken(c *gin.Context) {
 		user.InventoryUser,
 		user.FinanceUser,
 		user.InventoryAdmin,
-		user.FinanceAdmin,
 		user.SystemAdmin,
 		csrf_token)
 	if err != nil {
