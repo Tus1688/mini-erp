@@ -28,7 +28,7 @@ func RegisterUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
 }
 
-func ChangePassword(c *gin.Context) {
+func ChangePasswordUser(c *gin.Context) {
 	var request models.UserForgotPassword
 	var user models.User
 	if err := c.ShouldBindJSON(&request); err != nil {

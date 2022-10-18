@@ -37,17 +37,19 @@ func initRouter() *gin.Engine {
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(middlewares.AssignCsrf())
 	router.Use(middlewares.ValidateCsrf())
-	// router.Use(middlewares.AssignUser())
+
 	api := router.Group("/api/v1/auth")
 	{
 		api.POST("/login", controllers.GenerateToken)
 		admin := api.Group("/admin").Use(middlewares.Auth(100)) // 1 minute expired
 		{
 			admin.POST("/register", controllers.RegisterUser)
+			admin.POST("/reset-password", controllers.AdminChangePassword)
+			admin.POST("/toggle-active", controllers.AdminToggleActive)
 		}
 		user := api.Group("/user").Use(middlewares.Auth(100)) // 1 minute expired
 		{
-			user.POST("/changepw", controllers.ChangePassword)
+			user.POST("/changepw", controllers.ChangePasswordUser)
 		}
 	}
 	return router

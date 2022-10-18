@@ -22,6 +22,16 @@ type UserForgotPassword struct {
 	NewPassword string `json:"new_password" binding:"required"`
 }
 
+type AdminChangePassword struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type AdminToggleActiveStatus struct {
+	Username string `json:"username" binding:"required"`
+	Active   *bool  `json:"active" binding:"required"`
+}
+
 func (user *User) HashPassword(password string) error {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {

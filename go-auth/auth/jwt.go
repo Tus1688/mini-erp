@@ -19,7 +19,6 @@ type JWTClaim struct {
 	Inv_u      *bool  // inventory user
 	Fin_u      *bool  // finance user
 	Inv_a      *bool  // inventory admin
-	Fin_a      *bool  // finance admin
 	Sys_a      *bool  // system admin
 	Csrf_token string // provided csrf_token cookie value
 	jwt.RegisteredClaims
