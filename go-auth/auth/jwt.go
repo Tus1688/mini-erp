@@ -113,6 +113,72 @@ func GetUsernameFromToken(signedToken string) (username string, err error) {
 	return
 }
 
+func TokenIsFinanceUser(signedToken string) (err error) {
+	claims, err := ExtractClaims(signedToken)
+	if err != nil {
+		return
+	}
+	isFinanceUser := *claims.Fin_u
+	if !isFinanceUser {
+		err = errors.New("not finance user")
+	}
+	return
+}
+
+func TokenIsInventoryUser(signedToken string) (err error) {
+	claims, err := ExtractClaims(signedToken)
+	if err != nil {
+		return
+	}
+	isInventoryUser := *claims.Inv_u
+	if !isInventoryUser {
+		err = errors.New("not inventory user")
+	}
+	return
+}
+
+func TokenIsInventoryAdmin(signedToken string) (err error) {
+	claims, err := ExtractClaims(signedToken)
+	if err != nil {
+		return
+	}
+	isInventoryAdmin := *claims.Inv_a
+	if !isInventoryAdmin {
+		err = errors.New("not inventory admin")
+	}
+	return
+}
+
+func TokenIsSystemAdmin(signedToken string) (err error) {
+	claims, err := ExtractClaims(signedToken)
+	if err != nil {
+		return
+	}
+	isSystemAdmin := *claims.Sys_a
+	if !isSystemAdmin {
+		err = errors.New("not system admin")
+	}
+	return
+}
+
+func ExtractClaims(signedToken string) (claims *JWTClaim, err error) {
+	token, err := jwt.ParseWithClaims(
+		signedToken,
+		&JWTClaim{},
+		func(token *jwt.Token) (interface{}, error) {
+			return JwtKey, nil
+		},
+	)
+	if err != nil {
+		return
+	}
+	claims, ok := token.Claims.(*JWTClaim)
+	if !ok {
+		err = errors.New("invalid token")
+	}
+	return
+}
+
 func Encrypt(key []byte, text string) string {
 	// key := []byte(keyText)
 	plaintext := []byte(text)

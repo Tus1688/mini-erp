@@ -35,25 +35,26 @@ func loadEnv() {
 func initRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
-	router.Use(middlewares.AssignCsrf())
-	router.Use(middlewares.ValidateCsrf())
+	router.Use(middlewares.AssignCsrf())   // assign CSRF token to cookie
+	router.Use(middlewares.ValidateCsrf()) // validate CSRF token
 
 	api := router.Group("/api/v1/auth")
 	{
-		api.POST("/login", controllers.GenerateToken)
+		api.POST("/login", controllers.GenerateToken) // login
 		admin := api.Group("/admin")
-		admin.Use(middlewares.TokenExpired(10))
-		admin.Use(middlewares.EnforceCsrf())
+		admin.Use(middlewares.TokenExpired(10)) // expire token after 10 minutes
+		admin.Use(middlewares.EnforceCsrf())    // enforce CSRF_token cookie == CSRF_token in JWT
+		admin.Use(middlewares.UserIsSysAdmin()) // user must be system admin
 		{
-			admin.POST("/register", controllers.RegisterUser)
-			admin.POST("/reset-password", controllers.AdminChangePassword)
-			admin.PUT("/toggle-active", controllers.AdminToggleActive)
+			admin.POST("/register", controllers.RegisterUser)              // register new user
+			admin.POST("/reset-password", controllers.AdminChangePassword) // reset user password
+			admin.PUT("/toggle-active", controllers.AdminToggleActive)     // toggle user active status
 		}
 		user := api.Group("/user")
-		user.Use(middlewares.TokenExpired(10))
-		user.Use(middlewares.EnforceCsrf())
+		user.Use(middlewares.TokenExpired(10)) // expire token after 10 minutes
+		user.Use(middlewares.EnforceCsrf())    // enforce CSRF_token cookie == CSRF_token in JWT
 		{
-			user.POST("/changepw", controllers.ChangePasswordUser)
+			user.POST("/changepw", controllers.ChangePasswordUser) // change password as current user
 		}
 	}
 	return router
