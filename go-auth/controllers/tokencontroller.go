@@ -24,7 +24,7 @@ func GenerateToken(c *gin.Context) {
 		return
 	}
 
-	record := database.Instance.Where("username = ?", request.Username).First(&user)
+	record := database.Instance.Where("username = ? and active = 1", request.Username).First(&user)
 	if record.Error != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
