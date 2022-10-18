@@ -8,7 +8,23 @@ import (
 )
 
 // @expiredIn = int / minutes
-func Auth(expiredIn int8) gin.HandlerFunc {
+func TokenExpired(expiredIn int8) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tokenString := c.GetHeader("Authorization")
+		if tokenString == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "no token provided"})
+			return
+		}
+		err := auth.ValidateTokenExpired(tokenString, expiredIn)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+		c.Next()
+	}
+}
+
+func EnforceCsrf() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" {
@@ -20,16 +36,10 @@ func Auth(expiredIn int8) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "CSRF token not found"})
 			return
 		}
-		err1 := auth.ValidateCsrfToken(tokenString, cookie)
-		if err1 != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err1.Error()})
-			return
-		}
-		err := auth.ValidateTokenExpired(tokenString, expiredIn)
+		err := auth.ValidateCsrfToken(tokenString, cookie)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
-		c.Next()
 	}
 }

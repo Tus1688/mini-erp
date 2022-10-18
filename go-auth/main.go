@@ -41,13 +41,17 @@ func initRouter() *gin.Engine {
 	api := router.Group("/api/v1/auth")
 	{
 		api.POST("/login", controllers.GenerateToken)
-		admin := api.Group("/admin").Use(middlewares.Auth(100)) // 1 minute expired
+		admin := api.Group("/admin")
+		admin.Use(middlewares.TokenExpired(10))
+		admin.Use(middlewares.EnforceCsrf())
 		{
 			admin.POST("/register", controllers.RegisterUser)
 			admin.POST("/reset-password", controllers.AdminChangePassword)
 			admin.PUT("/toggle-active", controllers.AdminToggleActive)
 		}
-		user := api.Group("/user").Use(middlewares.Auth(100)) // 1 minute expired
+		user := api.Group("/user")
+		user.Use(middlewares.TokenExpired(10))
+		user.Use(middlewares.EnforceCsrf())
 		{
 			user.POST("/changepw", controllers.ChangePasswordUser)
 		}
