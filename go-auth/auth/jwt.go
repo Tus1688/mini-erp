@@ -1,12 +1,7 @@
 package auth
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
-	"io"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -50,20 +45,7 @@ func GenerateJWT(
 }
 
 func ValidateTokenExpired(signedToken string, minute_to_exp int8) (err error) {
-	token, err := jwt.ParseWithClaims(
-		signedToken,
-		&JWTClaim{},
-		func(token *jwt.Token) (interface{}, error) {
-			return JwtKey, nil
-		},
-	)
-	if err != nil {
-		return
-	}
-	claims, ok := token.Claims.(*JWTClaim)
-	if !ok {
-		err = errors.New("invalid token")
-	}
+	claims, err := ExtractClaims(signedToken)
 	// check whether the token is expired in @minute_to_exp
 	if claims.IssuedAt.Time.Add(time.Duration(minute_to_exp) * time.Minute).Before(time.Now()) {
 		err = errors.New("token expired")
@@ -73,20 +55,7 @@ func ValidateTokenExpired(signedToken string, minute_to_exp int8) (err error) {
 }
 
 func ValidateCsrfToken(signedToken string, csrf_token string) (err error) {
-	token, err := jwt.ParseWithClaims(
-		signedToken,
-		&JWTClaim{},
-		func(token *jwt.Token) (interface{}, error) {
-			return JwtKey, nil
-		},
-	)
-	if err != nil {
-		return
-	}
-	claims, ok := token.Claims.(*JWTClaim)
-	if !ok {
-		err = errors.New("invalid token")
-	}
+	claims, err := ExtractClaims(signedToken)
 	decryptedCsrf := Decrypt(JwtKey, claims.Csrf_token)
 	if decryptedCsrf != csrf_token {
 		err = errors.New("invalid csrf token")
@@ -95,19 +64,9 @@ func ValidateCsrfToken(signedToken string, csrf_token string) (err error) {
 }
 
 func GetUsernameFromToken(signedToken string) (username string, err error) {
-	token, err := jwt.ParseWithClaims(
-		signedToken,
-		&JWTClaim{},
-		func(token *jwt.Token) (interface{}, error) {
-			return JwtKey, nil
-		},
-	)
+	claims, err := ExtractClaims(signedToken)
 	if err != nil {
 		return
-	}
-	claims, ok := token.Claims.(*JWTClaim)
-	if !ok {
-		err = errors.New("invalid token")
 	}
 	username = claims.Username
 	return
@@ -177,54 +136,4 @@ func ExtractClaims(signedToken string) (claims *JWTClaim, err error) {
 		err = errors.New("invalid token")
 	}
 	return
-}
-
-func Encrypt(key []byte, text string) string {
-	// key := []byte(keyText)
-	plaintext := []byte(text)
-
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
-	}
-
-	// The IV needs to be unique, but not secure. Therefore it's common to
-	// include it at the beginning of the ciphertext.
-	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
-	iv := ciphertext[:aes.BlockSize]
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		panic(err)
-	}
-
-	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
-
-	// convert to base64
-	return base64.URLEncoding.EncodeToString(ciphertext)
-}
-
-// Decrypt from base64 to decrypted string
-func Decrypt(key []byte, cryptoText string) string {
-	ciphertext, _ := base64.URLEncoding.DecodeString(cryptoText)
-
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
-	}
-
-	// The IV needs to be unique, but not secure. Therefore it's common to
-	// include it at the beginning of the ciphertext.
-	if len(ciphertext) < aes.BlockSize {
-		panic("ciphertext too short")
-	}
-	iv := ciphertext[:aes.BlockSize]
-	ciphertext = ciphertext[aes.BlockSize:]
-
-	stream := cipher.NewCFBDecrypter(block, iv)
-
-	// XORKeyStream can work in-place if the two arguments are the same.
-	stream.XORKeyStream(ciphertext, ciphertext)
-
-	// return fmt.Sprintf("%s", ciphertext)
-	return string(ciphertext)
 }
