@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"fmt"
 	"go-auth/auth"
 	"go-auth/database"
 	"go-auth/models"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -43,8 +43,8 @@ func Login(c *gin.Context) {
 	jti := auth.GenerateRandomString(10)
 	refresh_token := auth.GenerateRandomString(32)
 
-	redisKey := fmt.Sprintf("%s %s", user.Username, jti)
-	redisError := database.Rdb.Set(database.Rdb.Context(), redisKey, refresh_token, 0).Err()
+	redisKey := user.Username + " " + jti
+	redisError := database.Rdb.Set(database.Rdb.Context(), redisKey, refresh_token, 10*time.Hour).Err()
 	if redisError != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while generating token 1"})
 		return
@@ -62,7 +62,7 @@ func Login(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while generating token 2"})
 		return
 	}
-	c.SetCookie("refresh_token", refresh_token, 60*60*12, "/", os.Getenv("DOMAIN_NAME"), false, true)
+	c.SetCookie("refresh_token", refresh_token, 60*60*10, "/", os.Getenv("DOMAIN_NAME"), false, true)
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
 
@@ -124,4 +124,23 @@ func ChangePasswordUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
+}
+
+func Logout(c *gin.Context) {
+	signedToken := c.GetHeader("Authorization")
+	claims, err := auth.ExtractClaims(signedToken)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+	// redisKey = Username + " " + JTI
+	redisKey := claims.Username + " " + claims.ID
+	redisError := database.Rdb.Del(database.Rdb.Context(), redisKey).Err()
+	if redisError != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while logging out"})
+		return
+	}
+	// send expired refresh_token cookie to client to revoke prev refresh_token
+	c.SetCookie("refresh_token", "", -1, "/", os.Getenv("DOMAIN_NAME"), false, true)
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }

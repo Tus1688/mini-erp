@@ -53,5 +53,5 @@ func RefreshToken(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while generating token 2"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"Token": newToken})
+	c.JSON(http.StatusOK, gin.H{"token": newToken})
 }
