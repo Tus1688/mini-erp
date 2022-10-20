@@ -56,6 +56,7 @@ func initRouter() *gin.Engine {
 		user.Use(middlewares.EnforceCsrf())    // enforce CSRF_token cookie == CSRF_token in JWT
 		{
 			user.POST("/changepw", controllers.ChangePasswordUser) // change password as current user
+			user.GET("/refresh-token", controllers.RefreshToken)   // refresh expired JWT
 		}
 	}
 	return router

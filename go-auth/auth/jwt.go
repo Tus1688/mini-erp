@@ -25,7 +25,8 @@ func GenerateJWT(
 	fin_u *bool,
 	inv_a *bool,
 	sys_a *bool,
-	csrf_token string) (tokenString string, err error) {
+	csrf_token string,
+	id string) (tokenString string, err error) {
 	encryptedCsrf := Encrypt(JwtKey, csrf_token)
 	claims := &JWTClaim{
 		Username:   username,
@@ -37,6 +38,7 @@ func GenerateJWT(
 		RegisteredClaims: jwt.RegisteredClaims{
 			// iat give more flexibility in defining the expiration time
 			IssuedAt: jwt.NewNumericDate(time.Now()),
+			ID:       id,
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -69,6 +71,15 @@ func GetUsernameFromToken(signedToken string) (username string, err error) {
 		return
 	}
 	username = claims.Username
+	return
+}
+
+func GetJTIFromToken(signedToken string) (jti string, err error) {
+	claims, err := ExtractClaims(signedToken)
+	if err != nil {
+		return
+	}
+	jti = claims.ID
 	return
 }
 

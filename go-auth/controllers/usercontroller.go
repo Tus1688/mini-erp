@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"go-auth/auth"
 	"go-auth/database"
 	"go-auth/models"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -37,17 +39,30 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// make a JTI for the token, and store it as key in redis with value of 32 random bytes
+	jti := auth.GenerateRandomString(10)
+	refresh_token := auth.GenerateRandomString(32)
+
+	redisKey := fmt.Sprintf("%s %s", user.Username, jti)
+	redisError := database.Rdb.Set(database.Rdb.Context(), redisKey, refresh_token, 0).Err()
+	if redisError != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while generating token 1"})
+		return
+	}
+
 	tokenString, err := auth.GenerateJWT(
 		user.Username,
 		user.InventoryUser,
 		user.FinanceUser,
 		user.InventoryAdmin,
 		user.SystemAdmin,
-		csrf_token)
+		csrf_token,
+		jti)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while generating token"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while generating token 2"})
 		return
 	}
+	c.SetCookie("refresh_token", refresh_token, 60*60*12, "/", os.Getenv("DOMAIN_NAME"), false, true)
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
 
