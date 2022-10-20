@@ -15,7 +15,8 @@ import (
 
 func main() {
 	loadEnv()
-	database.Connect()
+	database.MysqlConnect()
+	database.RedisConnect()
 	database.Migrate()
 	database.InitAdminAccount()
 
@@ -40,7 +41,7 @@ func initRouter() *gin.Engine {
 
 	api := router.Group("/api/v1/auth")
 	{
-		api.POST("/login", controllers.GenerateToken) // login
+		api.POST("/login", controllers.Login) // login
 		admin := api.Group("/admin")
 		admin.Use(middlewares.TokenExpired(10)) // expire token after 10 minutes
 		admin.Use(middlewares.EnforceCsrf())    // enforce CSRF_token cookie == CSRF_token in JWT

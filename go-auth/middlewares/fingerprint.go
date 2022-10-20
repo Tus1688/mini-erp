@@ -1,8 +1,6 @@
 package middlewares
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"go-auth/auth"
 	"net/http"
 	"os"
@@ -15,7 +13,7 @@ func AssignCsrf() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_, err := c.Cookie("csrf_token")
 		if err != nil {
-			csrfToken := generateRandomString(32)
+			csrfToken := auth.GenerateRandomString(32)
 			encryptedCsrf := auth.Encrypt(auth.JwtKey, csrfToken)
 			c.SetSameSite(http.SameSiteStrictMode)
 			c.SetCookie("csrf_token", csrfToken, 60*60*12, "/", os.Getenv("DOMAIN_NAME"), false, true)
@@ -45,13 +43,4 @@ func ValidateCsrf() gin.HandlerFunc {
 		}
 		c.Next()
 	}
-}
-
-func generateRandomString(n int) string {
-	b := make([]byte, n)
-	_, err := rand.Read(b)
-	if err != nil {
-		return ""
-	}
-	return base64.URLEncoding.EncodeToString(b)
 }

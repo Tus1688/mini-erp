@@ -14,7 +14,7 @@ import (
 var Instance *gorm.DB
 var dbError error
 
-func Connect() {
+func MysqlConnect() {
 	DbHost := os.Getenv("DB_HOST")
 	DbUser := os.Getenv("DB_USER")
 	DbPassword := os.Getenv("DB_PASSWORD")
@@ -36,7 +36,7 @@ func Connect() {
 	if dbError != nil {
 		panic(dbError)
 	}
-	log.Printf("Connected to DB!")
+	log.Printf("Connected to Mysql!")
 }
 
 func Migrate() {
