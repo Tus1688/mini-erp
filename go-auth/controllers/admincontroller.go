@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"go-auth/auth"
 	"go-auth/database"
 	"go-auth/models"
 	"net/http"
@@ -30,6 +31,7 @@ func AdminChangePassword(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
+	auth.PurgeSessionMatchPattern(request.Username)
 }
 
 func AdminToggleActive(c *gin.Context) {

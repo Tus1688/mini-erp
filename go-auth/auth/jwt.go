@@ -74,15 +74,6 @@ func GetUsernameFromToken(signedToken string) (username string, err error) {
 	return
 }
 
-func GetJTIFromToken(signedToken string) (jti string, err error) {
-	claims, err := ExtractClaims(signedToken)
-	if err != nil {
-		return
-	}
-	jti = claims.ID
-	return
-}
-
 func TokenIsFinanceUser(signedToken string) (err error) {
 	claims, err := ExtractClaims(signedToken)
 	if err != nil {

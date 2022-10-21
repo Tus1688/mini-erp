@@ -124,6 +124,7 @@ func ChangePasswordUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
+	auth.PurgeSessionMatchPattern(username)
 }
 
 func Logout(c *gin.Context) {
