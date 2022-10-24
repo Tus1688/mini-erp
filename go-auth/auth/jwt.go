@@ -48,6 +48,9 @@ func GenerateJWT(
 
 func ValidateTokenExpired(signedToken string, minute_to_exp int8) (err error) {
 	claims, err := ExtractClaims(signedToken)
+	if err != nil {
+		return
+	}
 	// check whether the token is expired in @minute_to_exp
 	if claims.IssuedAt.Time.Add(time.Duration(minute_to_exp) * time.Minute).Before(time.Now()) {
 		err = errors.New("token expired")
@@ -58,6 +61,9 @@ func ValidateTokenExpired(signedToken string, minute_to_exp int8) (err error) {
 
 func ValidateCsrfToken(signedToken string, csrf_token string) (err error) {
 	claims, err := ExtractClaims(signedToken)
+	if err != nil {
+		return
+	}
 	decryptedCsrf := Decrypt(JwtKey, claims.Csrf_token)
 	if decryptedCsrf != csrf_token {
 		err = errors.New("invalid csrf token")
