@@ -4,7 +4,6 @@ import (
 	"go-api/auth"
 	"go-api/controllers"
 	"go-api/database"
-	"go-api/middlewares"
 	"go-api/models"
 	"log"
 	"os"
@@ -34,16 +33,23 @@ func loadEnv() {
 func initRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
-	router.Use(middlewares.ValidateCsrf())
+	// router.Use(middlewares.ValidateCsrf())
+	// router.Use(middlewares.TokenExpired(60))
 
 	api := router.Group("/api/v1")
 	{
 		api.POST("/customer", controllers.CreateCustomer)
 
-		// geo controllers
-		api.POST("/city", controllers.CreateCity)
-		api.POST("/province", controllers.CreateProvince)
-		api.POST("/country", controllers.CreateCountry)
+		geo := api.Group("/geo")
+		{
+			geo.POST("/city", controllers.CreateCity)
+			geo.POST("/province", controllers.CreateProvince)
+			geo.POST("/country", controllers.CreateCountry)
+
+			geo.DELETE("/city", controllers.DeleteCity)
+			geo.DELETE("/province", controllers.DeleteProvince)
+			geo.DELETE("/country", controllers.DeleteCountry)
+		}
 	}
 
 	return router

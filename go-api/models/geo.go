@@ -25,6 +25,20 @@ type Country struct {
 	CountryName string `json:"country_name" gorm:"type:varchar(50);not null;unique"`
 }
 
+type ApiGeoDelete struct {
+	ID int `json:"id" binding:"required"`
+}
+
+type APICityCreate struct {
+	CityName   string `json:"city_name" binding:"required"`
+	ProvinceID int    `json:"province_id" binding:"required"`
+}
+
+type APIProvinceCreate struct {
+	ProvinceName string `json:"province_name" binding:"required"`
+	CountryID    int    `json:"country_id" binding:"required"`
+}
+
 func (t *City) BeforeCreate(tx *gorm.DB) (err error) {
 	var current City
 	database.Instance.Last(&current)
