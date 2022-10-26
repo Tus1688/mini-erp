@@ -9,6 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/***************************
+CREATE
+***************************/
+
 func CreateCity(c *gin.Context) {
 	var request models.APICityCreate
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -76,6 +80,10 @@ func CreateCountry(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Country created successfully"})
 }
+
+/***************************
+DELETE
+***************************/
 
 func DeleteCity(c *gin.Context) {
 	var request models.ApiGeoDelete
@@ -153,4 +161,76 @@ func DeleteCountry(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Country deleted successfully"})
+}
+
+/***************************
+UPDATE
+***************************/
+
+func UpdateCity(c *gin.Context) {
+	var request models.APICityUpdate
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		return
+	}
+
+	record := database.Instance.Where("id = ?", request.ID).Updates(models.City{
+		CityName:      request.CityName,
+		ProvinceRefer: request.ProvinceID,
+	})
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when updating city"})
+		return
+	}
+	if record.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "City not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "City updated successfully"})
+}
+
+func UpdateProvince(c *gin.Context) {
+	var request models.APIProvinceUpdate
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		return
+	}
+
+	record := database.Instance.Where("id = ?", request.ID).Updates(models.Province{
+		ProvinceName: request.ProvinceName,
+		CountryRefer: request.CountryID,
+	})
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when updating province"})
+		return
+	}
+	if record.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Province not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Province updated successfully"})
+}
+
+func UpdateCountry(c *gin.Context) {
+	var request models.APICountryUpdate
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		return
+	}
+
+	record := database.Instance.Where("id = ?", request.ID).Updates(models.Country{
+		CountryName: request.CountryName,
+	})
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when updating country"})
+		return
+	}
+	if record.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Country not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Country updated successfully"})
 }
