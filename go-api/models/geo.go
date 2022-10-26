@@ -39,6 +39,10 @@ type APIProvinceCreate struct {
 	CountryID    int    `json:"country_id" binding:"required"`
 }
 
+type APICountryCreate struct {
+	CountryName string `json:"country_name" binding:"required"`
+}
+
 func (t *City) BeforeCreate(tx *gorm.DB) (err error) {
 	var current City
 	database.Instance.Last(&current)

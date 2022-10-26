@@ -21,11 +21,12 @@ func CreateCity(c *gin.Context) {
 		ProvinceRefer: request.ProvinceID,
 	})
 	if record.Error != nil {
-		if strings.Contains(record.Error.Error(), "Duplicate entry") {
+		// 1062 is the error code for duplicate entry
+		if strings.Contains(record.Error.Error(), "1062") {
 			c.JSON(http.StatusConflict, gin.H{"error": request.CityName + " already exists"})
 			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": "something went wrong when creating city"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating city"})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "City created successfully"})
@@ -43,26 +44,30 @@ func CreateProvince(c *gin.Context) {
 		CountryRefer: request.CountryID,
 	})
 	if record.Error != nil {
-		if strings.Contains(record.Error.Error(), "Duplicate entry") {
+		// 1062 is the error code for duplicate entry
+		if strings.Contains(record.Error.Error(), "1062") {
 			c.JSON(http.StatusConflict, gin.H{"error": request.ProvinceName + " already exists"})
 			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": "something went wrong when creating province"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating province"})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Province created successfully"})
 }
 
 func CreateCountry(c *gin.Context) {
-	var request models.Country
+	var request models.APICountryCreate
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
 		return
 	}
 
-	record := database.Instance.Create(&request)
+	record := database.Instance.Create(&models.Country{
+		CountryName: request.CountryName,
+	})
 	if record.Error != nil {
-		if strings.Contains(record.Error.Error(), "Duplicate entry") {
+		// 1062 is the error code for duplicate entry
+		if strings.Contains(record.Error.Error(), "1062") {
 			c.JSON(http.StatusConflict, gin.H{"error": request.CountryName + " already exists"})
 			return
 		}
@@ -82,7 +87,12 @@ func DeleteCity(c *gin.Context) {
 
 	record := database.Instance.Where("id = ?", request.ID).Delete(&city)
 	if record.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "something went wrong when deleting city"})
+		// 1451 is the error code for foreign key constraint
+		if strings.Contains(record.Error.Error(), "1451") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete city because it is being used in some address"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when deleting city"})
 		return
 	}
 	if record.RowsAffected == 0 {
@@ -103,7 +113,12 @@ func DeleteProvince(c *gin.Context) {
 
 	record := database.Instance.Where("id = ?", request.ID).Delete(&province)
 	if record.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "something went wrong when deleting province"})
+		// 1451 is the error code for foreign key constraint
+		if strings.Contains(record.Error.Error(), "1451") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete province because it is being used by a city"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when deleting province"})
 		return
 	}
 	if record.RowsAffected == 0 {
@@ -124,7 +139,12 @@ func DeleteCountry(c *gin.Context) {
 
 	record := database.Instance.Where("id = ?", request.ID).Delete(&country)
 	if record.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "something went wrong when deleting country"})
+		// 1451 is the error code for foreign key constraint
+		if strings.Contains(record.Error.Error(), "1451") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete country because it is being used by a province"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when deleting country"})
 		return
 	}
 	if record.RowsAffected == 0 {
