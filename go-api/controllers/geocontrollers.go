@@ -87,13 +87,12 @@ DELETE
 
 func DeleteCity(c *gin.Context) {
 	var request models.ApiGeoDelete
-	var city models.City
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
 		return
 	}
 
-	record := database.Instance.Where("id = ?", request.ID).Delete(&city)
+	record := database.Instance.Where("id = ?", request.ID).Delete(&models.City{})
 	if record.Error != nil {
 		// 1451 is the error code for foreign key constraint
 		if strings.Contains(record.Error.Error(), "1451") {
@@ -113,13 +112,12 @@ func DeleteCity(c *gin.Context) {
 
 func DeleteProvince(c *gin.Context) {
 	var request models.ApiGeoDelete
-	var province models.Province
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
 		return
 	}
 
-	record := database.Instance.Where("id = ?", request.ID).Delete(&province)
+	record := database.Instance.Where("id = ?", request.ID).Delete(&models.Province{})
 	if record.Error != nil {
 		// 1451 is the error code for foreign key constraint
 		if strings.Contains(record.Error.Error(), "1451") {
@@ -139,13 +137,12 @@ func DeleteProvince(c *gin.Context) {
 
 func DeleteCountry(c *gin.Context) {
 	var request models.ApiGeoDelete
-	var country models.Country
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
 		return
 	}
 
-	record := database.Instance.Where("id = ?", request.ID).Delete(&country)
+	record := database.Instance.Where("id = ?", request.ID).Delete(&models.Country{})
 	if record.Error != nil {
 		// 1451 is the error code for foreign key constraint
 		if strings.Contains(record.Error.Error(), "1451") {
@@ -183,7 +180,7 @@ func UpdateCity(c *gin.Context) {
 		return
 	}
 	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "City not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "City not found or no changes were made"})
 		return
 	}
 
@@ -206,7 +203,7 @@ func UpdateProvince(c *gin.Context) {
 		return
 	}
 	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Province not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Province not found or no changes were made"})
 		return
 	}
 
@@ -228,7 +225,7 @@ func UpdateCountry(c *gin.Context) {
 		return
 	}
 	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Country not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Country not found or no changes were made"})
 		return
 	}
 

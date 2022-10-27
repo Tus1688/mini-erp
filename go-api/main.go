@@ -28,6 +28,7 @@ func loadEnv() {
 		log.Fatal("Error loading .env file")
 	}
 	auth.JwtKey = []byte(os.Getenv("JWT_KEY"))
+	log.Print(".env loaded")
 }
 
 func initRouter() *gin.Engine {
@@ -49,6 +50,10 @@ func initRouter() *gin.Engine {
 			geo.DELETE("/city", controllers.DeleteCity)
 			geo.DELETE("/province", controllers.DeleteProvince)
 			geo.DELETE("/country", controllers.DeleteCountry)
+
+			geo.PATCH("/city", controllers.UpdateCity)
+			geo.PATCH("/province", controllers.UpdateProvince)
+			geo.PATCH("/country", controllers.UpdateCountry)
 		}
 	}
 
