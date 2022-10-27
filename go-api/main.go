@@ -43,6 +43,10 @@ func initRouter() *gin.Engine {
 
 		geo := api.Group("/geo")
 		{
+			geo.GET("/city", controllers.GetCity)
+			geo.GET("/province", controllers.GetProvince)
+			geo.GET("/country", controllers.GetCountry)
+
 			geo.POST("/city", controllers.CreateCity)
 			geo.POST("/province", controllers.CreateProvince)
 			geo.POST("/country", controllers.CreateCountry)

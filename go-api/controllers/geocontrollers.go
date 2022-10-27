@@ -10,6 +10,49 @@ import (
 )
 
 /***************************
+RETRIEVE
+***************************/
+
+func GetCity(c *gin.Context) {
+	var response []models.APICityResponse
+
+	database.Instance.Table("cities c").Select("c.id, c.city_name, p.province_name, ct.country_name").
+		Joins("left join provinces p on c.province_refer = p.id").
+		Joins("left join countries ct on ct.id = p.country_refer").Scan(&response)
+
+	if response == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No city found"})
+		return
+	}
+	c.JSON(http.StatusOK, response)
+}
+
+func GetProvince(c *gin.Context) {
+	var response []models.APIProvinceResponse
+
+	database.Instance.Table("provinces p").Select("p.id, p.province_name, ct.country_name").
+		Joins("left join countries ct on ct.id = p.country_refer").Scan(&response)
+
+	if response == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No province found"})
+		return
+	}
+	c.JSON(http.StatusOK, response)
+}
+
+func GetCountry(c *gin.Context) {
+	var response []models.APICountryResponse
+
+	database.Instance.Table("countries").Select("id, country_name").Order("id asc").Scan(&response)
+
+	if response == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No country found"})
+		return
+	}
+	c.JSON(http.StatusOK, response)
+}
+
+/***************************
 CREATE
 ***************************/
 

@@ -60,6 +60,24 @@ type APICountryUpdate struct {
 	CountryName string `json:"country_name" binding:"required"`
 }
 
+type APICityResponse struct {
+	ID           int    `json:"id"`
+	CityName     string `json:"city_name"`
+	ProvinceName string `json:"province_name"`
+	CountryName  string `json:"country_name"`
+}
+
+type APIProvinceResponse struct {
+	ID           int    `json:"id"`
+	ProvinceName string `json:"province_name"`
+	CountryName  string `json:"country_name"`
+}
+
+type APICountryResponse struct {
+	ID          int    `json:"id"`
+	CountryName string `json:"country_name"`
+}
+
 func (t *City) BeforeCreate(tx *gorm.DB) (err error) {
 	var current City
 	database.Instance.Last(&current)
