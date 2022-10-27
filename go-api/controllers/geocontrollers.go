@@ -59,12 +59,12 @@ CREATE
 func CreateCity(c *gin.Context) {
 	var request models.APICityCreate
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	record := database.Instance.Create(&models.City{
-		CityName:      request.CityName,
+		CityName:      strings.ToLower(request.CityName),
 		ProvinceRefer: request.ProvinceID,
 	})
 	if record.Error != nil {
@@ -82,12 +82,12 @@ func CreateCity(c *gin.Context) {
 func CreateProvince(c *gin.Context) {
 	var request models.APIProvinceCreate
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	record := database.Instance.Create(&models.Province{
-		ProvinceName: request.ProvinceName,
+		ProvinceName: strings.ToLower(request.ProvinceName),
 		CountryRefer: request.CountryID,
 	})
 	if record.Error != nil {
@@ -105,12 +105,12 @@ func CreateProvince(c *gin.Context) {
 func CreateCountry(c *gin.Context) {
 	var request models.APICountryCreate
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	record := database.Instance.Create(&models.Country{
-		CountryName: request.CountryName,
+		CountryName: strings.ToLower(request.CountryName),
 	})
 	if record.Error != nil {
 		// 1062 is the error code for duplicate entry
@@ -118,7 +118,7 @@ func CreateCountry(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": request.CountryName + " already exists"})
 			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": "something went wrong when creating country"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating country"})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Country created successfully"})
@@ -131,7 +131,7 @@ DELETE
 func DeleteCity(c *gin.Context) {
 	var request models.ApiGeoDelete
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -139,7 +139,7 @@ func DeleteCity(c *gin.Context) {
 	if record.Error != nil {
 		// 1451 is the error code for foreign key constraint
 		if strings.Contains(record.Error.Error(), "1451") {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete city because it is being used in some address"})
+			c.JSON(http.StatusConflict, gin.H{"error": "Cannot delete city because it is being used in some address"})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when deleting city"})
@@ -156,7 +156,7 @@ func DeleteCity(c *gin.Context) {
 func DeleteProvince(c *gin.Context) {
 	var request models.ApiGeoDelete
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -164,7 +164,7 @@ func DeleteProvince(c *gin.Context) {
 	if record.Error != nil {
 		// 1451 is the error code for foreign key constraint
 		if strings.Contains(record.Error.Error(), "1451") {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete province because it is being used by a city"})
+			c.JSON(http.StatusConflict, gin.H{"error": "Cannot delete province because it is being used by a city"})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when deleting province"})
@@ -181,7 +181,7 @@ func DeleteProvince(c *gin.Context) {
 func DeleteCountry(c *gin.Context) {
 	var request models.ApiGeoDelete
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -189,7 +189,7 @@ func DeleteCountry(c *gin.Context) {
 	if record.Error != nil {
 		// 1451 is the error code for foreign key constraint
 		if strings.Contains(record.Error.Error(), "1451") {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete country because it is being used by a province"})
+			c.JSON(http.StatusConflict, gin.H{"error": "Cannot delete country because it is being used by a province"})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when deleting country"})
@@ -210,12 +210,12 @@ UPDATE
 func UpdateCity(c *gin.Context) {
 	var request models.APICityUpdate
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	record := database.Instance.Where("id = ?", request.ID).Updates(models.City{
-		CityName:      request.CityName,
+		CityName:      strings.ToLower(request.CityName),
 		ProvinceRefer: request.ProvinceID,
 	})
 	if record.Error != nil {
@@ -233,12 +233,12 @@ func UpdateCity(c *gin.Context) {
 func UpdateProvince(c *gin.Context) {
 	var request models.APIProvinceUpdate
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	record := database.Instance.Where("id = ?", request.ID).Updates(models.Province{
-		ProvinceName: request.ProvinceName,
+		ProvinceName: strings.ToLower(request.ProvinceName),
 		CountryRefer: request.CountryID,
 	})
 	if record.Error != nil {
@@ -256,12 +256,12 @@ func UpdateProvince(c *gin.Context) {
 func UpdateCountry(c *gin.Context) {
 	var request models.APICountryUpdate
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	record := database.Instance.Where("id = ?", request.ID).Updates(models.Country{
-		CountryName: request.CountryName,
+		CountryName: strings.ToLower(request.CountryName),
 	})
 	if record.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when updating country"})
