@@ -129,8 +129,8 @@ DELETE
 ***************************/
 
 func DeleteCity(c *gin.Context) {
-	var request models.ApiGeoDelete
-	if err := c.ShouldBindJSON(&request); err != nil {
+	var request models.APICommonQueryId
+	if err := c.ShouldBind(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -154,8 +154,8 @@ func DeleteCity(c *gin.Context) {
 }
 
 func DeleteProvince(c *gin.Context) {
-	var request models.ApiGeoDelete
-	if err := c.ShouldBindJSON(&request); err != nil {
+	var request models.APICommonQueryId
+	if err := c.ShouldBind(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -179,8 +179,8 @@ func DeleteProvince(c *gin.Context) {
 }
 
 func DeleteCountry(c *gin.Context) {
-	var request models.ApiGeoDelete
-	if err := c.ShouldBindJSON(&request); err != nil {
+	var request models.APICommonQueryId
+	if err := c.ShouldBind(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}

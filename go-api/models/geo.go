@@ -8,25 +8,21 @@ import (
 
 type City struct {
 	ID            int      `gorm:"primary_key"`
-	CityName      string   `json:"city_name" gorm:"type:varchar(50);not null;unique"`
-	ProvinceRefer int      `json:"province_id" gorm:"not null"`
+	CityName      string   `gorm:"type:varchar(50);not null;unique"`
+	ProvinceRefer int      `gorm:"not null"`
 	Province      Province `gorm:"foreignkey:ProvinceRefer"`
 }
 
 type Province struct {
 	ID           int     `gorm:"primary_key"`
-	ProvinceName string  `json:"province_name" gorm:"type:varchar(50);not null;unique"`
-	CountryRefer int     `json:"country_id" gorm:"not null"`
+	ProvinceName string  `gorm:"type:varchar(50);not null;unique"`
+	CountryRefer int     `gorm:"not null"`
 	Country      Country `gorm:"foreignkey:CountryRefer"`
 }
 
 type Country struct {
 	ID          int    `gorm:"primary_key"`
-	CountryName string `json:"country_name" gorm:"type:varchar(50);not null;unique"`
-}
-
-type ApiGeoDelete struct {
-	ID int `json:"id" binding:"required"`
+	CountryName string `gorm:"type:varchar(50);not null;unique"`
 }
 
 type APICityCreate struct {

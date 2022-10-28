@@ -39,7 +39,10 @@ func initRouter() *gin.Engine {
 
 	api := router.Group("/api/v1")
 	{
+		api.GET("/customer", controllers.GetCustomer)
 		api.POST("/customer", controllers.CreateCustomer)
+		api.DELETE("/customer", controllers.DeleteCustomer)
+		api.PATCH("/customer", controllers.UpdateCustomer)
 
 		geo := api.Group("/geo")
 		{
