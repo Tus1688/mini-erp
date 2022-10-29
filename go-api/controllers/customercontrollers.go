@@ -34,9 +34,16 @@ func GetCustomer(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&requestPaging); err == nil {
+		var anchor int
+		if requestPaging.LastID != 0 {
+			anchor = requestPaging.LastID
+		} else {
+			anchor = (requestPaging.Page * requestPaging.PageSize) - requestPaging.PageSize
+		}
+
 		database.Instance.Table("customers").
 			Select("customers.id, customers.name, customers.tax_id, customers.address").
-			Where("customers.id > ?", (requestPaging.Page*requestPaging.PageSize)-requestPaging.PageSize).
+			Where("customers.id > ?", anchor).
 			Limit(requestPaging.PageSize).
 			Scan(&responseArr)
 

@@ -8,16 +8,24 @@ import (
 )
 
 type Batch struct {
-	ID          int       `json:"id" gorm:"primary_key"`
-	CreatedAt   time.Time `json:"created_at"`
-	ExpiredDate time.Time `json:"expired_date"`
+	ID          int `gorm:"primary_key"`
+	CreatedAt   time.Time
+	ExpiredDate time.Time
+}
+
+type Variant struct {
+	ID          int    `gorm:"primary_key"`
+	Name        string `gorm:"type:varchar(30);not null;unique"`
+	Description string `gorm:"type:varchar(100);not null"`
+	UpdatedAt   time.Time
 }
 
 type Item struct {
-	ID           int    `json:"id" gorm:"primary_key"`
-	Name         string `json:"name" gorm:"type:varchar(50);not null"`
-	BatchIDRefer int    `json:"batch" gorm:"not null"`
-	Batch        Batch  `gorm:"foreignkey:BatchIDRefer"`
+	ID           int     `gorm:"primary_key"`
+	BatchRefer   int     `gorm:"not null"`
+	Batch        Batch   `gorm:"foreignkey:BatchRefer"`
+	VariantRefer int     `gorm:"not null"`
+	Variant      Variant `gorm:"foreignkey:VariantRefer"`
 }
 
 func (t *Batch) BeforeCreate(tx *gorm.DB) (err error) {
@@ -25,6 +33,14 @@ func (t *Batch) BeforeCreate(tx *gorm.DB) (err error) {
 	database.Instance.Last(&current)
 	t.ID = current.ID + 1
 	t.CreatedAt = time.Now()
+	return
+}
+
+func (t *Variant) BeforeCreate(tx *gorm.DB) (err error) {
+	var current Variant
+	database.Instance.Last(&current)
+	t.ID = current.ID + 1
+	t.UpdatedAt = time.Now()
 	return
 }
 

@@ -34,10 +34,17 @@ func GetCity(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&requestPaging); err == nil {
+		var anchor int
+		if requestPaging.LastID != 0 {
+			anchor = requestPaging.LastID
+		} else {
+			anchor = (requestPaging.Page * requestPaging.PageSize) - requestPaging.PageSize
+		}
+
 		database.Instance.Table("cities c").Select("c.id, c.city_name, p.province_name, ct.country_name").
 			Joins("left join provinces p on c.province_refer = p.id").
 			Joins("left join countries ct on ct.id = p.country_refer").
-			Where("c.id > ?", (requestPaging.Page*requestPaging.PageSize)-requestPaging.PageSize).
+			Where("c.id > ?", anchor).
 			Limit(requestPaging.PageSize).
 			Scan(&responseArr)
 
@@ -72,9 +79,16 @@ func GetProvince(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&requestPaging); err == nil {
+		var anchor int
+		if requestPaging.LastID != 0 {
+			anchor = requestPaging.LastID
+		} else {
+			anchor = (requestPaging.Page * requestPaging.PageSize) - requestPaging.PageSize
+		}
+
 		database.Instance.Table("provinces p").Select("p.id, p.province_name, ct.country_name").
 			Joins("left join countries ct on ct.id = p.country_refer").
-			Where("p.id > ?", (requestPaging.Page*requestPaging.PageSize)-requestPaging.PageSize).
+			Where("p.id > ?", anchor).
 			Limit(requestPaging.PageSize).
 			Scan(&responseArr)
 
@@ -108,8 +122,15 @@ func GetCountry(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&requestPaging); err == nil {
+		var anchor int
+		if requestPaging.LastID != 0 {
+			anchor = requestPaging.LastID
+		} else {
+			anchor = (requestPaging.Page * requestPaging.PageSize) - requestPaging.PageSize
+		}
+
 		database.Instance.Table("countries").Select("id, country_name").
-			Where("id > ?", (requestPaging.Page*requestPaging.PageSize)-requestPaging.PageSize).
+			Where("id > ?", anchor).
 			Limit(requestPaging.PageSize).
 			Scan(&responseArr)
 

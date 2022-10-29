@@ -7,4 +7,5 @@ type APICommonQueryId struct {
 type APICommonPagination struct {
 	Page     int `form:"page" binding:"required"`
 	PageSize int `form:"page_size" binding:"required"`
+	LastID   int `form:"last_id"`
 }
