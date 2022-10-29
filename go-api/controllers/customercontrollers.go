@@ -12,11 +12,32 @@ import (
 func GetCustomer(c *gin.Context) {
 	var response models.APICustomerResponseSpecific
 	var responseArr []models.APICustomerResponse
-	var request models.APICommonQueryId
+	var requestID models.APICommonQueryId
+	var requestPaging models.APICommonPagination
 
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBind(&requestID); err == nil {
+		// select c.id, c.name, c.tax_id, c.address, ct.city_name, p.province_name, ctr.country_name from customers c left join cities ct on c.city_refer = ct.id left join provinces p on ct.province_refer = p.id left join countries ctr on p.country_refer = ctr.id;
+		database.Instance.Table("customers").
+			Select("customers.id, customers.name, customers.tax_id, customers.address, cities.city_name, provinces.province_name, countries.country_name").
+			Joins("left join cities on customers.city_refer = cities.id").
+			Joins("left join provinces on cities.province_refer = provinces.id").
+			Joins("left join countries on provinces.country_refer = countries.id").
+			Having("customers.id = ?", requestID.ID).Scan(&response)
+
+		if response.ID == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No customer found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
+	}
+
+	if err := c.ShouldBind(&requestPaging); err == nil {
 		database.Instance.Table("customers").
 			Select("customers.id, customers.name, customers.tax_id, customers.address").
+			Where("customers.id > ?", (requestPaging.Page*requestPaging.PageSize)-requestPaging.PageSize).
+			Limit(requestPaging.PageSize).
 			Scan(&responseArr)
 
 		if responseArr == nil {
@@ -28,20 +49,7 @@ func GetCustomer(c *gin.Context) {
 		return
 	}
 
-	// select c.id, c.name, c.tax_id, c.address, ct.city_name, p.province_name, ctr.country_name from customers c left join cities ct on c.city_refer = ct.id left join provinces p on ct.province_refer = p.id left join countries ctr on p.country_refer = ctr.id;
-	database.Instance.Table("customers").
-		Select("customers.id, customers.name, customers.tax_id, customers.address, cities.city_name, provinces.province_name, countries.country_name").
-		Joins("left join cities on customers.city_refer = cities.id").
-		Joins("left join provinces on cities.province_refer = provinces.id").
-		Joins("left join countries on provinces.country_refer = countries.id").
-		Having("customers.id = ?", request.ID).Scan(&response)
-
-	if response.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No customer found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, response)
+	c.Status(http.StatusBadRequest)
 }
 
 func CreateCustomer(c *gin.Context) {

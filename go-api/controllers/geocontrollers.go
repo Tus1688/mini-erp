@@ -14,42 +14,114 @@ RETRIEVE
 ***************************/
 
 func GetCity(c *gin.Context) {
-	var response []models.APICityResponse
+	var response models.APICityResponse
+	var responseArr []models.APICityResponse
+	var requestID models.APICommonQueryId
+	var requestPaging models.APICommonPagination
 
-	database.Instance.Table("cities c").Select("c.id, c.city_name, p.province_name, ct.country_name").
-		Joins("left join provinces p on c.province_refer = p.id").
-		Joins("left join countries ct on ct.id = p.country_refer").Scan(&response)
+	if err := c.ShouldBind(&requestID); err == nil {
+		database.Instance.Table("cities c").Select("c.id, c.city_name, p.province_name, ct.country_name").
+			Joins("left join provinces p on c.province_refer = p.id").
+			Joins("left join countries ct on ct.id = p.country_refer").
+			Having("c.id = ?", requestID.ID).Scan(&response)
 
-	if response == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No city found"})
+		if response.ID == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No city found"})
+			return
+		}
+		c.JSON(http.StatusOK, response)
 		return
 	}
-	c.JSON(http.StatusOK, response)
+
+	if err := c.ShouldBind(&requestPaging); err == nil {
+		database.Instance.Table("cities c").Select("c.id, c.city_name, p.province_name, ct.country_name").
+			Joins("left join provinces p on c.province_refer = p.id").
+			Joins("left join countries ct on ct.id = p.country_refer").
+			Where("c.id > ?", (requestPaging.Page*requestPaging.PageSize)-requestPaging.PageSize).
+			Limit(requestPaging.PageSize).
+			Scan(&responseArr)
+
+		if responseArr == nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No city found"})
+			return
+		}
+		c.JSON(http.StatusOK, responseArr)
+		return
+	}
+
+	c.Status(http.StatusBadRequest)
 }
 
 func GetProvince(c *gin.Context) {
-	var response []models.APIProvinceResponse
+	var response models.APIProvinceResponse
+	var responseArr []models.APIProvinceResponse
+	var requestID models.APICommonQueryId
+	var requestPaging models.APICommonPagination
 
-	database.Instance.Table("provinces p").Select("p.id, p.province_name, ct.country_name").
-		Joins("left join countries ct on ct.id = p.country_refer").Scan(&response)
+	if err := c.ShouldBind(&requestID); err == nil {
+		database.Instance.Table("provinces p").Select("p.id, p.province_name, ct.country_name").
+			Joins("left join countries ct on ct.id = p.country_refer").
+			Having("p.id = ?", requestID.ID).Scan(&response)
 
-	if response == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No province found"})
+		if response.ID == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No province found"})
+			return
+		}
+		c.JSON(http.StatusOK, response)
 		return
 	}
-	c.JSON(http.StatusOK, response)
+
+	if err := c.ShouldBind(&requestPaging); err == nil {
+		database.Instance.Table("provinces p").Select("p.id, p.province_name, ct.country_name").
+			Joins("left join countries ct on ct.id = p.country_refer").
+			Where("p.id > ?", (requestPaging.Page*requestPaging.PageSize)-requestPaging.PageSize).
+			Limit(requestPaging.PageSize).
+			Scan(&responseArr)
+
+		if responseArr == nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No province found"})
+			return
+		}
+		c.JSON(http.StatusOK, responseArr)
+		return
+	}
+
+	c.Status(http.StatusBadRequest)
 }
 
 func GetCountry(c *gin.Context) {
-	var response []models.APICountryResponse
+	var response models.APICountryResponse
+	var responseArr []models.APICountryResponse
+	var requestID models.APICommonQueryId
+	var requestPaging models.APICommonPagination
 
-	database.Instance.Table("countries").Select("id, country_name").Order("id asc").Scan(&response)
+	if err := c.ShouldBind(&requestID); err == nil {
+		database.Instance.Table("countries").Select("id, country_name").
+			Having("id = ?", requestID.ID).Scan(&response)
 
-	if response == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No country found"})
+		if response.ID == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No country found"})
+			return
+		}
+		c.JSON(http.StatusOK, response)
 		return
 	}
-	c.JSON(http.StatusOK, response)
+
+	if err := c.ShouldBind(&requestPaging); err == nil {
+		database.Instance.Table("countries").Select("id, country_name").
+			Where("id > ?", (requestPaging.Page*requestPaging.PageSize)-requestPaging.PageSize).
+			Limit(requestPaging.PageSize).
+			Scan(&responseArr)
+
+		if responseArr == nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No country found"})
+			return
+		}
+		c.JSON(http.StatusOK, responseArr)
+		return
+	}
+
+	c.Status(http.StatusBadRequest)
 }
 
 /***************************
