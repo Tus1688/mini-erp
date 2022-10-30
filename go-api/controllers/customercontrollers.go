@@ -14,6 +14,7 @@ func GetCustomer(c *gin.Context) {
 	var responseArr []models.APICustomerResponse
 	var requestID models.APICommonQueryId
 	var requestPaging models.APICommonPagination
+	var requestSearch models.APICommonSearch
 
 	if err := c.ShouldBind(&requestID); err == nil {
 		// select c.id, c.name, c.tax_id, c.address, ct.city_name, p.province_name, ctr.country_name from customers c left join cities ct on c.city_refer = ct.id left join provinces p on ct.province_refer = p.id left join countries ctr on p.country_refer = ctr.id;
@@ -30,6 +31,23 @@ func GetCustomer(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, response)
+		return
+	}
+
+	if err := c.ShouldBind(&requestSearch); err == nil {
+		query := "%" + strings.ToLower(requestSearch.Search) + "%"
+		database.Instance.Table("customers").
+			Select("customers.id, customers.name, customers.tax_id, customers.address").
+			Where("customers.name LIKE ?", query).
+			Limit(10).
+			Scan(&responseArr)
+
+		if responseArr == nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No customer found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, responseArr)
 		return
 	}
 

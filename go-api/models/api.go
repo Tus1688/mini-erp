@@ -9,3 +9,7 @@ type APICommonPagination struct {
 	PageSize int `form:"page_size" binding:"required"`
 	LastID   int `form:"last_id"`
 }
+
+type APICommonSearch struct {
+	Search string `form:"search" binding:"required"`
+}
