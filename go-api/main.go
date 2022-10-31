@@ -62,6 +62,14 @@ func initRouter() *gin.Engine {
 			geo.PATCH("/province", controllers.UpdateProvince)
 			geo.PATCH("/country", controllers.UpdateCountry)
 		}
+
+		inv := api.Group("/inventory")
+		{
+			inv.GET("/batch", controllers.GetBatch)
+			inv.POST("/batch", controllers.CreateBatch)
+			inv.DELETE("/batch", controllers.DeleteBatch)
+			inv.PATCH("/batch", controllers.UpdateBatch)
+		}
 	}
 
 	return router

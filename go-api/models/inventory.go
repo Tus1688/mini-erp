@@ -46,17 +46,25 @@ type ItemStock struct {
 }
 
 type APIInventoryBatchCreate struct {
-	CreatedAt   time.Time `json:"created_at"`
 	ExpiredDate time.Time `json:"expired_date" binding:"required"`
+}
+
+type APIInventoryBatchUpdate struct {
+	ID          int       `json:"id" binding:"required"`
+	ExpiredDate time.Time `json:"expired_date" binding:"required"`
+}
+
+type APIInventoryBatchResponse struct {
+	ID          int       `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	ExpiredDate time.Time `json:"expired_date"`
 }
 
 func (t *Batch) BeforeCreate(tx *gorm.DB) (err error) {
 	var current Batch
 	database.Instance.Last(&current)
 	t.ID = current.ID + 1
-	if t.CreatedAt.IsZero() {
-		t.CreatedAt = time.Now()
-	}
+	t.CreatedAt = time.Now()
 	return
 }
 
