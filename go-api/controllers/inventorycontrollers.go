@@ -123,7 +123,7 @@ func UpdateBatch(c *gin.Context) {
 		return
 	}
 	if check.ExpiredDate == request.ExpiredDate {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No changes detected"})
+		c.JSON(http.StatusOK, gin.H{"message": "No changes detected"})
 		return
 	}
 

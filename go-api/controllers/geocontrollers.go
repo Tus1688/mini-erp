@@ -358,16 +358,27 @@ func UpdateCity(c *gin.Context) {
 		return
 	}
 
+	var check models.City
+	database.Instance.Model(&models.City{}).Where("id = ?", request.ID).First(&check)
+	if check.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "City not found"})
+		return
+	}
+	if check.CityName == strings.ToLower(request.CityName) && check.ProvinceRefer == request.ProvinceID {
+		c.JSON(http.StatusOK, gin.H{"message": "No changes detected"})
+		return
+	}
+
 	record := database.Instance.Where("id = ?", request.ID).Updates(models.City{
 		CityName:      strings.ToLower(request.CityName),
 		ProvinceRefer: request.ProvinceID,
 	})
 	if record.Error != nil {
+		if strings.Contains(record.Error.Error(), "1062") {
+			c.JSON(http.StatusConflict, gin.H{"error": request.CityName + " already exists"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when updating city"})
-		return
-	}
-	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "City not found or no changes were made"})
 		return
 	}
 
@@ -381,16 +392,27 @@ func UpdateProvince(c *gin.Context) {
 		return
 	}
 
+	var check models.Province
+	database.Instance.Model(&models.Province{}).Where("id = ?", request.ID).First(&check)
+	if check.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Province not found"})
+		return
+	}
+	if check.ProvinceName == strings.ToLower(request.ProvinceName) && check.CountryRefer == request.CountryID {
+		c.JSON(http.StatusOK, gin.H{"message": "No changes detected"})
+		return
+	}
+
 	record := database.Instance.Where("id = ?", request.ID).Updates(models.Province{
 		ProvinceName: strings.ToLower(request.ProvinceName),
 		CountryRefer: request.CountryID,
 	})
 	if record.Error != nil {
+		if strings.Contains(record.Error.Error(), "1062") {
+			c.JSON(http.StatusConflict, gin.H{"error": request.ProvinceName + " already exists"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when updating province"})
-		return
-	}
-	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Province not found or no changes were made"})
 		return
 	}
 
@@ -404,15 +426,26 @@ func UpdateCountry(c *gin.Context) {
 		return
 	}
 
+	var check models.Country
+	database.Instance.Model(&models.Country{}).Where("id = ?", request.ID).First(&check)
+	if check.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Country not found"})
+		return
+	}
+	if check.CountryName == strings.ToLower(request.CountryName) {
+		c.JSON(http.StatusOK, gin.H{"message": "No changes detected"})
+		return
+	}
+
 	record := database.Instance.Where("id = ?", request.ID).Updates(models.Country{
 		CountryName: strings.ToLower(request.CountryName),
 	})
 	if record.Error != nil {
+		if strings.Contains(record.Error.Error(), "1062") {
+			c.JSON(http.StatusConflict, gin.H{"error": request.CountryName + " already exists"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when updating country"})
-		return
-	}
-	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Country not found or no changes were made"})
 		return
 	}
 

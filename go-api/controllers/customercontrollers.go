@@ -108,6 +108,17 @@ func UpdateCustomer(c *gin.Context) {
 		return
 	}
 
+	var check models.Customer
+	database.Instance.Model(&models.Customer{}).Where("id = ?", request.ID).First(&check)
+	if check.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Customer not found"})
+		return
+	}
+	if check.Name == strings.ToLower(request.Name) && check.TaxID == request.TaxID && check.Address == strings.ToLower(request.Address) && check.CityRefer == request.City {
+		c.JSON(http.StatusOK, gin.H{"message": "No changes detected"})
+		return
+	}
+
 	record := database.Instance.Where("id = ?", request.ID).Updates(models.Customer{
 		Name:      strings.ToLower(request.Name),
 		TaxID:     strings.ToLower(request.TaxID),
@@ -115,11 +126,11 @@ func UpdateCustomer(c *gin.Context) {
 		CityRefer: request.City,
 	})
 	if record.Error != nil {
+		if strings.Contains(record.Error.Error(), "1062") {
+			c.JSON(http.StatusConflict, gin.H{"error": request.Name + " already exists"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when updating customer"})
-		return
-	}
-	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Customer not found or no changes were made"})
 		return
 	}
 
