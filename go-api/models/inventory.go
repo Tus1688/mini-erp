@@ -60,6 +60,23 @@ type APIInventoryBatchResponse struct {
 	ExpiredDate time.Time `json:"expired_date"`
 }
 
+type APIInventoryVariantCreate struct {
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description" binding:"required"`
+}
+
+type APIInventoryVariantResponse struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+type APIInventoryVariantUpdate struct {
+	ID          int    `json:"id" binding:"required"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 func (t *Batch) BeforeCreate(tx *gorm.DB) (err error) {
 	var current Batch
 	database.Instance.Last(&current)

@@ -23,7 +23,7 @@ func GetCustomer(c *gin.Context) {
 			Joins("left join cities on customers.city_refer = cities.id").
 			Joins("left join provinces on cities.province_refer = provinces.id").
 			Joins("left join countries on provinces.country_refer = countries.id").
-			Having("customers.id = ?", requestID.ID).Scan(&response)
+			Where("customers.id = ?", requestID.ID).Scan(&response)
 
 		if response.ID == 0 {
 			c.JSON(http.StatusNotFound, gin.H{"error": "No customer found"})

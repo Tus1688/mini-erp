@@ -69,6 +69,11 @@ func initRouter() *gin.Engine {
 			inv.POST("/batch", controllers.CreateBatch)
 			inv.DELETE("/batch", controllers.DeleteBatch)
 			inv.PATCH("/batch", controllers.UpdateBatch)
+
+			inv.GET("/variant", controllers.GetVariant)
+			inv.POST("/variant", controllers.CreateVariant)
+			inv.DELETE("/variant", controllers.DeleteVariant)
+			inv.PATCH("/variant", controllers.UpdateVariant)
 		}
 	}
 
