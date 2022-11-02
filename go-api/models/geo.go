@@ -41,14 +41,14 @@ type APICountryCreate struct {
 
 type APICityUpdate struct {
 	ID         int    `json:"id" binding:"required"`
-	CityName   string `json:"city_name" binding:"required"`
-	ProvinceID int    `json:"province_id" binding:"required"`
+	CityName   string `json:"city_name"`
+	ProvinceID int    `json:"province_id"`
 }
 
 type APIProvinceUpdate struct {
 	ID           int    `json:"id" binding:"required"`
-	ProvinceName string `json:"province_name" binding:"required"`
-	CountryID    int    `json:"country_id" binding:"required"`
+	ProvinceName string `json:"province_name"`
+	CountryID    int    `json:"country_id"`
 }
 
 type APICountryUpdate struct {

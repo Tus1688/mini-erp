@@ -24,10 +24,10 @@ type APICustomerCreate struct {
 
 type APICustomerUpdate struct {
 	ID      int    `json:"id" binding:"required"`
-	Name    string `json:"name" binding:"required"`
-	TaxID   string `json:"tax_id" binding:"required"`
-	Address string `json:"address" binding:"required"`
-	City    int    `json:"city_id" binding:"required"`
+	Name    string `json:"name"`
+	TaxID   string `json:"tax_id"`
+	Address string `json:"address"`
+	City    int    `json:"city_id"`
 }
 
 type APICustomerResponseSpecific struct {
