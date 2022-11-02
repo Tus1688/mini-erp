@@ -10,6 +10,76 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetItem(c *gin.Context) {
+	var response models.APIInventoryItemResponse
+	var responseArr []models.APIInventoryItemResponse
+	var requestID models.APICommonQueryId
+	var requestPaging models.APICommonPagination
+	var requestSearch models.APICommonSearch
+
+	if err := c.ShouldBind(&requestID); err == nil {
+		database.Instance.Table("items").
+			Select("items.id, items.batch_refer, variants.name, batches.expired_date").
+			Joins("left join batches on batches.id = items.batch_refer").
+			Joins("left join variants on variants.id = items.variant_refer").
+			Where("items.id = ?", requestID.ID).Scan(&response)
+
+		if response.ID == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Item not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
+	}
+
+	if err := c.ShouldBind(&requestSearch); err == nil {
+		query := "%" + strings.ToLower(requestSearch.Search) + "%"
+		database.Instance.Table("items").
+			Select("items.id, items.batch_refer, variants.name, batches.expired_date").
+			Joins("left join batches on batches.id = items.batch_refer").
+			Joins("left join variants on variants.id = items.variant_refer").
+			Where("variants.name LIKE ?", query).
+			Limit(10). // need to reconsider this as we might have more than 10 items
+			Scan(&responseArr)
+
+		if responseArr == nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Item not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, responseArr)
+		return
+	}
+
+	if err := c.ShouldBind(&requestPaging); err == nil {
+		var anchor int
+		if requestPaging.Page != 0 {
+			anchor = requestPaging.LastID
+		} else {
+			anchor = (requestPaging.Page * requestPaging.PageSize) - requestPaging.PageSize
+		}
+
+		database.Instance.Table("items").
+			Select("items.id, items.batch_refer, variants.name, batches.expired_date").
+			Joins("left join batches on batches.id = items.batch_refer").
+			Joins("left join variants on variants.id = items.variant_refer").
+			Where("items.id > ?", anchor).
+			Limit(requestPaging.PageSize).
+			Scan(&responseArr)
+
+		if responseArr == nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Item not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, responseArr)
+		return
+	}
+
+	c.Status(http.StatusBadRequest)
+}
+
 func CreateItem(c *gin.Context) {
 	var request models.APIInventoryItemCreate
 	if err := c.ShouldBindJSON(&request); err != nil {

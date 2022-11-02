@@ -94,6 +94,13 @@ type APIInventoryItemProductionCreate struct {
 	Quantity     int `json:"quantity" binding:"required"`
 }
 
+type APIInventoryItemResponse struct {
+	ID          int       `json:"id"`
+	BatchRefer  int       `json:"batch_id"`
+	Name        string    `json:"variant_name"`
+	ExpiredDate time.Time `json:"expired_date"`
+}
+
 func (t *Batch) BeforeCreate(tx *gorm.DB) (err error) {
 	var current Batch
 	database.Instance.Last(&current)

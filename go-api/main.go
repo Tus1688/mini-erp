@@ -75,6 +75,7 @@ func initRouter() *gin.Engine {
 			inv.DELETE("/variant", controllers.DeleteVariant)
 			inv.PATCH("/variant", controllers.UpdateVariant)
 
+			inv.GET("/item", controllers.GetItem)
 			inv.POST("/item", controllers.CreateItem)
 			inv.PATCH("/item", controllers.UpdateItem)
 			inv.DELETE("/item", controllers.DeleteItem)
