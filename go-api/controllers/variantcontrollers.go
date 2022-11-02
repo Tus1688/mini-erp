@@ -109,7 +109,7 @@ func UpdateVariant(c *gin.Context) {
 		return
 	}
 	if check.Name == strings.ToLower(request.Name) && check.Description == strings.ToLower(request.Description) {
-		c.JSON(http.StatusOK, gin.H{"error": "No changes detected"})
+		c.JSON(http.StatusOK, gin.H{"message": "No changes detected"})
 		return
 	}
 

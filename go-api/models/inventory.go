@@ -37,12 +37,12 @@ type Item struct {
 	Variant      Variant `gorm:"foreignkey:VariantRefer"`
 }
 
-type ItemStock struct {
+type ItemTransactionLog struct {
 	ID        int  `gorm:"primary_key"`
 	ItemRefer int  `gorm:"not null"`
 	Quantity  int  `gorm:"not null"`
 	Item      Item `gorm:"foreignkey:ItemRefer"`
-	UpdatedAt time.Time
+	CreatedAt time.Time
 }
 
 type APIInventoryBatchCreate struct {
@@ -77,6 +77,23 @@ type APIInventoryVariantUpdate struct {
 	Description string `json:"description"`
 }
 
+type APIInventoryItemCreate struct {
+	BatchRefer   int `json:"batch_id" binding:"required"`
+	VariantRefer int `json:"variant_id" binding:"required"`
+}
+
+type APIInventoryItemUpdate struct {
+	ID           int `json:"id" binding:"required"`
+	BatchRefer   int `json:"batch_id"`
+	VariantRefer int `json:"variant_id"`
+}
+
+type APIInventoryItemProductionCreate struct {
+	BatchRefer   int `json:"batch_refer" binding:"required"`
+	VariantRefer int `json:"variant_refer" binding:"required"`
+	Quantity     int `json:"quantity" binding:"required"`
+}
+
 func (t *Batch) BeforeCreate(tx *gorm.DB) (err error) {
 	var current Batch
 	database.Instance.Last(&current)
@@ -100,17 +117,10 @@ func (t *Item) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (t *ItemStock) BeforeCreate(tx *gorm.DB) (err error) {
-	var current ItemStock
+func (t *ItemTransactionLog) BeforeCreate(tx *gorm.DB) (err error) {
+	var current ItemTransactionLog
 	database.Instance.Last(&current)
 	t.ID = current.ID + 1
-	t.UpdatedAt = time.Now()
-	return
-}
-
-func (t *ItemStock) BeforeUpdate(tx *gorm.DB) (err error) {
-	var current ItemStock
-	database.Instance.Last(&current)
-	t.UpdatedAt = time.Now()
+	t.CreatedAt = time.Now()
 	return
 }
