@@ -24,13 +24,15 @@ type Invoice struct {
 
 type InvoiceItem struct {
 	InvoiceRefer int     `gorm:"not null"`
-	ItemRefer    int     `gorm:"not null"`
+	BatchRefer   int     `gorm:"not null"`
+	VariantRefer int     `gorm:"not null"`
 	Quantity     int     `gorm:"not null"`
 	Price        int     `gorm:"not null"`
 	Discount     int     `gorm:"not null"`
 	Total        int     `gorm:"not null"`
 	Invoice      Invoice `gorm:"foreignkey:InvoiceRefer"`
-	Item         Item    `gorm:"foreignkey:ItemRefer"`
+	Batch        Batch   `gorm:"foreignkey:BatchRefer"`
+	Variant      Variant `gorm:"foreignkey:VariantRefer"`
 }
 
 type InvoiceDraft struct {
@@ -44,13 +46,15 @@ type InvoiceDraft struct {
 
 type InvoiceItemDraft struct {
 	InvoiceDraftRefer int     `gorm:"not null"`
-	ItemRefer         int     `gorm:"not null"`
+	BatchRefer        int     `gorm:"not null"`
+	VariantRefer      int     `gorm:"not null"`
 	Quantity          int     `gorm:"not null"`
 	Price             int     `gorm:"not null"`
 	Discount          int     `gorm:"not null"`
 	Total             int     `gorm:"not null"`
 	InvoiceDraft      Invoice `gorm:"foreignkey:InvoiceDraftRefer"`
-	Item              Item    `gorm:"foreignkey:ItemRefer"`
+	Batch             Batch   `gorm:"foreignkey:BatchRefer"`
+	Variant           Variant `gorm:"foreignkey:VariantRefer"`
 }
 
 func (t *TermOfPayment) BeforeCreate(tx *gorm.DB) (err error) {

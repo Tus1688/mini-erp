@@ -21,19 +21,14 @@ func CreateProduction(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	// create the item in the database and retrieve the ID
-	item := models.Item{BatchRefer: request.BatchRefer, VariantRefer: request.VariantRefer}
-	itemRecord := database.Instance.Create(&item)
-	if itemRecord.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating item (1/2)"})
-		return
-	}
 
-	// insert the itemID to ItemTransactionLog
-	transaction := models.ItemTransactionLog{ItemRefer: item.ID, Quantity: request.Quantity}
-	transactionRecord := database.Instance.Create(&transaction)
+	transactionRecord := database.Instance.Create(&models.ItemTransactionLog{
+		BatchRefer:   request.BatchRefer,
+		VariantRefer: request.VariantRefer,
+		Quantity:     request.Quantity,
+	})
 	if transactionRecord.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating stock logs (2/2)"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating stock logs"})
 		return
 	}
 

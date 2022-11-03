@@ -75,12 +75,8 @@ func initRouter() *gin.Engine {
 			inv.DELETE("/variant", controllers.DeleteVariant)
 			inv.PATCH("/variant", controllers.UpdateVariant)
 
-			inv.GET("/item", controllers.GetItem)
-			// create single item is not allowed, use production instead!
-			inv.PATCH("/item", controllers.UpdateItem)
-			inv.DELETE("/item", controllers.DeleteItem)
-
-			inv.POST("/produce", controllers.CreateProduction)
+			inv.GET("/stock", controllers.GetStock)
+			inv.POST("/produce", controllers.CreateProduction) // add stock
 		}
 	}
 

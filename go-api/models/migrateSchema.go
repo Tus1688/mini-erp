@@ -15,7 +15,6 @@ func MigrateDB() {
 		// inventory
 		&Batch{},
 		&Variant{},
-		&Item{},
 		&ItemTransactionLog{},
 	)
 	log.Print("Migrated DB!")
