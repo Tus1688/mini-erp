@@ -88,17 +88,17 @@ type APIInventoryItemUpdate struct {
 	VariantRefer int `json:"variant_id"`
 }
 
-type APIInventoryItemProductionCreate struct {
-	BatchRefer   int `json:"batch_refer" binding:"required"`
-	VariantRefer int `json:"variant_refer" binding:"required"`
-	Quantity     int `json:"quantity" binding:"required"`
-}
-
 type APIInventoryItemResponse struct {
 	ID          int       `json:"id"`
 	BatchRefer  int       `json:"batch_id"`
 	Name        string    `json:"variant_name"`
 	ExpiredDate time.Time `json:"expired_date"`
+}
+
+type APIInventoryItemProductionCreate struct {
+	BatchRefer   int `json:"batch_id" binding:"required"`
+	VariantRefer int `json:"variant_id" binding:"required"`
+	Quantity     int `json:"quantity" binding:"required"`
 }
 
 func (t *Batch) BeforeCreate(tx *gorm.DB) (err error) {

@@ -4,11 +4,13 @@ import (
 	"go-api/database"
 	"go-api/models"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
+
+// Imo, delete item should be done in a soft delete manner, so that we can still track the history of the item
+// CreateItem is happening in produce controller as it is a part of the produce process
 
 func GetItem(c *gin.Context) {
 	var response models.APIInventoryItemResponse
@@ -80,23 +82,6 @@ func GetItem(c *gin.Context) {
 	c.Status(http.StatusBadRequest)
 }
 
-func CreateItem(c *gin.Context) {
-	var request models.APIInventoryItemCreate
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	data := models.Item{BatchRefer: request.BatchRefer, VariantRefer: request.VariantRefer}
-	record := database.Instance.Create(&data)
-	if record.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating item"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{"message": "Item with id " + strconv.Itoa(data.ID) + " created successfully"})
-}
-
 func UpdateItem(c *gin.Context) {
 	var request models.APIInventoryItemUpdate
 	if err := c.ShouldBind(&request); err != nil {
@@ -134,6 +119,10 @@ func DeleteItem(c *gin.Context) {
 		return
 	}
 
+	// !!! WIP !!!
+	// check whether there is any item id associated with sales invoices, if yes, then tell user to delete the sales invoice first
+
+	// delete item
 	record := database.Instance.Where("id = ?", request.ID).Delete(&models.Item{})
 	if record.Error != nil {
 		if strings.Contains(record.Error.Error(), "1451") {
