@@ -20,8 +20,8 @@ func GetStock(c *gin.Context) {
 			Select("variants.name, batches.id, batches.expired_date, SUM(item_transaction_logs.quantity) as quantity").
 			Joins("LEFT JOIN variants ON variants.id = item_transaction_logs.variant_refer").
 			Joins("LEFT JOIN batches ON batches.id = item_transaction_logs.batch_refer").
-			Group("item_transaction_logs.variant_refer, item_transaction_logs.batch_refer").
 			Where("variants.name LIKE ?", query).
+			Group("item_transaction_logs.variant_refer, item_transaction_logs.batch_refer").
 			Scan(&responseArr)
 
 		if responseArr == nil {
@@ -33,6 +33,7 @@ func GetStock(c *gin.Context) {
 		return
 	}
 
+	// need to reconsider pagination on grouped query
 	if err := c.ShouldBind(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.LastID != 0 {
@@ -45,8 +46,8 @@ func GetStock(c *gin.Context) {
 			Select("variants.name, batches.id, batches.expired_date, SUM(item_transaction_logs.quantity) as quantity").
 			Joins("LEFT JOIN variants ON variants.id = item_transaction_logs.variant_refer").
 			Joins("LEFT JOIN batches ON batches.id = item_transaction_logs.batch_refer").
-			Group("item_transaction_logs.variant_refer, item_transaction_logs.batch_refer").
 			Where("item_transaction_logs.id > ?", anchor).
+			Group("item_transaction_logs.variant_refer, item_transaction_logs.batch_refer").
 			Limit(requestPaging.PageSize).
 			Scan(&responseArr)
 

@@ -84,6 +84,14 @@ type APIInventoryStockReponse struct {
 	ExpiredDate time.Time `json:"expired_date"`
 }
 
+type APIInventoryTransactionLogResponse struct {
+	ID         int       `json:"id"`
+	BatchRefer int       `json:"batch_id"`
+	Name       string    `json:"variant_name"`
+	Quantity   int       `json:"quantity"`
+	CreatedAt  time.Time `json:"created_at"`
+}
+
 func (t *Batch) BeforeCreate(tx *gorm.DB) (err error) {
 	var current Batch
 	database.Instance.Last(&current)

@@ -75,8 +75,9 @@ func initRouter() *gin.Engine {
 			inv.DELETE("/variant", controllers.DeleteVariant)
 			inv.PATCH("/variant", controllers.UpdateVariant)
 
-			inv.GET("/stock", controllers.GetStock)
-			inv.POST("/produce", controllers.CreateProduction) // add stock
+			inv.GET("/item-transaction-log", controllers.GetItemTransactionLogs) // transaction logs whether it's production or sales
+			inv.GET("/stock", controllers.GetStock)                              // get stock by batch and variant
+			inv.POST("/produce", controllers.CreateProduction)                   // add stock
 		}
 	}
 
