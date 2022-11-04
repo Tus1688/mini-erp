@@ -39,6 +39,16 @@ type ItemTransactionLog struct {
 	Variant      Variant `gorm:"foreignkey:VariantRefer"`
 }
 
+type ItemTransactionLogDraft struct {
+	ID           int `gorm:"primary_key"`
+	BatchRefer   int `gorm:"not null"`
+	VariantRefer int `gorm:"not null"`
+	Quantity     int `gorm:"not null"`
+	CreatedAt    time.Time
+	Batch        Batch   `gorm:"foreignkey:BatchRefer"`
+	Variant      Variant `gorm:"foreignkey:VariantRefer"`
+}
+
 type APIInventoryBatchCreate struct {
 	ExpiredDate time.Time `json:"expired_date" binding:"required"`
 }

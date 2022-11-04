@@ -67,17 +67,27 @@ func initRouter() *gin.Engine {
 		{
 			inv.GET("/batch", controllers.GetBatch)
 			inv.POST("/batch", controllers.CreateBatch)
-			inv.DELETE("/batch", controllers.DeleteBatch)
-			inv.PATCH("/batch", controllers.UpdateBatch)
 
 			inv.GET("/variant", controllers.GetVariant)
 			inv.POST("/variant", controllers.CreateVariant)
-			inv.DELETE("/variant", controllers.DeleteVariant)
-			inv.PATCH("/variant", controllers.UpdateVariant)
 
+			// real table
 			inv.GET("/item-transaction-log", controllers.GetItemTransactionLogs) // transaction logs whether it's production or sales
 			inv.GET("/stock", controllers.GetStock)                              // get stock by batch and variant
-			inv.POST("/produce", controllers.CreateProduction)                   // add stock
+
+			// draft table
+			inv.GET("/production", controllers.GetProductionDraft)     // get item transaction log draft
+			inv.POST("/production", controllers.CreateProductionDraft) // add stock to draft table
+
+			admin := inv.Group("/") // admin only (inv_a is true)
+			// admin.Use(middlewares.UserIsInventoryAdmin())
+			{
+				admin.DELETE("/batch", controllers.DeleteBatch)
+				admin.PATCH("/batch", controllers.UpdateBatch)
+
+				admin.DELETE("/variant", controllers.DeleteVariant)
+				admin.PATCH("/variant", controllers.UpdateVariant)
+			}
 		}
 	}
 
