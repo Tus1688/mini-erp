@@ -90,6 +90,7 @@ func initRouter() *gin.Engine {
 
 				admin.PATCH("/production", controllers.UpdateProductionDraft)  // update item transaction log draft
 				admin.DELETE("/production", controllers.DeleteProductionDraft) // delete item transaction log draft
+				admin.PUT("/production", controllers.ApproveProductionDraft)   // approve draft and move it to "real" table
 			}
 		}
 	}

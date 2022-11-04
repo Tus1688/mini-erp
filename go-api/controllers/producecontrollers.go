@@ -150,3 +150,29 @@ func DeleteProductionDraft(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "successfully deleted item and stock logs in draft"})
 }
+
+func ApproveProductionDraft(c *gin.Context) {
+	var request models.APICommonQueryId
+	if err := c.ShouldBindQuery(&request); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	// get draft value
+	var draft models.ItemTransactionLogDraft
+	database.Instance.Model(&models.ItemTransactionLogDraft{}).Where("id = ?", request.ID).First(&draft)
+	if draft.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction log draft not found"})
+		return
+	}
+	// delete those draft value
+	database.Instance.Where("id = ?", request.ID).Delete(&models.ItemTransactionLogDraft{})
+	// move to "real" table
+	record := models.ItemTransactionLog{BatchRefer: draft.BatchRefer, VariantRefer: draft.VariantRefer, Quantity: draft.Quantity}
+	query := database.Instance.Create(&record)
+	if query.Error != nil {
+		database.Instance.Create(&draft)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when approving stock logs, rollbacking changes..."})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "successfully approved item and stock logs"})
+}
