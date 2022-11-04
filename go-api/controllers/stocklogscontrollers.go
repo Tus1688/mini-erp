@@ -16,7 +16,7 @@ func GetItemTransactionLogs(c *gin.Context) {
 	var requestPaging models.APICommonPagination
 	var requestSearch models.APICommonSearch
 
-	if err := c.ShouldBind(&requestID); err == nil {
+	if err := c.ShouldBindQuery(&requestID); err == nil {
 		database.Instance.Table("item_transaction_logs itr").
 			Select("itr.id, itr.batch_refer, variants.name, itr.quantity, itr.created_at").
 			Joins("LEFT JOIN variants ON variants.id = itr.variant_refer").
@@ -31,7 +31,7 @@ func GetItemTransactionLogs(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestSearch); err == nil {
+	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		query := "%" + strings.ToLower(requestSearch.Search) + "%"
 		database.Instance.Table("item_transaction_logs itr").
 			Select("itr.id, itr.batch_refer, variants.name, itr.quantity, itr.created_at").
@@ -47,7 +47,7 @@ func GetItemTransactionLogs(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestPaging); err == nil {
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.LastID != 0 {
 			anchor = requestPaging.LastID

@@ -16,7 +16,7 @@ func GetVariant(c *gin.Context) {
 	var requestPaging models.APICommonPagination
 	var requestSearch models.APICommonSearch
 
-	if err := c.ShouldBind(&requestID); err == nil {
+	if err := c.ShouldBindQuery(&requestID); err == nil {
 		database.Instance.Table("variants").
 			Select("variants.id, variants.name, variants.description").
 			Where("variants.id = ?", requestID.ID).Scan(&response)
@@ -30,7 +30,7 @@ func GetVariant(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestSearch); err == nil {
+	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		query := "%" + strings.ToLower(requestSearch.Search) + "%"
 		database.Instance.Table("variants").
 			Select("variants.id, variants.name, variants.description").
@@ -47,7 +47,7 @@ func GetVariant(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestPaging); err == nil {
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.Page != 0 {
 			anchor = requestPaging.LastID
@@ -131,7 +131,7 @@ func UpdateVariant(c *gin.Context) {
 
 func DeleteVariant(c *gin.Context) {
 	var request models.APICommonQueryId
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBindQuery(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}

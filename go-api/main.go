@@ -87,6 +87,9 @@ func initRouter() *gin.Engine {
 
 				admin.DELETE("/variant", controllers.DeleteVariant)
 				admin.PATCH("/variant", controllers.UpdateVariant)
+
+				admin.PATCH("/production", controllers.UpdateProductionDraft)  // update item transaction log draft
+				admin.DELETE("/production", controllers.DeleteProductionDraft) // delete item transaction log draft
 			}
 		}
 	}

@@ -87,6 +87,13 @@ type APIInventoryItemProductionCreate struct {
 	Quantity     int `json:"quantity" binding:"required"`
 }
 
+type APIInventoryItemProductionUpdate struct {
+	ID           int `json:"id" binding:"required"`
+	BatchRefer   int `json:"batch_id"`
+	VariantRefer int `json:"variant_id"`
+	Quantity     int `json:"quantity"`
+}
+
 type APIInventoryStockReponse struct {
 	Name        string    `json:"variant_name"`
 	ID          int       `json:"batch_id"`

@@ -16,7 +16,7 @@ func GetBatch(c *gin.Context) {
 	var requestPaging models.APICommonPagination
 	var requestSearch models.APICommonSearch
 
-	if err := c.ShouldBind(&requestID); err == nil {
+	if err := c.ShouldBindQuery(&requestID); err == nil {
 		database.Instance.Table("batches b").
 			Select("b.id, b.created_at, b.expired_date").
 			Where("b.id = ?", requestID.ID).Scan(&response)
@@ -29,7 +29,7 @@ func GetBatch(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestSearch); err == nil {
+	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		database.Instance.Table("batches b").
 			Select("b.id, b.created_at, b.expired_date").
 			Where("b.expired_date LIKE ?", "%"+requestSearch.Search+"%").
@@ -44,7 +44,7 @@ func GetBatch(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestPaging); err == nil {
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.LastID != 0 {
 			anchor = requestPaging.LastID
@@ -86,7 +86,7 @@ func CreateBatch(c *gin.Context) {
 
 func DeleteBatch(c *gin.Context) {
 	var request models.APICommonQueryId
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBindQuery(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}

@@ -74,7 +74,7 @@ func GetProductionDraft(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestPaging); err == nil {
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.LastID != 0 {
 			anchor = requestPaging.LastID
@@ -98,4 +98,55 @@ func GetProductionDraft(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusBadRequest)
+}
+
+func UpdateProductionDraft(c *gin.Context) {
+	var request models.APIInventoryItemProductionUpdate
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	var check models.ItemTransactionLogDraft
+	database.Instance.Model(&models.ItemTransactionLogDraft{}).Where("id = ?", request.ID).First(&check)
+	if check.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction log draft not found"})
+		return
+	}
+	if check.BatchRefer == request.BatchRefer && check.VariantRefer == request.VariantRefer && check.Quantity == request.Quantity {
+		c.JSON(http.StatusOK, gin.H{"error": "No changes detected"})
+		return
+	}
+
+	record := database.Instance.Where("id = ?", request.ID).Updates(&models.ItemTransactionLogDraft{
+		BatchRefer:   request.BatchRefer,
+		VariantRefer: request.VariantRefer,
+		Quantity:     request.Quantity,
+	})
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when updating stock logs"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "successfully updated item and stock logs to Draft"})
+}
+
+func DeleteProductionDraft(c *gin.Context) {
+	var request models.APICommonQueryId
+	if err := c.ShouldBindQuery(&request); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	record := database.Instance.Where("id = ?", request.ID).Delete(&models.ItemTransactionLogDraft{})
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when deleting stock logs"})
+		return
+	}
+	if record.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction log draft not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "successfully deleted item and stock logs in draft"})
 }

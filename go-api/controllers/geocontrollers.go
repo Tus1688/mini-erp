@@ -20,7 +20,7 @@ func GetCity(c *gin.Context) {
 	var requestPaging models.APICommonPagination
 	var requestSearch models.APICommonSearch
 
-	if err := c.ShouldBind(&requestID); err == nil {
+	if err := c.ShouldBindQuery(&requestID); err == nil {
 		database.Instance.Table("cities c").Select("c.id, c.city_name, p.province_name, ct.country_name").
 			Joins("left join provinces p on c.province_refer = p.id").
 			Joins("left join countries ct on ct.id = p.country_refer").
@@ -34,7 +34,7 @@ func GetCity(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestSearch); err == nil {
+	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		query := "%" + strings.ToLower(requestSearch.Search) + "%"
 		database.Instance.Table("cities c").Select("c.id, c.city_name, p.province_name, ct.country_name").
 			Joins("left join provinces p on c.province_refer = p.id").
@@ -51,7 +51,7 @@ func GetCity(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestPaging); err == nil {
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.LastID != 0 {
 			anchor = requestPaging.LastID
@@ -84,7 +84,7 @@ func GetProvince(c *gin.Context) {
 	var requestPaging models.APICommonPagination
 	var requestSearch models.APICommonSearch
 
-	if err := c.ShouldBind(&requestID); err == nil {
+	if err := c.ShouldBindQuery(&requestID); err == nil {
 		database.Instance.Table("provinces p").Select("p.id, p.province_name, ct.country_name").
 			Joins("left join countries ct on ct.id = p.country_refer").
 			Where("p.id = ?", requestID.ID).Scan(&response)
@@ -97,7 +97,7 @@ func GetProvince(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestSearch); err == nil {
+	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		query := "%" + strings.ToLower(requestSearch.Search) + "%"
 		database.Instance.Table("provinces p").Select("p.id, p.province_name, ct.country_name").
 			Joins("left join countries ct on ct.id = p.country_refer").
@@ -113,7 +113,7 @@ func GetProvince(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestPaging); err == nil {
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.LastID != 0 {
 			anchor = requestPaging.LastID
@@ -145,7 +145,7 @@ func GetCountry(c *gin.Context) {
 	var requestPaging models.APICommonPagination
 	var requestSearch models.APICommonSearch
 
-	if err := c.ShouldBind(&requestID); err == nil {
+	if err := c.ShouldBindQuery(&requestID); err == nil {
 		database.Instance.Table("countries").Select("id, country_name").
 			Where("id = ?", requestID.ID).Scan(&response)
 
@@ -157,7 +157,7 @@ func GetCountry(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestSearch); err == nil {
+	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		query := "%" + strings.ToLower(requestSearch.Search) + "%"
 		database.Instance.Table("countries").Select("id, country_name").
 			Where("country_name LIKE ?", query).
@@ -172,7 +172,7 @@ func GetCountry(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestPaging); err == nil {
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.LastID != 0 {
 			anchor = requestPaging.LastID
@@ -274,7 +274,7 @@ DELETE
 
 func DeleteCity(c *gin.Context) {
 	var request models.APICommonQueryId
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBindQuery(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -299,7 +299,7 @@ func DeleteCity(c *gin.Context) {
 
 func DeleteProvince(c *gin.Context) {
 	var request models.APICommonQueryId
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBindQuery(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -324,7 +324,7 @@ func DeleteProvince(c *gin.Context) {
 
 func DeleteCountry(c *gin.Context) {
 	var request models.APICommonQueryId
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBindQuery(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}

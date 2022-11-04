@@ -16,7 +16,7 @@ func GetCustomer(c *gin.Context) {
 	var requestPaging models.APICommonPagination
 	var requestSearch models.APICommonSearch
 
-	if err := c.ShouldBind(&requestID); err == nil {
+	if err := c.ShouldBindQuery(&requestID); err == nil {
 		// select c.id, c.name, c.tax_id, c.address, ct.city_name, p.province_name, ctr.country_name from customers c left join cities ct on c.city_refer = ct.id left join provinces p on ct.province_refer = p.id left join countries ctr on p.country_refer = ctr.id;
 		database.Instance.Table("customers").
 			Select("customers.id, customers.name, customers.tax_id, customers.address, cities.city_name, provinces.province_name, countries.country_name").
@@ -34,7 +34,7 @@ func GetCustomer(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestSearch); err == nil {
+	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		query := "%" + strings.ToLower(requestSearch.Search) + "%"
 		database.Instance.Table("customers").
 			Select("customers.id, customers.name, customers.tax_id, customers.address").
@@ -51,7 +51,7 @@ func GetCustomer(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBind(&requestPaging); err == nil {
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.LastID != 0 {
 			anchor = requestPaging.LastID
@@ -139,7 +139,7 @@ func UpdateCustomer(c *gin.Context) {
 
 func DeleteCustomer(c *gin.Context) {
 	var request models.APICommonQueryId
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBindQuery(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}

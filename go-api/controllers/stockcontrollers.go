@@ -14,7 +14,7 @@ func GetStock(c *gin.Context) {
 	var requestPaging models.APICommonPagination
 	var requestSearch models.APICommonSearch
 
-	if err := c.ShouldBind(&requestSearch); err == nil {
+	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		query := "%" + strings.ToLower(requestSearch.Search) + "%"
 		database.Instance.Table("item_transaction_logs").
 			Select("variants.name, batches.id, batches.expired_date, SUM(item_transaction_logs.quantity) as quantity").
@@ -34,7 +34,7 @@ func GetStock(c *gin.Context) {
 	}
 
 	// need to reconsider pagination on grouped query
-	if err := c.ShouldBind(&requestPaging); err == nil {
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
 		var anchor int
 		if requestPaging.LastID != 0 {
 			anchor = requestPaging.LastID
