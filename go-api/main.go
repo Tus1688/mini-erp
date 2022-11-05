@@ -93,6 +93,11 @@ func initRouter() *gin.Engine {
 				admin.PUT("/production", controllers.ApproveProductionDraft)   // approve draft and move it to "real" table
 			}
 		}
+
+		fin := api.Group("/finance")
+		{
+			fin.POST("/sales-invoice", controllers.CreateSalesInvoiceDraft)
+		}
 	}
 
 	return router
