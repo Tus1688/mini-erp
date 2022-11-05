@@ -5,6 +5,7 @@ import (
 	"go-api/database"
 	"go-api/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,6 +28,7 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 	for _, item := range request.Items {
 		var stock helperSelectStock
 
+		// for item_transaction_log_drafts, we don't acknowledge awaiting approval production stock
 		database.Instance.Raw(`
 			select v.name, batch_refer as ID, sum(quantity) as quantity
 			from
@@ -50,10 +52,23 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 		}
 
 		if stock.Quantity < item.Quantity {
-			// c.JSON(http.StatusConflict, gin.H{"error": "Stock is not enough for " + stock.Name + " batch " + strconv.Itoa(item.BatchRefer)})
-			c.JSON(http.StatusConflict, stock)
+			c.JSON(http.StatusConflict, gin.H{"error": "Stock is not enough for " + stock.Name + " batch " + strconv.Itoa(item.BatchRefer)})
 			return
 		}
+	}
+
+	// insert item to transaction_log_drafts so stock can be reserved
+	var itemDraft []models.ItemTransactionLogDraft
+	for _, item := range request.Items {
+		itemDraft = append(itemDraft, models.ItemTransactionLogDraft{
+			BatchRefer:   item.BatchRefer,
+			VariantRefer: item.VariantRefer,
+			Quantity:     -item.Quantity,
+		})
+	}
+	itemTransactionLogDraft := database.Instance.Create(&itemDraft)
+	if itemTransactionLogDraft.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating item transaction log draft (1/3)"})
 	}
 
 	// declare invoice so we can use invoice.ID later
@@ -66,14 +81,14 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 
 	invRecord := database.Instance.Create(&invoice)
 	if invRecord.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating invoice (1/2)"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating invoice (2/3)"})
 		return
 	}
 
-	// toBeInserted is request.Items combined with Invoice.ID
-	var toBeInserted []helperInsert
+	// invoiceItems is request.Items combined with Invoice.ID
+	var invoiceItems []models.InvoiceItemDraft
 	for _, item := range request.Items {
-		toBeInserted = append(toBeInserted, helperInsert{
+		invoiceItems = append(invoiceItems, models.InvoiceItemDraft{
 			InvoiceDraftRefer: invoice.ID,
 			BatchRefer:        item.BatchRefer,
 			VariantRefer:      item.VariantRefer,
@@ -84,22 +99,12 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 		})
 	}
 
-	invItemRecord := database.Instance.Model(&models.InvoiceItemDraft{}).Create(&toBeInserted)
+	invItemRecord := database.Instance.Create(&invoiceItems)
 	if invItemRecord.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating invoice (2/2)"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating invoice (3/3)"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "successfully created invoice"})
-}
-
-type helperInsert struct {
-	InvoiceDraftRefer int
-	BatchRefer        int
-	VariantRefer      int
-	Quantity          int
-	Price             int
-	Discount          int
-	Total             int
 }
 
 type helperSelectStock struct {

@@ -132,3 +132,11 @@ func (t *ItemTransactionLog) BeforeCreate(tx *gorm.DB) (err error) {
 	t.CreatedAt = time.Now()
 	return
 }
+
+func (t *ItemTransactionLogDraft) BeforeCreate(tx *gorm.DB) (err error) {
+	var current ItemTransactionLogDraft
+	database.Instance.Last(&current)
+	t.ID = current.ID + 1
+	t.CreatedAt = time.Now()
+	return
+}
