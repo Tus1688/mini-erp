@@ -52,7 +52,8 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 		}
 
 		if stock.Quantity < item.Quantity {
-			c.JSON(http.StatusConflict, gin.H{"error": "Stock is not enough for " + stock.Name + " batch " + strconv.Itoa(item.BatchRefer)})
+			c.JSON(http.StatusConflict, gin.H{"error": "Stock is not enough for " + stock.Name +
+				" (variant id: " + strconv.Itoa(item.VariantRefer) + " batch id: " + strconv.Itoa(item.BatchRefer) + ")"})
 			return
 		}
 	}

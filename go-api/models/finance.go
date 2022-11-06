@@ -9,7 +9,7 @@ import (
 
 type TermOfPayment struct {
 	ID        int    `gorm:"primary_key"`
-	Name      string `gorm:"type:varchar(50);not null"`
+	Name      string `gorm:"type:varchar(50);not null;unique"`
 	DueDate   int    `gorm:"not null"`
 	CreatedBy string `gorm:"type:varchar(20);not null"`
 }
@@ -74,6 +74,18 @@ type APIFinanceInvoiceCreate struct {
 	CustomerRefer int       `json:"customer_id" binding:"required"`
 	Date          time.Time `json:"date" binding:"required"`
 	Items         []Items   `json:"items" binding:"required"`
+}
+
+type APIFinanceTOPCreate struct {
+	Name    string `json:"name" binding:"required"`
+	DueDate int    `json:"due_date" binding:"required"`
+}
+
+// for update request & get response
+type APIFinanceTOP struct {
+	ID      int    `json:"id" binding:"required"`
+	Name    string `json:"name"`
+	DueDate int    `json:"due_date"`
 }
 
 func (t *TermOfPayment) BeforeCreate(tx *gorm.DB) (err error) {

@@ -49,6 +49,20 @@ type ItemTransactionLogDraft struct {
 	Variant      Variant `gorm:"foreignkey:VariantRefer"`
 }
 
+// sales invoice's item that hasn't been approved is put in this table
+// so that we can delete the row if the sales invoice is rejected
+type FinanceItemTransactionLogDraft struct {
+	ID                int `gorm:"primary_key"`
+	BatchRefer        int `gorm:"not null"`
+	VariantRefer      int `gorm:"not null"`
+	Quantity          int `gorm:"not null"`
+	InvoiceDraftRefer int `gorm:"not null"`
+	CreatedAt         time.Time
+	Batch             Batch        `gorm:"foreignkey:BatchRefer"`
+	Variant           Variant      `gorm:"foreignkey:VariantRefer"`
+	InvoiceDraft      InvoiceDraft `gorm:"foreignkey:InvoiceDraftRefer"`
+}
+
 type APIInventoryBatchCreate struct {
 	ExpiredDate time.Time `json:"expired_date" binding:"required"`
 }

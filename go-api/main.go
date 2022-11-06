@@ -96,6 +96,11 @@ func initRouter() *gin.Engine {
 
 		fin := api.Group("/finance")
 		{
+			fin.GET("/term-of-payment", controllers.GetTOP)
+			fin.POST("/term-of-payment", controllers.CreateTOP)
+			fin.PATCH("/term-of-payment", controllers.UpdateTOP)
+			fin.DELETE("/term-of-payment", controllers.DeleteTOP)
+
 			fin.POST("/sales-invoice", controllers.CreateSalesInvoiceDraft)
 		}
 	}

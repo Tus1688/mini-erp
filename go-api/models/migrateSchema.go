@@ -17,6 +17,10 @@ func MigrateDB() {
 		&Variant{},
 		&ItemTransactionLog{},
 		&ItemTransactionLogDraft{},
+		// finance
+		&TermOfPayment{},
+		&InvoiceDraft{},
+		&InvoiceItemDraft{},
 	)
 	log.Print("Migrated DB!")
 }
