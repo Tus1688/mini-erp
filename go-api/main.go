@@ -102,6 +102,8 @@ func initRouter() *gin.Engine {
 			fin.DELETE("/term-of-payment", controllers.DeleteTOP)
 
 			fin.POST("/sales-invoice", controllers.CreateSalesInvoiceDraft)
+			fin.DELETE("/sales-invoice", controllers.DeleteSalesInvoiceDraft)
+			fin.PUT("/sales-invoice", controllers.ApproveSalesInvoiceDraft)
 		}
 	}
 

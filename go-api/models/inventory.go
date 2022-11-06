@@ -140,9 +140,7 @@ func (t *Variant) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (t *ItemTransactionLog) BeforeCreate(tx *gorm.DB) (err error) {
-	var current ItemTransactionLog
-	database.Instance.Last(&current)
-	t.ID = current.ID + 1
+	// multiple insert will cause the same id so we can't use last id + 1
 	t.CreatedAt = time.Now()
 	return
 }
@@ -156,8 +154,7 @@ func (t *ItemTransactionLogDraft) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (t *FinanceItemTransactionLogDraft) BeforeCreate(tx *gorm.DB) (err error) {
-	// as we may create multiple item transaction log draft for one invoice draft
-	// we don't need to get exact last id as it might be the same as the previous one (database locking)
+	// multiple insert will cause the same id so we can't use last id + 1
 	t.CreatedAt = time.Now()
 	return
 }
