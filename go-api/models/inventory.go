@@ -154,3 +154,10 @@ func (t *ItemTransactionLogDraft) BeforeCreate(tx *gorm.DB) (err error) {
 	t.CreatedAt = time.Now()
 	return
 }
+
+func (t *FinanceItemTransactionLogDraft) BeforeCreate(tx *gorm.DB) (err error) {
+	// as we may create multiple item transaction log draft for one invoice draft
+	// we don't need to get exact last id as it might be the same as the previous one (database locking)
+	t.CreatedAt = time.Now()
+	return
+}

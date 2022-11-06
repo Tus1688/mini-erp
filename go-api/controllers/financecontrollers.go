@@ -28,7 +28,7 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 	for _, item := range request.Items {
 		var stock helperSelectStock
 
-		// for item_transaction_log_drafts, we don't acknowledge awaiting approval production stock
+		// why we don't include item_transaction_log_drafts? bcs we don't acknowledge awaiting approval production stock
 		database.Instance.Raw(`
 			select v.name, batch_refer as ID, sum(quantity) as quantity
 			from
@@ -37,8 +37,7 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 				from item_transaction_logs
 				Union all
 				select batch_refer, variant_refer, quantity
-				from item_transaction_log_drafts
-				where quantity < 0
+				from finance_item_transaction_log_drafts
 			) t
 			left join variants v
 			on v.id = t.variant_refer
@@ -58,31 +57,35 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 		}
 	}
 
-	// insert item to transaction_log_drafts so stock can be reserved
-	var itemDraft []models.ItemTransactionLogDraft
-	for _, item := range request.Items {
-		itemDraft = append(itemDraft, models.ItemTransactionLogDraft{
-			BatchRefer:   item.BatchRefer,
-			VariantRefer: item.VariantRefer,
-			Quantity:     -item.Quantity,
-		})
-	}
-	itemTransactionLogDraft := database.Instance.Create(&itemDraft)
-	if itemTransactionLogDraft.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating item transaction log draft (1/3)"})
-	}
-
-	// declare invoice so we can use invoice.ID later
-	invoice := models.InvoiceDraft{
+	// declare invoiceDraft so we can use invoiceDraft.ID later
+	invoiceDraft := models.InvoiceDraft{
 		TOPRefer:      request.TOPRefer,
 		CustomerRefer: request.CustomerRefer,
 		Date:          request.Date,
 		CreatedBy:     username,
 	}
 
-	invRecord := database.Instance.Create(&invoice)
+	invRecord := database.Instance.Create(&invoiceDraft)
 	if invRecord.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating invoice (2/3)"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating invoice (1/3)"})
+		return
+	}
+
+	// insert item to finance_transaction_log_drafts so stock can be reserved
+	var itemDraft []models.FinanceItemTransactionLogDraft
+	for _, item := range request.Items {
+		itemDraft = append(itemDraft, models.FinanceItemTransactionLogDraft{
+			InvoiceDraftRefer: invoiceDraft.ID,
+			BatchRefer:        item.BatchRefer,
+			VariantRefer:      item.VariantRefer,
+			Quantity:          -item.Quantity,
+		})
+	}
+	itemTransactionLogDraft := database.Instance.Create(&itemDraft)
+	if itemTransactionLogDraft.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating item transaction log draft (2/3)"})
+		// delete invoiceDraft if itemTransactionLogDraft failed
+		database.Instance.Delete(&models.InvoiceDraft{}, invoiceDraft.ID)
 		return
 	}
 
@@ -90,7 +93,7 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 	var invoiceItems []models.InvoiceItemDraft
 	for _, item := range request.Items {
 		invoiceItems = append(invoiceItems, models.InvoiceItemDraft{
-			InvoiceDraftRefer: invoice.ID,
+			InvoiceDraftRefer: invoiceDraft.ID,
 			BatchRefer:        item.BatchRefer,
 			VariantRefer:      item.VariantRefer,
 			Quantity:          item.Quantity,
@@ -103,8 +106,12 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 	invItemRecord := database.Instance.Create(&invoiceItems)
 	if invItemRecord.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when creating invoice (3/3)"})
+		// delete invoiceDraft and itemTransactionLogDraft if invItemRecord failed
+		database.Instance.Delete(&models.InvoiceDraft{}, invoiceDraft.ID)
+		database.Instance.Where("invoice_draft_refer = ?", invoiceDraft.ID).Delete(&models.FinanceItemTransactionLogDraft{})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "successfully created invoice"})
 }
 

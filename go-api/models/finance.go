@@ -48,16 +48,16 @@ type InvoiceDraft struct {
 }
 
 type InvoiceItemDraft struct {
-	InvoiceDraftRefer int     `gorm:"not null"`
-	BatchRefer        int     `gorm:"not null"`
-	VariantRefer      int     `gorm:"not null"`
-	Quantity          int     `gorm:"not null"`
-	Price             int     `gorm:"not null"`
-	Discount          int     `gorm:"not null"`
-	Total             int     `gorm:"not null"`
-	InvoiceDraft      Invoice `gorm:"foreignkey:InvoiceDraftRefer"`
-	Batch             Batch   `gorm:"foreignkey:BatchRefer"`
-	Variant           Variant `gorm:"foreignkey:VariantRefer"`
+	InvoiceDraftRefer int          `gorm:"not null"`
+	BatchRefer        int          `gorm:"not null"`
+	VariantRefer      int          `gorm:"not null"`
+	Quantity          int          `gorm:"not null"`
+	Price             int          `gorm:"not null"`
+	Discount          int          `gorm:"not null"`
+	Total             int          `gorm:"not null"`
+	InvoiceDraft      InvoiceDraft `gorm:"foreignkey:InvoiceDraftRefer"`
+	Batch             Batch        `gorm:"foreignkey:BatchRefer"`
+	Variant           Variant      `gorm:"foreignkey:VariantRefer"`
 }
 
 // Items will be inserted to InvoiceItem

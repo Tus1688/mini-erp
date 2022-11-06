@@ -21,6 +21,7 @@ func MigrateDB() {
 		&TermOfPayment{},
 		&InvoiceDraft{},
 		&InvoiceItemDraft{},
+		&FinanceItemTransactionLogDraft{},
 	)
 	log.Print("Migrated DB!")
 }
