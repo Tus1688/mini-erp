@@ -6,6 +6,8 @@ import (
 	"go-api/models"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -240,4 +242,105 @@ func ApproveSalesInvoiceDraft(c *gin.Context) {
 	database.Instance.Where("invoice_draft_refer = ?", request.ID).Delete(&models.InvoiceItemDraft{})
 	// delete from invoice_drafts
 	database.Instance.Delete(&models.InvoiceDraft{}, request.ID)
+}
+
+func GetSalesInvoiceDraft(c *gin.Context) {
+	var requestID models.APICommonQueryId
+	var requestSearch models.APICommonSearch
+	var requestPaging models.APICommonPagination
+
+	if err := c.ShouldBindQuery(&requestID); err == nil {
+		var invoiceDraft helperSelectInvoiceDraft
+		var invoiceItemDraft []models.ItemsResponse
+		// query from models.InvoiceDraft where id = requestID.ID
+		database.Instance.Raw(`
+			select id.id, top.name as "TOPName", c.name as "CustName", id.date, id.created_by
+			from invoice_drafts id, customers c, term_of_payments top
+			where id.customer_refer = c.id and id.top_refer = top.id and id.id = ?;
+		`, requestID.ID).Scan(&invoiceDraft)
+		if invoiceDraft.ID == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found"})
+			return
+		}
+
+		database.Instance.Raw(`
+			select v.name, iid.batch_refer, v.description, iid.price, iid.discount, iid.quantity, iid.total
+			from invoice_item_drafts iid
+			left join variants v
+			on iid.variant_refer = v.id
+			where iid.invoice_draft_refer = ?;
+		`, requestID.ID).Scan(&invoiceItemDraft)
+
+		total := 0
+		for _, item := range invoiceItemDraft {
+			total += item.Total
+		}
+
+		c.JSON(http.StatusOK, models.APIFinanceInvoiceResponseSpecific{
+			ID:        invoiceDraft.ID,
+			TOPName:   invoiceDraft.TOPName,
+			CustName:  invoiceDraft.CustName,
+			Date:      invoiceDraft.Date,
+			CreatedBy: invoiceDraft.CreatedBy,
+			Total:     total,
+			Items:     invoiceItemDraft,
+		})
+		return
+	}
+
+	if err := c.ShouldBindQuery(&requestSearch); err == nil {
+		var invoiceDrafts []models.APIFinanceInvoiceResponse
+
+		database.Instance.Raw(`
+		select id.id, top.name as "TOPName", c.name as "CustName", id.date, id.created_by, sum(iid.total) as total
+		from invoice_drafts id, customers c, term_of_payments top, invoice_item_drafts iid
+		where id.customer_refer = c.id and id.top_refer = top.id and iid.invoice_draft_refer = id.id
+		and c.name like ?
+		group by 1;
+		`, "%"+strings.ToLower(requestSearch.Search)+"%").Scan(&invoiceDrafts)
+
+		if invoiceDrafts == nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, invoiceDrafts)
+		return
+	}
+
+	if err := c.ShouldBindQuery(&requestPaging); err == nil {
+		var anchor int
+		if requestPaging.LastID != 0 {
+			anchor = requestPaging.LastID
+		} else {
+			anchor = (requestPaging.Page * requestPaging.PageSize) - requestPaging.PageSize
+		}
+		var invoiceDrafts []models.APIFinanceInvoiceResponse
+
+		database.Instance.Raw(`
+		select id.id, top.name as "TOPName", c.name as "CustName", id.date, id.created_by, sum(iid.total) as total
+		from invoice_drafts id, customers c, term_of_payments top, invoice_item_drafts iid
+		where id.customer_refer = c.id and id.top_refer = top.id and iid.invoice_draft_refer = id.id
+		and id.id > ?
+		group by 1
+		limit ?;
+		`, anchor, requestPaging.PageSize).Scan(&invoiceDrafts)
+
+		if invoiceDrafts == nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, invoiceDrafts)
+		return
+	}
+	c.Status(http.StatusBadRequest)
+}
+
+type helperSelectInvoiceDraft struct {
+	ID        int
+	TOPName   string
+	CustName  string
+	Date      time.Time
+	CreatedBy string
 }

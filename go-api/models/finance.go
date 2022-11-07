@@ -69,6 +69,35 @@ type Items struct {
 	Discount     int `json:"discount" binding:"required"`
 }
 
+type ItemsResponse struct {
+	Name        string `json:"name"` // variant.name
+	BatchRefer  int    `json:"batch_id"`
+	Description string `json:"description"` // variants.description
+	Price       int    `json:"price"`
+	Discount    int    `json:"discount"`
+	Quantity    int    `json:"quantity"`
+	Total       int    `json:"total"`
+}
+
+type APIFinanceInvoiceResponseSpecific struct {
+	ID        int             `json:"id"`
+	TOPName   string          `json:"top_name"`
+	CustName  string          `json:"customer_name"` // customers.name
+	Date      time.Time       `json:"date"`
+	CreatedBy string          `json:"created_by"`
+	Total     int             `json:"total"` // total from foreach []ItemsResponse.Total
+	Items     []ItemsResponse `json:"items"`
+}
+
+type APIFinanceInvoiceResponse struct {
+	ID        int       `json:"id"`
+	TOPName   string    `json:"top_name"`
+	CustName  string    `json:"customer_name"` // customers.name
+	Date      time.Time `json:"date"`
+	CreatedBy string    `json:"created_by"`
+	Total     int       `json:"total"` // total from foreach []ItemsResponse.Total
+}
+
 type APIFinanceInvoiceCreate struct {
 	TOPRefer      int       `json:"top_id" binding:"required"`
 	CustomerRefer int       `json:"customer_id" binding:"required"`
