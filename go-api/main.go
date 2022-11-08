@@ -98,13 +98,21 @@ func initRouter() *gin.Engine {
 		{
 			fin.GET("/term-of-payment", controllers.GetTOP)
 			fin.POST("/term-of-payment", controllers.CreateTOP)
-			fin.PATCH("/term-of-payment", controllers.UpdateTOP)
-			fin.DELETE("/term-of-payment", controllers.DeleteTOP)
 
-			fin.GET("/sales-invoice", controllers.GetSalesInvoiceDraft)
-			fin.POST("/sales-invoice", controllers.CreateSalesInvoiceDraft)
-			fin.DELETE("/sales-invoice", controllers.DeleteSalesInvoiceDraft)
-			fin.PUT("/sales-invoice", controllers.ApproveSalesInvoiceDraft)
+			fin.GET("/sales-invoice-draft", controllers.GetSalesInvoiceDraft)
+			fin.POST("/sales-invoice-draft", controllers.CreateSalesInvoiceDraft)
+
+			fin.GET("/sales-invoice", controllers.GetSalesInvoice)
+
+			admin := fin.Group("/") // admin only (fin_a is true)
+			// admin.User(middlewares.UserIsFinanceAdmin())
+			{
+				admin.PATCH("/term-of-payment", controllers.UpdateTOP)
+				admin.DELETE("/term-of-payment", controllers.DeleteTOP)
+
+				admin.DELETE("/sales-invoice-draft", controllers.DeleteSalesInvoiceDraft)
+				admin.PUT("/sales-invoice-draft", controllers.ApproveSalesInvoiceDraft)
+			}
 		}
 	}
 
