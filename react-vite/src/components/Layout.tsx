@@ -14,12 +14,12 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+import { InventoryRounded, PeopleRounded, RequestQuoteRounded, SettingsRounded } from '@mui/icons-material';
+import { Outlet, Link as RouterLink } from 'react-router-dom';
+import Link from '@mui/material/Link';
 
-const drawerWidth = 240;
+const drawerWidth = 200;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     open?: boolean;
@@ -59,6 +59,8 @@ const AppBar = styled(MuiAppBar, {
             duration: theme.transitions.duration.enteringScreen,
         }),
     }),
+    backgroundColor: 'transparent',
+    backdropFilter: 'blur(200px)',
 }));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -70,7 +72,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
-export default function Layout({children}: {children: React.ReactNode}) {
+export default function Layout() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
 
@@ -85,7 +87,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar position="fixed" open={open}>
+            <AppBar position="fixed" open={open} color='inherit'>
                 <Toolbar>
                     <IconButton
                         color="inherit"
@@ -121,34 +123,43 @@ export default function Layout({children}: {children: React.ReactNode}) {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                    {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                        <ListItem key={text} disablePadding>
+                    <ListItem key="Customers" disablePadding>
+                        <Link component={RouterLink} to="/customers" color={'#000'} width={drawerWidth} underline={'none'}>
                             <ListItemButton>
-                                <ListItemIcon>
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                </ListItemIcon>
-                                <ListItemText primary={text} />
+                                <PeopleRounded />
+                                <ListItemText primary="Customers" sx={{ ml: 2 }} />
                             </ListItemButton>
-                        </ListItem>
-                    ))}
-                </List>
-                <Divider />
-                <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem key={text} disablePadding>
+                        </Link>
+                    </ListItem>
+                    <ListItem key="Inventory" disablePadding>
+                        <Link component={RouterLink} to="/inventory" color={'#000'} width={drawerWidth} underline={'none'}>
                             <ListItemButton>
-                                <ListItemIcon>
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                </ListItemIcon>
-                                <ListItemText primary={text} />
+                                <InventoryRounded />
+                                <ListItemText primary="Inventory" sx={{ ml: 2 }} />
                             </ListItemButton>
-                        </ListItem>
-                    ))}
+                        </Link>
+                    </ListItem>
+                    <ListItem key="Finance" disablePadding>
+                        <Link component={RouterLink} to="/finance" color={'#000'} width={drawerWidth} underline={'none'}>
+                            <ListItemButton>
+                                <RequestQuoteRounded />
+                                <ListItemText primary="Finance" sx={{ ml: 2 }} />
+                            </ListItemButton>
+                        </Link>
+                    </ListItem>
+                    <ListItem key="Settings" disablePadding>
+                        <Link component={RouterLink} to="/settings" color={'#000'} width={drawerWidth} underline={'none'}>
+                            <ListItemButton>
+                                <SettingsRounded />
+                                <ListItemText primary="Settings" sx={{ ml: 2 }} />
+                            </ListItemButton>
+                        </Link>
+                    </ListItem>
                 </List>
             </Drawer>
             <Main open={open}>
                 <DrawerHeader />
-                {children}
+                <Outlet />
             </Main>
         </Box>
     );
