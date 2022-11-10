@@ -10,10 +10,14 @@ import {
     EuiHeaderLogo,
     EuiSpacer,
     EuiTitle,
+    EuiAvatar,
+    EuiIcon,
+    EuiButton,
+    EuiButtonIcon,
 } from "@elastic/eui";
+import { Outlet } from "react-router-dom";
 
 const Root = () => {
-    const buttons: React.ReactNode[] = [<div>test</div>, <div>test2</div>];
     return (
         <>
             {/* make a stick header that consists of item  */}
@@ -25,17 +29,34 @@ const Root = () => {
                     backgroundColor: "transparent",
                     backdropFilter: "blur(100px)",
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: "row",
                     justifyContent: "space-between",
+                    alignItems: "center",
                 }}
             >
-                <EuiHeaderLogo iconType="logoElastic">
-                    <EuiTitle size="s">
-                        <h1>Bumbuventory</h1>
-                    </EuiTitle>
-                </EuiHeaderLogo>
-                <EuiHeaderSection grow={true}>
-                    <EuiHeaderSectionItem border="right"></EuiHeaderSectionItem>
+                <EuiHeaderSection
+                    grow={false}
+                    style={{
+                        margin: "1rem 2rem",
+                    }}
+                >
+                    <EuiHeaderSectionItem border="right">
+                        <EuiTitle size="m">
+                            <h1>Bumbuventory</h1>
+                        </EuiTitle>
+                    </EuiHeaderSectionItem>
+                </EuiHeaderSection>
+                <EuiHeaderSection
+                    grow={false}
+                    style={{
+                        margin: "1rem 2rem",
+                    }}
+                >
+                    <EuiHeaderSectionItem border="right">
+                        <EuiIcon type="gear" />
+                        {/* we get name in session storage */}
+                        <EuiAvatar size="m" name="John Doe" />
+                    </EuiHeaderSectionItem>
                 </EuiHeaderSection>
             </EuiHeader>
             <EuiPageTemplate panelled={true} offset={undefined} grow={true}>
@@ -51,49 +72,7 @@ const Root = () => {
                         <div>test2</div>
                     </EuiPageBody>
                 </EuiPageTemplate.Sidebar>
-                <EuiPageTemplate.Header>
-                    {/* add pageTitle of Bumbuventory */}
-                    <EuiPageHeader
-                        pageTitle="Bumbuventory"
-                        rightSideItems={buttons ? buttons : undefined}
-                    />
-                </EuiPageTemplate.Header>
-                <EuiText grow={false}>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                    <h1>test</h1>
-                </EuiText>
+                <Outlet />
             </EuiPageTemplate>
         </>
     );

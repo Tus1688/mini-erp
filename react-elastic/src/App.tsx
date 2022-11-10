@@ -6,6 +6,8 @@ import {
 import { useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./components/Root";
+// import '@elastic/eui/dist/eui_theme_dark.css';
+// import '@elastic/eui/dist/eui_theme_light.css';
 
 export default function App() {
     const [color, setColorMode] = useState<EuiThemeColorMode>("dark");
