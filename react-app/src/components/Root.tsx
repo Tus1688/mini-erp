@@ -11,9 +11,10 @@ import {
     IconType,
     EuiButton,
     EuiSideNav,
+    EuiSideNavItemType,
 } from '@elastic/eui';
 import { useState } from 'react';
-import { Link, Outlet, redirect } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 const Header = () => {
     return (
@@ -71,21 +72,63 @@ const Header = () => {
 
 const SideNavItem = () => {
     const [selectedItemName, setSelectedItem] = useState<string | null>(null);
-    const selectItem = (name: string) => {
+    const selectItem = (name: string, url?: string) => {
         setSelectedItem(name);
-        
-    }
+        console.log(name)
+        if (url) {
+            console.log(url);
+        }
+    };
 
-    return (
-        <EuiSideNav
-            items={[
-                {
-                    id: 1,
-                    name: 'Dashboard',
-                },
-            ]}
-        />
-    );
+    const createItem = (name: string, data: {} = {}, url?: string) => {
+        return {
+            id: name,
+            name: name,
+            isSelected: selectedItemName === name,
+            onClick: () => selectItem(name, url),
+            ...data,
+        };
+    };
+
+    const sideNav = [
+        createItem('Home', {
+            items: [
+                createItem('Customers', {
+                    // emphasize: true,
+                    // isOpen: true,
+                    items: [
+                        createItem('Get Customers', {href: '/customers'}),
+                        createItem('Add Customer', {href: '/customers/add'}),
+                    ],
+                }),
+                createItem('Inventory', {
+                    items: [
+                        createItem('Get Stock'),
+                        createItem('Get Production Draft'),
+                        createItem('Create Production Entry'),
+                        createItem('Approve Production Draft')
+                    ]
+                }),
+                createItem('Finance',{
+                    items: [
+                        createItem('Get Sales Invoices'),
+                        createItem('Get Sales Invoices draft'),
+                        createItem('Create Sales Invoice draft'),
+                        createItem('Approve Sales Invoice draft')
+                    ]
+                }),
+                createItem('Settings', {
+                    items: [
+                        createItem('Get Users'),
+                        createItem('Add User'),
+                    ]
+                })
+            ],
+            href: '/',
+        }, "/"),
+    ];
+
+    return <EuiSideNav items={sideNav} />;
 };
 
 const Root = () => {
