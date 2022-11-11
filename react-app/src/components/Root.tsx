@@ -12,9 +12,14 @@ import {
     EuiButton,
     EuiSideNav,
     EuiSideNavItemType,
+    EuiText,
+    EuiTextColor,
+    EuiLink,
+    EuiAccordion,
+    EuiPanel,
 } from '@elastic/eui';
 import { useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 
 const Header = () => {
     return (
@@ -70,65 +75,105 @@ const Header = () => {
     );
 };
 
+const StyledNavLink = ({ url, label }: { url: string; label: string }) => {
+    const activeStyle: React.CSSProperties = {
+        fontWeight: '800',
+        marginBottom: '0.2rem',
+    };
+
+    const inactiveStyle: React.CSSProperties = {
+        fontWeight: 'normal',
+        marginBottom: '0.2rem',
+    };
+
+    return (
+        <NavLink
+            to={url}
+            style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}
+        >
+            <EuiTextColor color='default'>{label}</EuiTextColor>
+        </NavLink>
+    );
+};
+
 const SideNavItem = () => {
-    const [selectedItemName, setSelectedItem] = useState<string | null>(null);
-    const selectItem = (name: string, url?: string) => {
-        setSelectedItem(name);
-        console.log(name)
-        if (url) {
-            console.log(url);
-        }
+    const childAccordionItemStyle: React.CSSProperties = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        marginLeft: '1.5rem',
     };
+    return (
+        <>
+            <StyledNavLink url='/' label='Home' />
+            <EuiAccordion
+                id='Customers'
+                buttonContent='Customer Management'
+                arrowDisplay='none'
+            >
+                <div style={childAccordionItemStyle}>
+                    <StyledNavLink url='/customers' label='Customers list' />
+                    <StyledNavLink
+                        url='/customer-new'
+                        label='Create New Customer'
+                    />
+                </div>
+            </EuiAccordion>
 
-    const createItem = (name: string, data: {} = {}, url?: string) => {
-        return {
-            id: name,
-            name: name,
-            isSelected: selectedItemName === name,
-            onClick: () => selectItem(name, url),
-            ...data,
-        };
-    };
-
-    const sideNav = [
-        createItem('Home', {
-            items: [
-                createItem('Customers', {
-                    // emphasize: true,
-                    // isOpen: true,
-                    items: [
-                        createItem('Get Customers', {href: '/customers'}),
-                        createItem('Add Customer', {href: '/customers/add'}),
-                    ],
-                }),
-                createItem('Inventory', {
-                    items: [
-                        createItem('Get Stock'),
-                        createItem('Get Production Draft'),
-                        createItem('Create Production Entry'),
-                        createItem('Approve Production Draft')
-                    ]
-                }),
-                createItem('Finance',{
-                    items: [
-                        createItem('Get Sales Invoices'),
-                        createItem('Get Sales Invoices draft'),
-                        createItem('Create Sales Invoice draft'),
-                        createItem('Approve Sales Invoice draft')
-                    ]
-                }),
-                createItem('Settings', {
-                    items: [
-                        createItem('Get Users'),
-                        createItem('Add User'),
-                    ]
-                })
-            ],
-            href: '/',
-        }, "/"),
-    ];
-
-    return <EuiSideNav items={sideNav} />;
+            <EuiAccordion
+                id='Inventory'
+                buttonContent='Inventory Management'
+                arrowDisplay='none'
+            >
+                <div style={childAccordionItemStyle}>
+                    <StyledNavLink url='/inventory' label='Inventory list' />
+                    <StyledNavLink
+                        url='/production-draft'
+                        label='Production draft list'
+                    />
+                    <StyledNavLink
+                        url='/production-draft-create'
+                        label='Create Production draft'
+                    />
+                    <StyledNavLink
+                        url='/production-draft-approve'
+                        label='Approve Production draft'
+                    />
+                </div>
+            </EuiAccordion>
+            <EuiAccordion
+                id='Finance'
+                buttonContent='Finance Management'
+                arrowDisplay='none'
+            >
+                <div style={childAccordionItemStyle}>
+                    <StyledNavLink url='/so-list' label='Sales Invoice list' />
+                    <StyledNavLink
+                        url='/so-draft-list'
+                        label='Sales Invoice Draft list'
+                    />
+                    <StyledNavLink
+                        url='/so-draft-create'
+                        label='Create Sales Invoice Draft'
+                    />
+                    <StyledNavLink
+                        url='/so-draft-approve'
+                        label='Approve Sales Invoice Draft'
+                    />
+                </div>
+            </EuiAccordion>
+            <EuiAccordion
+                id='User'
+                buttonContent='User Management'
+                arrowDisplay='none'
+            >
+                <div style={childAccordionItemStyle}>
+                    <StyledNavLink url='/users' label='User list' />
+                    <StyledNavLink url='/user-create' label='Create New User' />
+                </div>
+            </EuiAccordion>
+        </>
+    );
 };
 
 const Root = () => {
