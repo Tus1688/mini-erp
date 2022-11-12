@@ -13,83 +13,109 @@ import {
     EuiContextMenuItem,
     EuiPopover,
     EuiContextMenuPanel,
-} from "@elastic/eui";
-import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
-import useTheme from "../hooks/useTheme";
+    EuiButtonEmpty,
+} from '@elastic/eui';
+import { useState } from 'react';
+import { NavLink, Outlet } from 'react-router-dom';
+import useTheme from '../hooks/useTheme';
 
 const Header = () => {
-    const [isPopoverOpen, setPopoverOpen] = useState(false);
+    const [isPopoverThemeOpen, setPopoverThemeOpen] = useState(false);
     const { toggleLightMode, toggleDarkMode } = useTheme();
+    const [isPopoverAvatarOpen, setPopoverAvatarOpen] = useState(false);
 
     const onSettingButtonClick = () => {
-        setPopoverOpen(!isPopoverOpen);
+        setPopoverThemeOpen(!isPopoverThemeOpen);
     };
 
-    const closePopover = () => {
-        setPopoverOpen(false);
+    const closeSettingPopover = () => {
+        setPopoverThemeOpen(false);
+    };
+
+    const closeAvatarPopover = () => {
+        setPopoverAvatarOpen(false);
     };
 
     const settingButton = (
         <EuiButtonIcon
-            aria-label="Settings"
-            iconType="gear"
-            iconSize="m"
-            color="text"
+            aria-label='Settings'
+            iconType='gear'
+            iconSize='m'
+            color='text'
             onClick={onSettingButtonClick}
         />
     );
 
     const toggleLightModeAndClose = () => {
-        closePopover();
+        closeSettingPopover();
         toggleLightMode();
         window.location.reload();
     };
 
     const toggleDarkModeAndClose = () => {
-        closePopover();
+        closeSettingPopover();
         toggleDarkMode();
         window.location.reload();
     };
 
-    const items = [
-        <EuiContextMenuItem key="light" onClick={toggleLightModeAndClose}>
-            <EuiIcon type="sun" color="primary" style={{ marginRight: "1rem" }} />
+    const avatarButton = (
+        <EuiButtonEmpty
+            aria-label='Avatar'
+            onClick={() => setPopoverAvatarOpen(!isPopoverAvatarOpen)}
+        >
+            <EuiAvatar name='John Doe' size='m' />
+        </EuiButtonEmpty>
+    );
+
+    const settingItems = [
+        <EuiContextMenuItem key='light' onClick={toggleLightModeAndClose}>
+            <EuiIcon type='sun' style={{ marginRight: '1rem' }} />
             <EuiTextColor>Light</EuiTextColor>
         </EuiContextMenuItem>,
-        <EuiContextMenuItem key="dark" onClick={toggleDarkModeAndClose}>
-            <EuiIcon type="moon" color='primary' style={{ marginRight: "1rem" }} />
+        <EuiContextMenuItem key='dark' onClick={toggleDarkModeAndClose}>
+            <EuiIcon type='moon' style={{ marginRight: '1rem' }} />
             <EuiTextColor>Dark</EuiTextColor>
+        </EuiContextMenuItem>,
+    ];
+
+    const avatarItems = [
+        <EuiContextMenuItem key='profile-setting' onClick={closeAvatarPopover}>
+            <EuiIcon type='user' style={{ marginRight: '1rem' }} />
+            <EuiTextColor>Profile Settings</EuiTextColor>
+        </EuiContextMenuItem>,
+        <EuiContextMenuItem key='logout' onClick={closeAvatarPopover}>
+            <EuiIcon type='exit' style={{ marginRight: '1rem' }} />
+            <EuiTextColor>Logout</EuiTextColor>
         </EuiContextMenuItem>,
     ];
 
     return (
         <EuiHeader
             style={{
-                position: "sticky",
+                position: 'sticky',
                 top: 0,
                 zIndex: 1,
-                backgroundColor: "transparent",
-                backdropFilter: "blur(100px)",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                border: "none",
+                backgroundColor: 'transparent',
+                backdropFilter: 'blur(100px)',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                border: 'none',
             }}
             css={{
                 // safari workaround
-                "-webkit-backdrop-filter": "blur(100px)",
+                '-webkit-backdrop-filter': 'blur(100px)',
             }}
         >
             <EuiHeaderSection
                 grow={false}
                 style={{
-                    margin: "1rem 2rem",
+                    margin: '1rem 1.5rem',
                 }}
             >
-                <EuiHeaderSectionItem border="right">
-                    <EuiTitle size="m">
+                <EuiHeaderSectionItem>
+                    <EuiTitle size='m'>
                         <h1>Bumbuventory</h1>
                     </EuiTitle>
                 </EuiHeaderSectionItem>
@@ -97,25 +123,33 @@ const Header = () => {
             <EuiHeaderSection
                 grow={false}
                 style={{
-                    margin: "1rem 2rem",
+                    margin: '1rem 2rem',
                 }}
             >
-                <EuiHeaderSectionItem border="right">
+                <EuiHeaderSectionItem border='right'>
                     <EuiPopover
-                        id="settings-popover"
+                        id='settings-popover'
                         button={settingButton}
-                        isOpen={isPopoverOpen}
-                        closePopover={closePopover}
-                        panelPaddingSize="none"
-                        anchorPosition="downRight"
+                        isOpen={isPopoverThemeOpen}
+                        closePopover={closeSettingPopover}
+                        panelPaddingSize='none'
+                        anchorPosition='downRight'
                         style={{
-                            margin: "0 1rem",
+                            margin: '0 0.5rem',
                         }}
                     >
-                        <EuiContextMenuPanel items={items} />
+                        <EuiContextMenuPanel items={settingItems} />
                     </EuiPopover>
-                    {/* we get name in session storage */}
-                    <EuiAvatar size="m" name="John Doe" />
+                    <EuiPopover
+                        id='avatar-popover'
+                        button={avatarButton}
+                        isOpen={isPopoverAvatarOpen}
+                        closePopover={closeAvatarPopover}
+                        panelPaddingSize='none'
+                        anchorPosition='downRight'
+                    >
+                        <EuiContextMenuPanel items={avatarItems} />
+                    </EuiPopover>
                 </EuiHeaderSectionItem>
             </EuiHeaderSection>
         </EuiHeader>
@@ -124,13 +158,13 @@ const Header = () => {
 
 const StyledNavLink = ({ url, label }: { url: string; label: string }) => {
     const activeStyle: React.CSSProperties = {
-        fontWeight: "800",
-        marginBottom: "0.2rem",
+        fontWeight: '800',
+        marginBottom: '0.2rem',
     };
 
     const inactiveStyle: React.CSSProperties = {
-        fontWeight: "normal",
-        marginBottom: "0.2rem",
+        fontWeight: 'normal',
+        marginBottom: '0.2rem',
     };
 
     return (
@@ -138,85 +172,85 @@ const StyledNavLink = ({ url, label }: { url: string; label: string }) => {
             to={url}
             style={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}
         >
-            <EuiTextColor color="default">{label}</EuiTextColor>
+            <EuiTextColor color='default'>{label}</EuiTextColor>
         </NavLink>
     );
 };
 
 const SideNavItem = () => {
     const childAccordionItemStyle: React.CSSProperties = {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-        marginLeft: "1.5rem",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        marginLeft: '1.5rem',
     };
     return (
         <>
-            <StyledNavLink url="/" label="Home" />
+            <StyledNavLink url='/' label='Home' />
             <EuiAccordion
-                id="Customers"
-                buttonContent="Customer Management"
-                arrowDisplay="none"
+                id='Customers'
+                buttonContent='Customer Management'
+                arrowDisplay='none'
             >
                 <div style={childAccordionItemStyle}>
-                    <StyledNavLink url="/customers" label="Customers list" />
+                    <StyledNavLink url='/customers' label='Customers list' />
                     <StyledNavLink
-                        url="/customer-new"
-                        label="Create New Customer"
+                        url='/customer-new'
+                        label='Create New Customer'
                     />
                 </div>
             </EuiAccordion>
 
             <EuiAccordion
-                id="Inventory"
-                buttonContent="Inventory Management"
-                arrowDisplay="none"
+                id='Inventory'
+                buttonContent='Inventory Management'
+                arrowDisplay='none'
             >
                 <div style={childAccordionItemStyle}>
-                    <StyledNavLink url="/inventory" label="Inventory list" />
+                    <StyledNavLink url='/inventory' label='Inventory list' />
                     <StyledNavLink
-                        url="/production-draft"
-                        label="Production draft list"
+                        url='/production-draft'
+                        label='Production draft list'
                     />
                     <StyledNavLink
-                        url="/production-draft-create"
-                        label="Create Production draft"
+                        url='/production-draft-create'
+                        label='Create Production draft'
                     />
                     <StyledNavLink
-                        url="/production-draft-approve"
-                        label="Approve Production draft"
+                        url='/production-draft-approve'
+                        label='Approve Production draft'
                     />
                 </div>
             </EuiAccordion>
             <EuiAccordion
-                id="Finance"
-                buttonContent="Finance Management"
-                arrowDisplay="none"
+                id='Finance'
+                buttonContent='Finance Management'
+                arrowDisplay='none'
             >
                 <div style={childAccordionItemStyle}>
-                    <StyledNavLink url="/so-list" label="Sales Invoice list" />
+                    <StyledNavLink url='/so-list' label='Sales Invoice list' />
                     <StyledNavLink
-                        url="/so-draft-list"
-                        label="Sales Invoice Draft list"
+                        url='/so-draft-list'
+                        label='Sales Invoice Draft list'
                     />
                     <StyledNavLink
-                        url="/so-draft-create"
-                        label="Create Sales Invoice Draft"
+                        url='/so-draft-create'
+                        label='Create Sales Invoice Draft'
                     />
                     <StyledNavLink
-                        url="/so-draft-approve"
-                        label="Approve Sales Invoice Draft"
+                        url='/so-draft-approve'
+                        label='Approve Sales Invoice Draft'
                     />
                 </div>
             </EuiAccordion>
             <EuiAccordion
-                id="User"
-                buttonContent="User Management"
-                arrowDisplay="none"
+                id='User'
+                buttonContent='User Management'
+                arrowDisplay='none'
             >
                 <div style={childAccordionItemStyle}>
-                    <StyledNavLink url="/users" label="User list" />
-                    <StyledNavLink url="/user-create" label="Create New User" />
+                    <StyledNavLink url='/users' label='User list' />
+                    <StyledNavLink url='/user-create' label='Create New User' />
                 </div>
             </EuiAccordion>
         </>
@@ -231,10 +265,10 @@ const Root = () => {
                 <EuiPageTemplate.Sidebar sticky={true}>
                     <EuiPageBody
                         style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between",
-                            marginTop: "2rem",
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            marginTop: '2rem',
                         }}
                     >
                         <SideNavItem />
