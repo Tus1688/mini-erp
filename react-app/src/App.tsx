@@ -1,17 +1,15 @@
 import {
     EuiProvider,
     EuiThemeAmsterdam,
-    EuiThemeColorMode,
-    EuiTitle,
 } from '@elastic/eui';
-import { useState } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './components/Root';
-// import '@elastic/eui/dist/eui_theme_dark.css';
-// import '@elastic/eui/dist/eui_theme_light.css';
+import '@elastic/eui/dist/eui_theme_dark.css';
+import  useTheme  from './hooks/useTheme';
 
 export default function App() {
-    const [color, setColorMode] = useState<EuiThemeColorMode>('dark');
+    const { theme } = useTheme();
+
     const router = createBrowserRouter([
         {
             path: '/',
@@ -38,7 +36,7 @@ export default function App() {
     ]);
 
     return (
-        <EuiProvider colorMode={color} theme={EuiThemeAmsterdam}>
+        <EuiProvider colorMode={theme} theme={EuiThemeAmsterdam}>
             <RouterProvider router={router} />
         </EuiProvider>
     );
