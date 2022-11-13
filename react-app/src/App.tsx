@@ -1,12 +1,16 @@
+import { EuiProvider, EuiThemeAmsterdam } from '@elastic/eui';
 import {
-    EuiProvider,
-    EuiThemeAmsterdam,
-} from '@elastic/eui';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+    createBrowserRouter,
+    Navigate,
+    RouterProvider,
+    useLocation,
+} from 'react-router-dom';
 import Root from './components/Root';
-import  useTheme  from './hooks/useTheme';
+import useTheme from './hooks/useTheme';
 import Login from './routes/Login';
 import useToken from './hooks/useToken';
+import React, { useEffect, useState } from 'react';
+import { isAuthenticatedRequest } from './api/Authentication';
 
 export default function App() {
     const { theme } = useTheme();
@@ -19,7 +23,11 @@ export default function App() {
         },
         {
             path: '/',
-            element: <Root />,
+            element: (
+                <RequireAuth>
+                    <Root />
+                </RequireAuth>
+            ),
             children: [
                 {
                     path: '/customers',
@@ -46,4 +54,26 @@ export default function App() {
             <RouterProvider router={router} />
         </EuiProvider>
     );
+}
+
+function RequireAuth({ children }: { children: React.ReactNode }) {
+    let location = useLocation();
+    const [isLoggedIn, setLoggedIn] = useState<boolean | null>(null);
+
+    const updateLoginState = async () => {
+        setLoggedIn(await isAuthenticatedRequest());
+    };
+
+    useEffect(() => {
+        updateLoginState();
+    }, []);
+
+    switch (isLoggedIn) {
+        case null:
+            return <div>Loading...</div>;
+        case true:
+            return <>{children}</>;
+        case false:
+            return <Navigate to='/login' state={{ from: location }} replace />;
+    }
 }

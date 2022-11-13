@@ -14,10 +14,13 @@ import {
     EuiPopover,
     EuiContextMenuPanel,
     EuiButtonEmpty,
+    EuiGlobalToastList,
 } from '@elastic/eui';
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { logoutRequest } from '../api/Authentication';
 import useTheme from '../hooks/useTheme';
+import useToast from '../hooks/useToast';
 
 const Header = () => {
     const [isPopoverThemeOpen, setPopoverThemeOpen] = useState(false);
@@ -58,6 +61,12 @@ const Header = () => {
         window.location.reload();
     };
 
+    const toggleLogoutAndClose = async () => {
+        await logoutRequest();
+        closeAvatarPopover();
+        window.location.reload();
+    };
+
     const avatarButton = (
         <EuiButtonEmpty
             aria-label='Avatar'
@@ -83,7 +92,7 @@ const Header = () => {
             <EuiIcon type='user' style={{ marginRight: '1rem' }} />
             <EuiTextColor>Profile Settings</EuiTextColor>
         </EuiContextMenuItem>,
-        <EuiContextMenuItem key='logout' onClick={closeAvatarPopover}>
+        <EuiContextMenuItem key='logout' onClick={toggleLogoutAndClose}>
             <EuiIcon type='exit' style={{ marginRight: '1rem' }} />
             <EuiTextColor>Logout</EuiTextColor>
         </EuiContextMenuItem>,
@@ -258,6 +267,7 @@ const SideNavItem = () => {
 };
 
 const Root = () => {
+    const { getAllToasts, removeToast } = useToast();
     return (
         <>
             <EuiPageTemplate panelled={true} grow={true}>
@@ -275,6 +285,11 @@ const Root = () => {
                     </EuiPageBody>
                 </EuiPageTemplate.Sidebar>
                 <Outlet />
+                <EuiGlobalToastList
+                    toasts={getAllToasts()}
+                    dismissToast={({ id }) => removeToast(id)}
+                    toastLifeTimeMs={6000}
+                />
             </EuiPageTemplate>
         </>
     );

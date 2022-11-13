@@ -5,16 +5,13 @@ import {
     EuiForm,
     EuiFormRow,
     EuiGlobalToastList,
-    EuiPageBody,
     EuiPageTemplate,
     EuiSpacer,
     EuiText,
     EuiTextAlign,
     EuiTextColor,
     EuiTitle,
-    useEuiTheme,
 } from '@elastic/eui';
-import { css } from '@emotion/css';
 import React, { Fragment } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useToast from '../hooks/useToast';
@@ -60,7 +57,6 @@ const loginUser = async (credentials: {
 const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
-    const [invalidCreds, setInvalidCreds] = React.useState(false);
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
     let navigate = useNavigate();
@@ -68,7 +64,7 @@ const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
 
     let from = location.state?.from?.pathname || '/';
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const token: Token = await loginUser({
             username,
@@ -80,7 +76,11 @@ const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
                 color: 'danger',
                 text: (
                     <Fragment>
-                        <p>{token.error}<br />maybe contact your administrator for help?</p>
+                        <p>
+                            {token.error}
+                            <br />
+                            maybe contact your administrator for help?
+                        </p>
                     </Fragment>
                 ),
                 id: getNewId(),
@@ -109,7 +109,7 @@ const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
                 </EuiText>
                 <EuiSpacer />
                 {/* prevent no data to be submitted */}
-                <EuiForm component='form' onSubmit={handleSubmit} defaultChecked={true}>
+                <EuiForm component='form' onSubmit={(e) => handleSubmit(e)}>
                     <EuiFormRow label='username'>
                         <EuiFieldText
                             name='username'
