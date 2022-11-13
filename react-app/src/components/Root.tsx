@@ -15,6 +15,7 @@ import {
     EuiContextMenuPanel,
     EuiButtonEmpty,
     EuiGlobalToastList,
+    EuiSpacer,
 } from '@elastic/eui';
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
@@ -124,9 +125,9 @@ const Header = () => {
                 }}
             >
                 <EuiHeaderSectionItem>
-                    <EuiTitle size='m'>
+                    {/* <EuiTitle size='m'>
                         <h1>Bumbuventory</h1>
-                    </EuiTitle>
+                    </EuiTitle> */}
                 </EuiHeaderSectionItem>
             </EuiHeaderSection>
             <EuiHeaderSection
@@ -195,6 +196,10 @@ const SideNavItem = () => {
     };
     return (
         <>
+            <EuiTitle size='m'>
+                <h2>Bumbuventory</h2>
+            </EuiTitle>
+            <EuiSpacer size='xl' />
             <StyledNavLink url='/' label='Home' />
             <EuiAccordion
                 id='Customers'
@@ -202,7 +207,10 @@ const SideNavItem = () => {
                 arrowDisplay='none'
             >
                 <div style={childAccordionItemStyle}>
-                    <StyledNavLink url='/customers' label='Customers list' />
+                    <StyledNavLink
+                        url='/customer-list'
+                        label='Customers list'
+                    />
                     <StyledNavLink
                         url='/customer-new'
                         label='Create New Customer'
@@ -273,14 +281,7 @@ const Root = () => {
             <EuiPageTemplate panelled={true} grow={true}>
                 <Header />
                 <EuiPageTemplate.Sidebar sticky={true}>
-                    <EuiPageBody
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            marginTop: '2rem',
-                        }}
-                    >
+                    <EuiPageBody>
                         <SideNavItem />
                     </EuiPageBody>
                 </EuiPageTemplate.Sidebar>

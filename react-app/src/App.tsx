@@ -11,6 +11,7 @@ import Login from './routes/Login';
 import useToken from './hooks/useToken';
 import React, { useEffect, useState } from 'react';
 import { isAuthenticatedRequest } from './api/Authentication';
+import CustomerList from './routes/CustomerList';
 
 export default function App() {
     const { theme } = useTheme();
@@ -30,8 +31,12 @@ export default function App() {
             ),
             children: [
                 {
-                    path: '/customers',
-                    element: <div>customers</div>,
+                    path: '/',
+                    element: <div>this is home</div>,
+                },
+                {
+                    path: '/customer-list',
+                    element: <CustomerList />,
                 },
                 {
                     path: '/inventory',

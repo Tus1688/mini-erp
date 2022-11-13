@@ -32,4 +32,9 @@ export const logoutRequest = async(): Promise<void> => {
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('state');
     }
+    if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('state');
+        alert('Any act of unauthorized access will be reported to the local authorities, stop now!');
+    }
 }
