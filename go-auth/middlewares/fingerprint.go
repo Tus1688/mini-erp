@@ -16,8 +16,8 @@ func AssignCsrf() gin.HandlerFunc {
 			csrfToken := auth.GenerateRandomString(32)
 			encryptedCsrf := auth.Encrypt(auth.JwtKey, csrfToken)
 			c.SetSameSite(http.SameSiteStrictMode)
-			c.SetCookie("csrf_token", csrfToken, 60*60*12, "/", os.Getenv("DOMAIN_NAME"), false, true)
-			c.SetCookie("validate", encryptedCsrf, 60*60*12, "/", os.Getenv("DOMAIN_NAME"), false, true)
+			c.SetCookie("csrf_token", csrfToken, 60*60*10, "/", os.Getenv("DOMAIN_NAME"), false, true)
+			c.SetCookie("validate", encryptedCsrf, 60*60*10, "/", os.Getenv("DOMAIN_NAME"), false, true)
 			c.Next()
 		}
 		c.Next()

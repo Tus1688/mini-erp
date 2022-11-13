@@ -61,7 +61,8 @@ func initRouter() *gin.Engine {
 		util.Use(middlewares.EnforceCsrf())
 		{
 			util.GET("/refresh-token", controllers.RefreshToken) // refresh token
-			util.GET("/logout", controllers.Logout)              // logout")
+			util.POST("/logout", controllers.Logout)             // logout")
+			util.POST("/validate", controllers.ValidateToken)    // validate token for frontend
 		}
 	}
 	return router

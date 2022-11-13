@@ -62,6 +62,7 @@ func Login(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while generating token 2"})
 		return
 	}
+	c.SetSameSite(http.SameSiteStrictMode)
 	c.SetCookie("refresh_token", refresh_token, 60*60*10, "/", os.Getenv("DOMAIN_NAME"), false, true)
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
@@ -141,7 +142,9 @@ func Logout(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while logging out"})
 		return
 	}
-	// send expired refresh_token cookie to client to revoke prev refresh_token
+	// send expired refresh_token, csrf_token, validate cookie to client to revoke prev cookies
 	c.SetCookie("refresh_token", "", -1, "/", os.Getenv("DOMAIN_NAME"), false, true)
+	c.SetCookie("csrf_token", "", -1, "/", os.Getenv("DOMAIN_NAME"), false, true)
+	c.SetCookie("validate", "", -1, "/", os.Getenv("DOMAIN_NAME"), false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }

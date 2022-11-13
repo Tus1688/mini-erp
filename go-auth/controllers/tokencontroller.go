@@ -55,3 +55,7 @@ func RefreshToken(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"token": newToken})
 }
+
+func ValidateToken(c *gin.Context) {
+	c.Status(http.StatusOK)
+}
