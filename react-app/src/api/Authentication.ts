@@ -38,3 +38,22 @@ export const logoutRequest = async(): Promise<void> => {
         alert('Any act of unauthorized access will be reported to the local authorities, stop now!');
     }
 }
+
+export const getRefreshToken = async(): Promise<boolean> => {
+    const response = await fetch('/api/v1/auth/util/refresh-token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionStorage.getItem('token') || ''
+        },
+    })
+    if (response.ok) {
+        // set the new token to the session storage
+        const data = await response.json();
+        sessionStorage.setItem('token', data.token);
+        return true;
+    }
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('state');
+    return false
+}
