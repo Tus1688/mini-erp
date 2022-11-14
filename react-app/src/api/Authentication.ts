@@ -41,7 +41,7 @@ export const logoutRequest = async(): Promise<void> => {
 
 export const getRefreshToken = async(): Promise<boolean> => {
     const response = await fetch('/api/v1/auth/util/refresh-token', {
-        method: 'POST',
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': sessionStorage.getItem('token') || ''

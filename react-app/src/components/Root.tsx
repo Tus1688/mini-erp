@@ -196,7 +196,7 @@ const SideNavItem = () => {
     };
     return (
         <>
-            <EuiTitle size='m'>
+            <EuiTitle size='xs'>
                 <h2>Bumbuventory</h2>
             </EuiTitle>
             <EuiSpacer size='xl' />
