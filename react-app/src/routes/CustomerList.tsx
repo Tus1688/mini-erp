@@ -15,13 +15,6 @@ import React, {
 } from 'react';
 import { getRefreshToken } from '../api/Authentication';
 
-type customer = {
-    id: number;
-    name: string;
-    tax_id: string;
-    Address: string;
-};
-
 const columns: EuiDataGridColumn[] = [
     {
         id: 'id',
@@ -33,7 +26,7 @@ const columns: EuiDataGridColumn[] = [
         id: 'tax_id',
     },
     {
-        id: 'Address',
+        id: 'address',
     },
 ];
 
@@ -46,7 +39,7 @@ const fetchCustomer = async ({
 }): Promise<Array<{ [key: string]: ReactNode }> | undefined> => {
     let baseUrl = '/api/v1/customer';
     // if there is pageINdex then append page= to the url also if there is pageSize then append page_size=
-    if (pageIndex != undefined && pageSize != undefined) {
+    if (pageIndex !== undefined && pageSize !== undefined) {
         // because the page index starts at 0 but the api starts at 1
         baseUrl += `?page=${pageIndex + 1}`;
         if (pageSize) {
@@ -91,13 +84,12 @@ const fetchCustomer = async ({
 
 const CustomerList = () => {
     const [rData, setData] = useState<Array<{ [key: string]: ReactNode }>>([
-        {},
     ]);
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
     });
-    // feed the customer from api to data
+    const [fetchedPage, setFetchedPage] = useState<number[]>([]);
 
     const onChangeItemsPerPage = useCallback(
         (pageSize: number) =>
@@ -110,15 +102,6 @@ const CustomerList = () => {
         [setPagination]
     );
 
-    // const onChangePage = useCallback(
-    //     (pageIndex: number) =>
-    //         setPagination((pagination) => ({
-    //             ...pagination,
-    //             pageIndex,
-    //         })),
-    //     [setPagination]
-    // );
-    // create onChangePage function that also fetch new data
     const onChangePage = useCallback(
         async (pageIndex: number) => {
             setPagination((pagination) => ({
@@ -161,14 +144,21 @@ const CustomerList = () => {
         const fetchData = async () => {
             const data = await fetchCustomer(pagination);
             if (data) {
-                console.log('hehe');
-                setData(rData => [...rData, ...data]);
+                // make sure that the data is not duplicated
+                setData((rData) => [...rData, ...data]);
             }
         };
-        fetchData();
-        console.log("effect is called")
-        console.log(rData);
-    }, [pagination]);
+        // check if the pagination.pageIndex is in the fetchedPage array
+        if (!fetchedPage.includes(pagination.pageIndex)) {
+            fetchData();
+            setFetchedPage((fetchedPage) => [
+                ...fetchedPage,
+                pagination.pageIndex,
+            ]);
+            console.log('fetching again');
+        }
+        console.log(rData)
+    }, [pagination, fetchedPage, rData]);
 
     return (
         <>
@@ -194,7 +184,7 @@ const CustomerList = () => {
                         setVisibleColumns,
                     }}
                     height={550}
-                    rowCount={100}
+                    rowCount={20}
                     renderCellValue={renderCellValue}
                     sorting={{ columns: sortingColumns, onSort }}
                     inMemory={{ level: 'sorting' }}
