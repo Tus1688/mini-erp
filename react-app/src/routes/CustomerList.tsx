@@ -5,8 +5,6 @@ import {
     EuiDataGridColumn,
     EuiDataGridControlColumn,
     EuiDescriptionList,
-    EuiDescriptionListDescription,
-    EuiDescriptionListTitle,
     EuiFlexGroup,
     EuiFlexItem,
     EuiFlyout,
@@ -31,6 +29,7 @@ import React, {
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
+import FlyoutDescriptionList from '../components/FlyoutDescriptionList';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -121,6 +120,98 @@ const trailingControlColumns: EuiDataGridControlColumn[] = [
     },
 ];
 
+type customerSpecific = {
+    id: number;
+    name: string;
+    tax_id: string;
+    address: string;
+    city_name: string;
+    province_name: string;
+    country_name: string;
+};
+
+const CustomerFlyout = ({
+    id,
+    toggleFlyout,
+}: {
+    id: number;
+    toggleFlyout: (value: React.SetStateAction<boolean>) => void;
+}) => {
+    let location = useLocation();
+    let navigate = useNavigate();
+    const [data, setData] = useState<customerSpecific>();
+
+    const fetchCustomerSpecific = async (
+        id: number
+    ): Promise<customerSpecific | undefined> => {
+        let baseUrl = `/api/v1/customer?id=${id + 1}`;
+        console.log(baseUrl);
+        const res = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (res.status === 200) {
+            const data = await res.json();
+            return data;
+        }
+        if (res.status === 401) {
+            const state = await getRefreshToken();
+            if (!state) {
+                navigate('/login', { state: { from: location.pathname } });
+                return;
+            }
+            // retry
+            const retry = await fetch(baseUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: sessionStorage.getItem('token') || '',
+                },
+            });
+            if (retry.status === 200) {
+                const data = await retry.json();
+                return data;
+            }
+            if (retry.status === 401) {
+                navigate('/login', { state: { from: location.pathname } });
+                return;
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchCustomerSpecific(id).then((data) => {
+            setData(data);
+        });
+    }, [id]);
+
+    return (
+        <EuiPortal>
+            <EuiFlyout ownFocus onClose={() => toggleFlyout(false)}>
+                <EuiFlyoutHeader hasBorder>
+                    <EuiTitle size='m'>
+                        <h2>{data?.name}'s details</h2>
+                    </EuiTitle>
+                </EuiFlyoutHeader>
+                <EuiFlyoutBody>
+                    <EuiDescriptionList>
+                        <FlyoutDescriptionList title='ID' description={data?.id} />
+                        <FlyoutDescriptionList title='Name' description={data?.name} />
+                        <FlyoutDescriptionList title='Tax ID' description={data?.tax_id} />
+                        <FlyoutDescriptionList title='Address' description={data?.address} />
+                        <FlyoutDescriptionList title='City' description={data?.city_name} />
+                        <FlyoutDescriptionList title='Province' description={data?.province_name} />
+                        <FlyoutDescriptionList title='Country' description={data?.country_name} />
+                    </EuiDescriptionList>
+                </EuiFlyoutBody>
+            </EuiFlyout>
+        </EuiPortal>
+    );
+};
+
 const CustomerList = () => {
     let navigate = useNavigate();
     let location = useLocation();
@@ -184,96 +275,8 @@ const CustomerList = () => {
         }
     };
 
-    type customerSpecific = {
-        id: number;
-        name: string;
-        tax_id: string;
-        address: string;
-        city_name: string;
-        province_name: string;
-        country_name: string;
-    };
-
-    const fetchCustomerSpecific = async (
-        id: number
-    ): Promise<Array<{ [key: string]: ReactNode }> | undefined> => {
-    // ): Promise<customerSpecific | undefined> => {
-        let baseUrl = `/api/v1/customer?id=${id}`;
-        console.log(baseUrl);
-        const res = await fetch(baseUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: sessionStorage.getItem('token') || '',
-            },
-        });
-        if (res.status === 200) {
-            const data = await res.json();
-            return data;
-        }
-        if (res.status === 401) {
-            const state = await getRefreshToken();
-            if (!state) {
-                navigate('/login', { state: { from: location.pathname } });
-                return
-            }
-            // retry
-            const retry = await fetch(baseUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: sessionStorage.getItem('token') || '',
-                },
-            });
-            if (retry.status === 200) {
-                const data = await retry.json();
-                return data;
-            }
-            if (retry.status === 401) {
-                navigate('/login', { state: { from: location.pathname } });
-                return
-            }
-        }
-    };
-
     const FlyoutRowCell = (rowIndex: EuiDataGridCellValueElementProps) => {
-        let flyout;
         const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
-        if (isFlyoutOpen) {
-            const rowData = rData[rowIndex.rowIndex as number];
-            console.log(rowData.id);
-
-            const customer = fetchCustomerSpecific(rowData.id as number);
-            console.log(customer)
-            const details = Object.entries(customer).map(([key, value]) => {
-                return (
-                    <Fragment>
-                        <EuiDescriptionListTitle>{key}</EuiDescriptionListTitle>
-                        <EuiDescriptionListDescription>
-                            {value}
-                        </EuiDescriptionListDescription>
-                    </Fragment>
-                );
-            });
-
-            flyout = (
-                <EuiPortal>
-                    <EuiFlyout
-                        ownFocus
-                        onClose={() => setIsFlyoutOpen(!isFlyoutOpen)}
-                    >
-                        <EuiFlyoutHeader hasBorder>
-                            <EuiTitle size='m'>
-                                <h2>{rowData.name}</h2>
-                            </EuiTitle>
-                        </EuiFlyoutHeader>
-                        <EuiFlyoutBody>
-                            <EuiDescriptionList>{details}</EuiDescriptionList>
-                        </EuiFlyoutBody>
-                    </EuiFlyout>
-                </EuiPortal>
-            );
-        }
 
         return (
             <Fragment>
@@ -284,10 +287,16 @@ const CustomerList = () => {
                     aria-label='View details'
                     onClick={() => setIsFlyoutOpen(!isFlyoutOpen)}
                 />
-                {flyout}
+                {isFlyoutOpen ? (
+                    <CustomerFlyout
+                        id={rowIndex.rowIndex as number}
+                        toggleFlyout={setIsFlyoutOpen}
+                    />
+                ) : null}
             </Fragment>
         );
     };
+
     const leadingControlColumns: EuiDataGridControlColumn[] = [
         {
             id: 'view',
