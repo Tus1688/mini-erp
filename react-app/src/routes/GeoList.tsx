@@ -1,17 +1,10 @@
 import {
     EuiButtonIcon,
     EuiDataGrid,
-    EuiDataGridCellValueElementProps,
     EuiDataGridColumn,
     EuiDataGridControlColumn,
-    EuiDescriptionList,
-    EuiDescriptionListDescription,
-    EuiDescriptionListTitle,
     EuiFlexGroup,
     EuiFlexItem,
-    EuiFlyout,
-    EuiFlyoutBody,
-    EuiFlyoutHeader,
     EuiPageTemplate,
     EuiPopover,
     EuiPopoverTitle,
@@ -21,7 +14,7 @@ import {
     EuiTextColor,
     EuiTitle,
 } from '@elastic/eui';
-import React, {
+import {
     Fragment,
     ReactNode,
     useCallback,
@@ -29,30 +22,8 @@ import React, {
     useMemo,
     useState,
 } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
-
-const columns: EuiDataGridColumn[] = [
-    {
-        id: 'id',
-        initialWidth: 50,
-        displayAsText: 'ID',
-    },
-    {
-        id: 'name',
-        initialWidth: 250,
-        displayAsText: 'Name',
-    },
-    {
-        id: 'tax_id',
-        initialWidth: 200,
-        displayAsText: 'Tax ID',
-    },
-    {
-        id: 'address',
-        displayAsText: 'Address',
-    },
-];
 
 const trailingControlColumns: EuiDataGridControlColumn[] = [
     {
@@ -121,31 +92,46 @@ const trailingControlColumns: EuiDataGridControlColumn[] = [
     },
 ];
 
-const CustomerList = () => {
+const columns: EuiDataGridColumn[] = [
+    {
+        id: 'id',
+        initialWidth: 50,
+        displayAsText: 'ID',
+    },
+    {
+        id: 'city_name',
+        displayAsText: 'City Name',
+    },
+    {
+        id: 'province_name',
+        displayAsText: 'Province Name',
+    },
+    {
+        id: 'country_name',
+        displayAsText: 'Country Name',
+    }
+]
+
+const GeoList = () => {
     let navigate = useNavigate();
     let location = useLocation();
     const [rData, setData] = useState<Array<{ [key: string]: ReactNode }>>([]);
-    const [pagination, setPagination] = useState({
+    const [paginationCity, setPaginationCity] = useState({
         pageIndex: 0,
         pageSize: 20,
     });
-    const [fetchedPage, setFetchedPage] = useState<number[]>([]);
+    const [fetchedPageCity, setFetchedPageCity] = useState<number[]>([]);
 
-    const fetchCustomer = async ({
+    const fetchCity = async ({
         pageIndex,
         pageSize,
     }: {
         pageIndex?: number;
         pageSize?: number;
-    }): Promise<Array<{ [key: string]: ReactNode }> | undefined> => {
-        let baseUrl = '/api/v1/customer';
-        // if there is pageINdex then append page= to the url also if there is pageSize then append page_size=
+    }): Promise<Array < { [key: string]: ReactNode } > | undefined> => {
+        let baseUrl = '/api/v1/geo/city';
         if (pageIndex !== undefined && pageSize !== undefined) {
-            // because the page index starts at 0 but the api starts at 1
-            baseUrl += `?page=${pageIndex + 1}`;
-            if (pageSize) {
-                baseUrl += `&page_size=${pageSize}`;
-            }
+            baseUrl += `?page=${pageIndex + 1}&page_size=${pageSize}`;
         }
         console.log(baseUrl);
         const res = await fetch(baseUrl, {
@@ -153,7 +139,7 @@ const CustomerList = () => {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: sessionStorage.getItem('token') || '',
-            },
+            }
         });
         if (res.status === 200) {
             const data = await res.json();
@@ -161,160 +147,47 @@ const CustomerList = () => {
         }
         if (res.status === 401) {
             const state = await getRefreshToken();
-            if (!state) {
-                navigate('/login', { state: { from: location } });
+            if(!state) {
+                navigate('/login', { state: { from: location.pathname }, replace: true });
                 return;
             }
-            // retry
             const retry = await fetch(baseUrl, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: sessionStorage.getItem('token') || '',
-                },
+                }
             });
             if (retry.status === 200) {
                 const data = await retry.json();
                 return data;
             }
             if (retry.status === 401) {
-                navigate('/login', { state: { from: location.pathname } });
+                navigate('/login', { state: { from: location.pathname }, replace: true });
                 return;
             }
         }
-    };
+    }
 
-    type customerSpecific = {
-        id: number;
-        name: string;
-        tax_id: string;
-        address: string;
-        city_name: string;
-        province_name: string;
-        country_name: string;
-    };
-
-    const fetchCustomerSpecific = async (
-        id: number
-    ): Promise<Array<{ [key: string]: ReactNode }> | undefined> => {
-    // ): Promise<customerSpecific | undefined> => {
-        let baseUrl = `/api/v1/customer?id=${id}`;
-        console.log(baseUrl);
-        const res = await fetch(baseUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: sessionStorage.getItem('token') || '',
-            },
-        });
-        if (res.status === 200) {
-            const data = await res.json();
-            return data;
-        }
-        if (res.status === 401) {
-            const state = await getRefreshToken();
-            if (!state) {
-                navigate('/login', { state: { from: location.pathname } });
-                return
-            }
-            // retry
-            const retry = await fetch(baseUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: sessionStorage.getItem('token') || '',
-                },
-            });
-            if (retry.status === 200) {
-                const data = await retry.json();
-                return data;
-            }
-            if (retry.status === 401) {
-                navigate('/login', { state: { from: location.pathname } });
-                return
-            }
-        }
-    };
-
-    const FlyoutRowCell = (rowIndex: EuiDataGridCellValueElementProps) => {
-        let flyout;
-        const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
-        if (isFlyoutOpen) {
-            const rowData = rData[rowIndex.rowIndex as number];
-            console.log(rowData.id);
-
-            const customer = fetchCustomerSpecific(rowData.id as number);
-            console.log(customer)
-            const details = Object.entries(customer).map(([key, value]) => {
-                return (
-                    <Fragment>
-                        <EuiDescriptionListTitle>{key}</EuiDescriptionListTitle>
-                        <EuiDescriptionListDescription>
-                            {value}
-                        </EuiDescriptionListDescription>
-                    </Fragment>
-                );
-            });
-
-            flyout = (
-                <EuiPortal>
-                    <EuiFlyout
-                        ownFocus
-                        onClose={() => setIsFlyoutOpen(!isFlyoutOpen)}
-                    >
-                        <EuiFlyoutHeader hasBorder>
-                            <EuiTitle size='m'>
-                                <h2>{rowData.name}</h2>
-                            </EuiTitle>
-                        </EuiFlyoutHeader>
-                        <EuiFlyoutBody>
-                            <EuiDescriptionList>{details}</EuiDescriptionList>
-                        </EuiFlyoutBody>
-                    </EuiFlyout>
-                </EuiPortal>
-            );
-        }
-
-        return (
-            <Fragment>
-                <EuiButtonIcon
-                    color='text'
-                    iconType='eye'
-                    iconSize='s'
-                    aria-label='View details'
-                    onClick={() => setIsFlyoutOpen(!isFlyoutOpen)}
-                />
-                {flyout}
-            </Fragment>
-        );
-    };
-    const leadingControlColumns: EuiDataGridControlColumn[] = [
-        {
-            id: 'view',
-            width: 36,
-            headerCellRender: () => null,
-            rowCellRender: FlyoutRowCell,
-        },
-    ];
 
     const onChangeItemsPerPage = useCallback(
         (pageSize: number) =>
-            setPagination((pagination) => ({
+            setPaginationCity((pagination) => ({
                 ...pagination,
                 pageSize,
                 pageIndex: 0,
             })),
-        [setPagination]
+        [setPaginationCity]
     );
 
     const onChangePage = useCallback(
         async (pageIndex: number) => {
-            setPagination((pagination) => ({
+            setPaginationCity((pagination) => ({
                 ...pagination,
                 pageIndex,
             }));
         },
-        [setPagination]
+        [setPaginationCity]
     );
 
     // Sorting
@@ -347,42 +220,40 @@ const CustomerList = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await fetchCustomer(pagination);
+            const data = await fetchCity(paginationCity);
             if (data) {
                 setData((rData) => [...rData, ...data]);
             }
         };
         // check if the pagination.pageIndex is in the fetchedPage array so the data is not duplicated
-        if (!fetchedPage.includes(pagination.pageIndex)) {
+        if (!fetchedPageCity.includes(paginationCity.pageIndex)) {
             fetchData();
-            setFetchedPage((fetchedPage) => [
+            setFetchedPageCity((fetchedPage) => [
                 ...fetchedPage,
-                pagination.pageIndex,
+                paginationCity.pageIndex,
             ]);
             console.log('fetching again');
         }
         console.log(rData);
-    }, [pagination, fetchedPage, rData]);
+    }, [paginationCity, fetchedPageCity, rData]);
 
     return (
         <>
             <EuiPageTemplate.Section style={{ height: 0 }}>
                 <EuiTitle size='l'>
-                    <h1>Customer List</h1>
+                    <h1>Location List</h1>
                 </EuiTitle>
                 <EuiText>
                     <EuiTextColor color='subdued'>
                         <p>
-                            In this page you can see, add, edit and delete
-                            customers.
+                            In this page you can see, add, edit and delete a Location List
                         </p>
                     </EuiTextColor>
                 </EuiText>
             </EuiPageTemplate.Section>
             <EuiPageTemplate.Section>
                 <EuiDataGrid
-                    aria-label='Customer List'
-                    leadingControlColumns={leadingControlColumns}
+                    aria-label='City List'
                     trailingControlColumns={trailingControlColumns}
                     columns={columns}
                     columnVisibility={{
@@ -390,17 +261,17 @@ const CustomerList = () => {
                         setVisibleColumns,
                     }}
                     height={550}
-                    rowCount={20}
+                    rowCount={18}
                     renderCellValue={renderCellValue}
                     sorting={{ columns: sortingColumns, onSort }}
                     inMemory={{ level: 'sorting' }}
                     pagination={{
-                        ...pagination,
+                        ...paginationCity,
                         // pageSizeOptions: [10, 20, 50],
                         onChangeItemsPerPage: onChangeItemsPerPage,
                         onChangePage: onChangePage,
-                        pageSize: pagination.pageSize,
-                        pageIndex: pagination.pageIndex,
+                        pageSize: paginationCity.pageSize,
+                        pageIndex: paginationCity.pageIndex,
                     }}
                 />
             </EuiPageTemplate.Section>
@@ -408,4 +279,4 @@ const CustomerList = () => {
     );
 };
 
-export default CustomerList;
+export default GeoList;

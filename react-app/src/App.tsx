@@ -12,6 +12,8 @@ import useToken from './hooks/useToken';
 import React, { useEffect, useState } from 'react';
 import { isAuthenticatedRequest } from './api/Authentication';
 import CustomerList from './routes/CustomerList';
+import GeoList from './routes/GeoList';
+import StockList from './routes/StockList';
 
 export default function App() {
     const { theme } = useTheme();
@@ -39,8 +41,12 @@ export default function App() {
                     element: <CustomerList />,
                 },
                 {
-                    path: '/inventory',
-                    element: <div>inventory</div>,
+                    path: '/geo',
+                    element: <GeoList />,
+                },
+                {
+                    path: '/stock-list',
+                    element: <StockList />
                 },
                 {
                     path: '/finance',

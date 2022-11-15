@@ -215,6 +215,10 @@ const SideNavItem = () => {
                         url='/customer-new'
                         label='Create New Customer'
                     />
+                    <StyledNavLink
+                        url='/geo'
+                        label='Location'
+                    />
                 </div>
             </EuiAccordion>
 
@@ -224,7 +228,7 @@ const SideNavItem = () => {
                 arrowDisplay='none'
             >
                 <div style={childAccordionItemStyle}>
-                    <StyledNavLink url='/inventory' label='Inventory list' />
+                    <StyledNavLink url='/stock-list' label='Inventory list' />
                     <StyledNavLink
                         url='/production-draft'
                         label='Production draft list'
