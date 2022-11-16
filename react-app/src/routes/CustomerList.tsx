@@ -252,6 +252,9 @@ const CustomerList = () => {
                     <CustomerDeleteModal
                         toggleModal={setDeleteModalOpen}
                         id={rData[rowIndex.rowIndex as number].id as number}
+                        setFetchedPage={setFetchedPage}
+                        setPagination={setPagination}
+                        setData={setData}
                     />
                 ) : null}
                 {editModalOpen ? (

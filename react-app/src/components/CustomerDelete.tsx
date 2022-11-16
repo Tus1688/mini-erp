@@ -6,9 +6,20 @@ import useToast from '../hooks/useToast';
 const CustomerDeleteModal = ({
     id,
     toggleModal,
+    setFetchedPage,
+    setPagination,
+    setData,
 }: {
     id: number;
     toggleModal: (value: React.SetStateAction<boolean>) => void;
+    setFetchedPage: React.Dispatch<React.SetStateAction<number[]>>
+    setPagination: React.Dispatch<React.SetStateAction<{
+        pageIndex: number;
+        pageSize: number;
+    }>>;
+    setData: React.Dispatch<React.SetStateAction<{
+        [key: string]: React.ReactNode;
+    }[]>>
 }) => {
     let location = useLocation();
     let navigate = useNavigate();
@@ -40,6 +51,12 @@ const CustomerDeleteModal = ({
         }
         if (res.status === 200) {
             toggleModal(false);
+            setFetchedPage([]);
+            setData([]);
+            setPagination({
+                pageIndex: 0,
+                pageSize: 20,
+            });
             return;
         }
         if (res.status === 401) {
@@ -57,6 +74,12 @@ const CustomerDeleteModal = ({
             });
             if (retry.status === 200) {
                 toggleModal(false);
+                setFetchedPage([]);
+                setData([]);
+                setPagination({
+                    pageIndex: 0,
+                    pageSize: 20,
+                });
                 return;
             }
             if (retry.status === 409) {

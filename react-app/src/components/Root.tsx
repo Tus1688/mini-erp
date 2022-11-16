@@ -102,7 +102,7 @@ const Header = () => {
             style={{
                 position: 'sticky',
                 top: 0,
-                zIndex: 1,
+                zIndex: 10,
                 backgroundColor: 'transparent',
                 backdropFilter: 'blur(100px)',
                 display: 'flex',
