@@ -9,6 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetCustomerCount(c *gin.Context) {
+	var count int64
+	database.Instance.Table("customers").Count(&count)
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
 func GetCustomer(c *gin.Context) {
 	var response models.APICustomerResponseSpecific
 	var responseArr []models.APICustomerResponse

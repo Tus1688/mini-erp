@@ -39,6 +39,7 @@ func initRouter() *gin.Engine {
 
 	api := router.Group("/api/v1")
 	{
+		api.GET("/customer-count", controllers.GetCustomerCount)
 		api.GET("/customer", controllers.GetCustomer)
 		api.POST("/customer", controllers.CreateCustomer)
 		api.DELETE("/customer", controllers.DeleteCustomer)
