@@ -12,7 +12,6 @@ import useToken from './hooks/useToken';
 import React, { useEffect, useState } from 'react';
 import { isAuthenticatedRequest } from './api/Authentication';
 import CustomerList from './routes/CustomerList';
-import GeoList from './routes/GeoList';
 import StockList from './routes/StockList';
 
 export default function App() {
@@ -39,10 +38,6 @@ export default function App() {
                 {
                     path: '/customer-list',
                     element: <CustomerList />,
-                },
-                {
-                    path: '/geo',
-                    element: <GeoList />,
                 },
                 {
                     path: '/stock-list',

@@ -213,10 +213,6 @@ const SideNavItem = () => {
                         url='/customer-new'
                         label='Create New Customer'
                     />
-                    <StyledNavLink
-                        url='/geo'
-                        label='Location'
-                    />
                 </div>
             </EuiAccordion>
 
