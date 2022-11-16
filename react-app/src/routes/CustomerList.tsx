@@ -533,11 +533,15 @@ const CustomerList = () => {
     }, [rData]);
 
     useEffect(() => {
-        const fetchData = async () => {
+        // balancer for pagination,
+        // if the last page is 1 and the use press page 3 
+        // balancer will set to 3 - 1 = 2
+        let balancer: number;
+        const fetchData = async (balancer: number) => {
             // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
             const last_id = rData.length > 0 ? rData[rData.length - 1].id as number: 0;
             const count = await fetchCustomerCount();
-            const data = await fetchCustomer({pageIndex: pagination.pageIndex, pageSize: pagination.pageSize, lastId: last_id});
+            const data = await fetchCustomer({pageIndex: pagination.pageIndex, pageSize: pagination.pageSize * balancer, lastId: last_id});
             if (data) {
                 setData((rData) => [...rData, ...data]);
                 if (count) {
@@ -547,7 +551,14 @@ const CustomerList = () => {
         };
         // check if the pagination.pageIndex is in the fetchedPage array so the data is not duplicated
         if (!fetchedPage.includes(pagination.pageIndex)) {
-            fetchData();
+            // check the pagination.pageIndex is greater than the last page
+            // then set the balancer to pagination.pageIndex - lastpage of the fetchedPage array
+            if (pagination.pageIndex > fetchedPage[fetchedPage.length - 1]) {
+                balancer = pagination.pageIndex - fetchedPage[fetchedPage.length - 1];
+            } else {
+                balancer = 1;
+            }
+            fetchData(balancer);
             setFetchedPage((fetchedPage) => [
                 ...fetchedPage,
                 pagination.pageIndex,
