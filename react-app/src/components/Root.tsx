@@ -14,14 +14,12 @@ import {
     EuiPopover,
     EuiContextMenuPanel,
     EuiButtonEmpty,
-    EuiGlobalToastList,
     EuiSpacer,
 } from '@elastic/eui';
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { logoutRequest } from '../api/Authentication';
 import useTheme from '../hooks/useTheme';
-import useToast from '../hooks/useToast';
 
 const Header = () => {
     const [isPopoverThemeOpen, setPopoverThemeOpen] = useState(false);
@@ -279,7 +277,6 @@ const SideNavItem = () => {
 };
 
 const Root = () => {
-    const { getAllToasts, removeToast } = useToast();
     return (
         <>
             <EuiPageTemplate panelled={true} grow={true}>
@@ -290,11 +287,6 @@ const Root = () => {
                     </EuiPageBody>
                 </EuiPageTemplate.Sidebar>
                 <Outlet />
-                <EuiGlobalToastList
-                    toasts={getAllToasts()}
-                    dismissToast={({ id }) => removeToast(id)}
-                    toastLifeTimeMs={6000}
-                />
             </EuiPageTemplate>
         </>
     );

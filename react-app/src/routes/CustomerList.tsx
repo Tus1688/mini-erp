@@ -1,5 +1,7 @@
 import {
+    EuiButton,
     EuiButtonIcon,
+    EuiConfirmModal,
     EuiDataGrid,
     EuiDataGridCellValueElementProps,
     EuiDataGridColumn,
@@ -10,6 +12,7 @@ import {
     EuiFlyout,
     EuiFlyoutBody,
     EuiFlyoutHeader,
+    EuiGlobalToastList,
     EuiPageTemplate,
     EuiPopover,
     EuiPopoverTitle,
@@ -30,6 +33,8 @@ import React, {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import FlyoutDescriptionList from '../components/FlyoutDescriptionList';
+import useToast from '../hooks/useToast';
+import { customerSpecific } from '../type/Customer';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -53,81 +58,108 @@ const columns: EuiDataGridColumn[] = [
     },
 ];
 
-const trailingControlColumns: EuiDataGridControlColumn[] = [
-    {
-        id: 'actions',
-        width: 40,
-        headerCellRender: () => null,
-        rowCellRender: function RowCellRender() {
-            const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-            return (
-                <div>
-                    <EuiPopover
-                        isOpen={isPopoverOpen}
-                        anchorPosition='upCenter'
-                        panelPaddingSize='s'
-                        button={
-                            <EuiButtonIcon
-                                aria-label='show actions'
-                                iconType='boxesHorizontal'
-                                color='text'
-                                onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-                            />
-                        }
-                        closePopover={() => setIsPopoverOpen(false)}
-                    >
-                        <EuiPopoverTitle>Actions</EuiPopoverTitle>
-                        <div style={{ width: 150 }}>
-                            {/* get selected id */}
-                            <button onClick={() => {}}>
-                                <EuiFlexGroup
-                                    alignItems='center'
-                                    component='span'
-                                    gutterSize='s'
-                                >
-                                    <EuiFlexItem grow={false}>
-                                        <EuiButtonIcon
-                                            aria-label='edit'
-                                            iconType='indexEdit'
-                                            color='text'
-                                        />
-                                    </EuiFlexItem>
-                                    <EuiFlexItem>Edit</EuiFlexItem>
-                                </EuiFlexGroup>
-                            </button>
-                            <EuiSpacer size='s' />
-                            <button onClick={() => {}}>
-                                <EuiFlexGroup
-                                    alignItems='center'
-                                    component='span'
-                                    gutterSize='s'
-                                >
-                                    <EuiFlexItem grow={false}>
-                                        <EuiButtonIcon
-                                            aria-label='delete'
-                                            iconType='trash'
-                                            color='text'
-                                        />
-                                    </EuiFlexItem>
-                                    <EuiFlexItem>Delete</EuiFlexItem>
-                                </EuiFlexGroup>
-                            </button>
-                        </div>
-                    </EuiPopover>
-                </div>
-            );
-        },
-    },
-];
-
-type customerSpecific = {
+const DeleteModal = ({
+    id,
+    toggleModal,
+}: {
     id: number;
-    name: string;
-    tax_id: string;
-    address: string;
-    city_name: string;
-    province_name: string;
-    country_name: string;
+    toggleModal: (value: React.SetStateAction<boolean>) => void;
+}) => {
+    let location = useLocation();
+    let navigate = useNavigate();
+
+    const { addToast, getAllToasts, removeToast, getNewId } = useToast();
+
+    const deleteCustomer = async (id: number) => {
+        const res = await fetch(`api/v1/customer?id=${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (res.status === 409) {
+            let data = await res.json();
+
+            addToast({
+                id: getNewId(),
+                title: 'Error',
+                color: 'danger',
+                text: (
+                    <>
+                        <p>{data.error}</p>
+                    </>
+                ),
+            });
+            return;
+        }
+        if (res.status === 200) {
+            toggleModal(false);
+            return;
+        }
+        if (res.status === 401) {
+            const state = getRefreshToken();
+            if (!state) {
+                navigate('/login', { state: { from: location } });
+                return;
+            }
+            const retry = await fetch(`api/v1/customer?id=${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: sessionStorage.getItem('token') || '',
+                },
+            });
+            if (retry.status === 200) {
+                toggleModal(false);
+                return;
+            }
+            if (retry.status === 409) {
+                let data = await retry.json();
+
+                addToast({
+                    id: getNewId(),
+                    title: 'Error',
+                    color: 'danger',
+                    text: (
+                        <>
+                            <p>{data.error}</p>
+                        </>
+                    ),
+                });
+                return;
+            }
+            if (retry.status === 401) {
+                navigate('/login', { state: { from: location } });
+                return;
+            }
+        }
+    };
+
+    return (
+        <>
+            <EuiConfirmModal
+                title='Delete customer'
+                onCancel={() => toggleModal(false)}
+                onConfirm={() => deleteCustomer(id)}
+                cancelButtonText='Cancel'
+                confirmButtonText='Yes, delete it'
+                buttonColor='danger'
+                defaultFocusedButton='confirm'
+            >
+                <p>
+                    You&rsquo;re about to delete customer
+                    <br />
+                    Are you sure you want to do this?
+                </p>
+            </EuiConfirmModal>
+            <EuiGlobalToastList
+                toasts={getAllToasts()}
+                dismissToast={({ id }) => removeToast(id)}
+                toastLifeTimeMs={6000}
+            />
+        </>
+    );
 };
 
 const CustomerFlyout = ({
@@ -144,7 +176,7 @@ const CustomerFlyout = ({
     const fetchCustomerSpecific = async (
         id: number
     ): Promise<customerSpecific | undefined> => {
-        let baseUrl = `/api/v1/customer?id=${id + 1}`;
+        let baseUrl = `/api/v1/customer?id=${id}`;
         console.log(baseUrl);
         const res = await fetch(baseUrl, {
             method: 'GET',
@@ -198,13 +230,34 @@ const CustomerFlyout = ({
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
                     <EuiDescriptionList>
-                        <FlyoutDescriptionList title='ID' description={data?.id} />
-                        <FlyoutDescriptionList title='Name' description={data?.name} />
-                        <FlyoutDescriptionList title='Tax ID' description={data?.tax_id} />
-                        <FlyoutDescriptionList title='Address' description={data?.address} />
-                        <FlyoutDescriptionList title='City' description={data?.city_name} />
-                        <FlyoutDescriptionList title='Province' description={data?.province_name} />
-                        <FlyoutDescriptionList title='Country' description={data?.country_name} />
+                        <FlyoutDescriptionList
+                            title='ID'
+                            description={data?.id}
+                        />
+                        <FlyoutDescriptionList
+                            title='Name'
+                            description={data?.name}
+                        />
+                        <FlyoutDescriptionList
+                            title='Tax ID'
+                            description={data?.tax_id}
+                        />
+                        <FlyoutDescriptionList
+                            title='Address'
+                            description={data?.address}
+                        />
+                        <FlyoutDescriptionList
+                            title='City'
+                            description={data?.city_name}
+                        />
+                        <FlyoutDescriptionList
+                            title='Province'
+                            description={data?.province_name}
+                        />
+                        <FlyoutDescriptionList
+                            title='Country'
+                            description={data?.country_name}
+                        />
                     </EuiDescriptionList>
                 </EuiFlyoutBody>
             </EuiFlyout>
@@ -238,7 +291,6 @@ const CustomerList = () => {
                 baseUrl += `&page_size=${pageSize}`;
             }
         }
-        console.log(baseUrl);
         const res = await fetch(baseUrl, {
             method: 'GET',
             headers: {
@@ -289,11 +341,84 @@ const CustomerList = () => {
                 />
                 {isFlyoutOpen ? (
                     <CustomerFlyout
-                        id={rowIndex.rowIndex as number}
+                        id={rData[rowIndex.rowIndex as number].id as number}
                         toggleFlyout={setIsFlyoutOpen}
                     />
                 ) : null}
             </Fragment>
+        );
+    };
+
+    const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
+        const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+        const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+        return (
+            <div>
+                <EuiPopover
+                    isOpen={isPopoverOpen}
+                    anchorPosition='upCenter'
+                    panelPaddingSize='s'
+                    button={
+                        <EuiButtonIcon
+                            aria-label='show actions'
+                            iconType='boxesHorizontal'
+                            color='text'
+                            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+                        />
+                    }
+                    closePopover={() => setIsPopoverOpen(false)}
+                >
+                    <EuiPopoverTitle>Actions</EuiPopoverTitle>
+                    <div style={{ width: 150 }}>
+                        {/* get selected id */}
+                        <button onClick={() => {}}>
+                            <EuiFlexGroup
+                                alignItems='center'
+                                component='span'
+                                gutterSize='s'
+                            >
+                                <EuiFlexItem grow={false}>
+                                    <EuiButtonIcon
+                                        aria-label='edit'
+                                        iconType='indexEdit'
+                                        color='text'
+                                    />
+                                </EuiFlexItem>
+                                <EuiFlexItem>Edit</EuiFlexItem>
+                            </EuiFlexGroup>
+                        </button>
+                        <EuiSpacer size='s' />
+                        <button
+                            onClick={() => {
+                                setDeleteModalOpen(!deleteModalOpen);
+                                setIsPopoverOpen(false);
+                            }}
+                        >
+                            <EuiFlexGroup
+                                alignItems='center'
+                                component='span'
+                                gutterSize='s'
+                            >
+                                <EuiFlexItem grow={false}>
+                                    <EuiButtonIcon
+                                        aria-label='delete'
+                                        iconType='trash'
+                                        color='text'
+                                    />
+                                </EuiFlexItem>
+                                <EuiFlexItem>Delete</EuiFlexItem>
+                            </EuiFlexGroup>
+                        </button>
+                    </div>
+                </EuiPopover>
+                {deleteModalOpen ? (
+                    <DeleteModal
+                        toggleModal={setDeleteModalOpen}
+                        id={rData[rowIndex.rowIndex as number].id as number}
+                    />
+                ) : null}
+            </div>
         );
     };
 
@@ -303,6 +428,15 @@ const CustomerList = () => {
             width: 36,
             headerCellRender: () => null,
             rowCellRender: FlyoutRowCell,
+        },
+    ];
+
+    const trailingControlColumns: EuiDataGridControlColumn[] = [
+        {
+            id: 'actions',
+            width: 40,
+            headerCellRender: () => null,
+            rowCellRender: RowCellRender,
         },
     ];
 
@@ -376,17 +510,32 @@ const CustomerList = () => {
     return (
         <>
             <EuiPageTemplate.Section style={{ height: 0 }}>
-                <EuiTitle size='l'>
-                    <h1>Customer List</h1>
-                </EuiTitle>
-                <EuiText>
-                    <EuiTextColor color='subdued'>
-                        <p>
-                            In this page you can see, add, edit and delete
-                            customers.
-                        </p>
-                    </EuiTextColor>
-                </EuiText>
+                <EuiFlexGroup justifyContent='spaceBetween'>
+                    <EuiFlexItem grow={false}>
+                        <EuiTitle size='l'>
+                            <h1>Customer List</h1>
+                        </EuiTitle>
+                        <EuiText>
+                            <EuiTextColor color='subdued'>
+                                <p>
+                                    In this page you can see, add, edit and
+                                    delete customers.
+                                </p>
+                            </EuiTextColor>
+                        </EuiText>
+                    </EuiFlexItem>
+                    <EuiButton
+                        iconType={'refresh'}
+                        iconSide='right'
+                        // onclick setfetchedpage to empty array
+                        onClick={() => {
+                            setFetchedPage([]);
+                            setData([]);
+                        }}
+                    >
+                        Refresh
+                    </EuiButton>
+                </EuiFlexGroup>
             </EuiPageTemplate.Section>
             <EuiPageTemplate.Section>
                 <EuiDataGrid
