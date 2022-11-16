@@ -45,25 +45,6 @@ func initRouter() *gin.Engine {
 		api.DELETE("/customer", controllers.DeleteCustomer)
 		api.PATCH("/customer", controllers.UpdateCustomer)
 
-		geo := api.Group("/geo")
-		{
-			geo.GET("/city", controllers.GetCity)
-			geo.GET("/province", controllers.GetProvince)
-			geo.GET("/country", controllers.GetCountry)
-
-			geo.POST("/city", controllers.CreateCity)
-			geo.POST("/province", controllers.CreateProvince)
-			geo.POST("/country", controllers.CreateCountry)
-
-			geo.DELETE("/city", controllers.DeleteCity)
-			geo.DELETE("/province", controllers.DeleteProvince)
-			geo.DELETE("/country", controllers.DeleteCountry)
-
-			geo.PATCH("/city", controllers.UpdateCity)
-			geo.PATCH("/province", controllers.UpdateProvince)
-			geo.PATCH("/country", controllers.UpdateCountry)
-		}
-
 		inv := api.Group("/inventory")
 		{
 			inv.GET("/batch", controllers.GetBatch)

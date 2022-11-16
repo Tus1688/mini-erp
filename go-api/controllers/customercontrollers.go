@@ -25,10 +25,7 @@ func GetCustomer(c *gin.Context) {
 	if err := c.ShouldBindQuery(&requestID); err == nil {
 		// select c.id, c.name, c.tax_id, c.address, ct.city_name, p.province_name, ctr.country_name from customers c left join cities ct on c.city_refer = ct.id left join provinces p on ct.province_refer = p.id left join countries ctr on p.country_refer = ctr.id;
 		database.Instance.Table("customers").
-			Select("customers.id, customers.name, customers.tax_id, customers.address, cities.city_name, provinces.province_name, countries.country_name").
-			Joins("left join cities on customers.city_refer = cities.id").
-			Joins("left join provinces on cities.province_refer = provinces.id").
-			Joins("left join countries on provinces.country_refer = countries.id").
+			Select("id, name, tax_id, address, city_name, province_name, country_name").
 			Where("customers.id = ?", requestID.ID).Scan(&response)
 
 		if response.ID == 0 {
@@ -91,10 +88,12 @@ func CreateCustomer(c *gin.Context) {
 	}
 
 	record := database.Instance.Create(&models.Customer{
-		Name:      strings.ToLower(request.Name),
-		TaxID:     strings.ToLower(request.TaxID),
-		Address:   strings.ToLower(request.Address),
-		CityRefer: request.City,
+		Name:         strings.ToLower(request.Name),
+		TaxID:        strings.ToLower(request.TaxID),
+		Address:      strings.ToLower(request.Address),
+		CityName:     strings.ToLower(request.CityName),
+		ProvinceName: strings.ToLower(request.ProvinceName),
+		CountryName:  strings.ToLower(request.CountryName),
 	})
 	if record.Error != nil {
 		if strings.Contains(record.Error.Error(), "1062") {
@@ -120,16 +119,20 @@ func UpdateCustomer(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Customer not found"})
 		return
 	}
-	if check.Name == strings.ToLower(request.Name) && check.TaxID == request.TaxID && check.Address == strings.ToLower(request.Address) && check.CityRefer == request.City {
+	if check.Name == strings.ToLower(request.Name) && check.TaxID == request.TaxID &&
+		check.Address == strings.ToLower(request.Address) && check.CityName == strings.ToLower(request.CityName) &&
+		check.ProvinceName == strings.ToLower(request.ProvinceName) && check.CountryName == strings.ToLower(request.CountryName) {
 		c.JSON(http.StatusOK, gin.H{"message": "No changes detected"})
 		return
 	}
 
 	record := database.Instance.Where("id = ?", request.ID).Updates(models.Customer{
-		Name:      strings.ToLower(request.Name),
-		TaxID:     strings.ToLower(request.TaxID),
-		Address:   strings.ToLower(request.Address),
-		CityRefer: request.City,
+		Name:         strings.ToLower(request.Name),
+		TaxID:        strings.ToLower(request.TaxID),
+		Address:      strings.ToLower(request.Address),
+		CityName:     strings.ToLower(request.CityName),
+		ProvinceName: strings.ToLower(request.ProvinceName),
+		CountryName:  strings.ToLower(request.CountryName),
 	})
 	if record.Error != nil {
 		if strings.Contains(record.Error.Error(), "1062") {
