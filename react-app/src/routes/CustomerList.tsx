@@ -27,7 +27,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import CustomerDeleteModal from '../components/CustomerDelete';
 import CustomerEditModal from '../components/CustomerEdit';
-import CustomerFlyout from '../components/CustomerFlyout';
+import CustomerModal from '../components/CustomerModal';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -157,8 +157,8 @@ const CustomerList = () => {
         }
     };
 
-    const FlyoutRowCell = (rowIndex: EuiDataGridCellValueElementProps) => {
-        const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
+    const EyeRowCell = (rowIndex: EuiDataGridCellValueElementProps) => {
+        const [isModalOpen, setIsModalOpen] = useState(false);
 
         return (
             <Fragment>
@@ -167,13 +167,13 @@ const CustomerList = () => {
                     iconType='eye'
                     iconSize='s'
                     aria-label='View details'
-                    onClick={() => setIsFlyoutOpen(!isFlyoutOpen)}
+                    onClick={() => setIsModalOpen(!isModalOpen)}
                 />
-                {isFlyoutOpen ? (
-                    <CustomerFlyout
+                {isModalOpen ? (
+                    <CustomerModal
                         id={rData[rowIndex.rowIndex as number].id as number}
-                        toggleFlyout={setIsFlyoutOpen}
-                    />
+                        toggleModal={setIsModalOpen}
+                        />
                 ) : null}
             </Fragment>
         );
@@ -272,7 +272,7 @@ const CustomerList = () => {
             id: 'view',
             width: 36,
             headerCellRender: () => null,
-            rowCellRender: FlyoutRowCell,
+            rowCellRender: EyeRowCell,
         },
     ];
 

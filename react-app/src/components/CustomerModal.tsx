@@ -1,44 +1,48 @@
 import {
-    EuiPortal,
-    EuiFlyout,
-    EuiFlyoutHeader,
-    EuiTitle,
-    EuiFlyoutBody,
+    EuiButton,
     EuiDescriptionList,
+    EuiModal,
+    EuiModalBody,
+    EuiModalFooter,
+    EuiModalHeader,
+    EuiModalHeaderTitle,
 } from '@elastic/eui';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchCustomerSpecific } from '../api/Customer';
 import { customerSpecific } from '../type/Customer';
 import FlyoutDescriptionList from './FlyoutDescriptionList';
 
-const CustomerFlyout = ({
+const CustomerModal = ({
     id,
-    toggleFlyout,
+    toggleModal,
 }: {
     id: number;
-    toggleFlyout: (value: React.SetStateAction<boolean>) => void;
+    toggleModal: (value: React.SetStateAction<boolean>) => void;
 }) => {
     let location = useLocation();
     let navigate = useNavigate();
     const [data, setData] = useState<customerSpecific>();
 
     useEffect(() => {
-        fetchCustomerSpecific({id: id, navigate: navigate, location: location}).then((data) => {
+        fetchCustomerSpecific({
+            id: id,
+            navigate: navigate,
+            location: location,
+        }).then((data) => {
             setData(data);
         });
     }, [id, navigate, location]);
 
     return (
-        <EuiPortal>
-            <EuiFlyout ownFocus onClose={() => toggleFlyout(false)}>
-                <EuiFlyoutHeader hasBorder>
-                    <EuiTitle size='m'>
-                        <h2>{data?.name}'s details</h2>
-                    </EuiTitle>
-                </EuiFlyoutHeader>
-                <EuiFlyoutBody>
-                    <EuiDescriptionList>
+        <EuiModal onClose={() => toggleModal(false)}>
+            <EuiModalHeader>
+                <EuiModalHeaderTitle>
+                    <h1>{data?.name}'s details</h1>
+                </EuiModalHeaderTitle>
+            </EuiModalHeader>
+            <EuiModalBody>
+            <EuiDescriptionList>
                         <FlyoutDescriptionList
                             title='ID'
                             description={data?.id}
@@ -68,10 +72,12 @@ const CustomerFlyout = ({
                             description={data?.country_name}
                         />
                     </EuiDescriptionList>
-                </EuiFlyoutBody>
-            </EuiFlyout>
-        </EuiPortal>
+            </EuiModalBody>
+            <EuiModalFooter>
+                <EuiButton onClick={() => toggleModal(false)}>Close</EuiButton>
+            </EuiModalFooter>
+        </EuiModal>
     );
 };
 
-export default CustomerFlyout;
+export default CustomerModal;
