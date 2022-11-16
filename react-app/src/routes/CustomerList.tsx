@@ -32,6 +32,9 @@ import React, {
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
+import CustomerDeleteModal from '../components/CustomerDelete';
+import CustomerEditModal from '../components/CustomerEdit';
+import CustomerFlyout from '../components/CustomerFlyout';
 import FlyoutDescriptionList from '../components/FlyoutDescriptionList';
 import useToast from '../hooks/useToast';
 import { customerSpecific } from '../type/Customer';
@@ -58,213 +61,6 @@ const columns: EuiDataGridColumn[] = [
     },
 ];
 
-const DeleteModal = ({
-    id,
-    toggleModal,
-}: {
-    id: number;
-    toggleModal: (value: React.SetStateAction<boolean>) => void;
-}) => {
-    let location = useLocation();
-    let navigate = useNavigate();
-
-    const { addToast, getAllToasts, removeToast, getNewId } = useToast();
-
-    const deleteCustomer = async (id: number) => {
-        const res = await fetch(`api/v1/customer?id=${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: sessionStorage.getItem('token') || '',
-            },
-        });
-        if (res.status === 409) {
-            let data = await res.json();
-
-            addToast({
-                id: getNewId(),
-                title: 'Error',
-                color: 'danger',
-                text: (
-                    <>
-                        <p>{data.error}</p>
-                    </>
-                ),
-            });
-            return;
-        }
-        if (res.status === 200) {
-            toggleModal(false);
-            return;
-        }
-        if (res.status === 401) {
-            const state = getRefreshToken();
-            if (!state) {
-                navigate('/login', { state: { from: location } });
-                return;
-            }
-            const retry = await fetch(`api/v1/customer?id=${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: sessionStorage.getItem('token') || '',
-                },
-            });
-            if (retry.status === 200) {
-                toggleModal(false);
-                return;
-            }
-            if (retry.status === 409) {
-                let data = await retry.json();
-
-                addToast({
-                    id: getNewId(),
-                    title: 'Error',
-                    color: 'danger',
-                    text: (
-                        <>
-                            <p>{data.error}</p>
-                        </>
-                    ),
-                });
-                return;
-            }
-            if (retry.status === 401) {
-                navigate('/login', { state: { from: location } });
-                return;
-            }
-        }
-    };
-
-    return (
-        <>
-            <EuiConfirmModal
-                title='Delete customer'
-                onCancel={() => toggleModal(false)}
-                onConfirm={() => deleteCustomer(id)}
-                cancelButtonText='Cancel'
-                confirmButtonText='Yes, delete it'
-                buttonColor='danger'
-                defaultFocusedButton='confirm'
-            >
-                <p>
-                    You&rsquo;re about to delete customer
-                    <br />
-                    Are you sure you want to do this?
-                </p>
-            </EuiConfirmModal>
-            <EuiGlobalToastList
-                toasts={getAllToasts()}
-                dismissToast={({ id }) => removeToast(id)}
-                toastLifeTimeMs={6000}
-            />
-        </>
-    );
-};
-
-const CustomerFlyout = ({
-    id,
-    toggleFlyout,
-}: {
-    id: number;
-    toggleFlyout: (value: React.SetStateAction<boolean>) => void;
-}) => {
-    let location = useLocation();
-    let navigate = useNavigate();
-    const [data, setData] = useState<customerSpecific>();
-
-    const fetchCustomerSpecific = async (
-        id: number
-    ): Promise<customerSpecific | undefined> => {
-        let baseUrl = `/api/v1/customer?id=${id}`;
-        console.log(baseUrl);
-        const res = await fetch(baseUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: sessionStorage.getItem('token') || '',
-            },
-        });
-        if (res.status === 200) {
-            const data = await res.json();
-            return data;
-        }
-        if (res.status === 401) {
-            const state = await getRefreshToken();
-            if (!state) {
-                navigate('/login', { state: { from: location.pathname } });
-                return;
-            }
-            // retry
-            const retry = await fetch(baseUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: sessionStorage.getItem('token') || '',
-                },
-            });
-            if (retry.status === 200) {
-                const data = await retry.json();
-                return data;
-            }
-            if (retry.status === 401) {
-                navigate('/login', { state: { from: location.pathname } });
-                return;
-            }
-        }
-    };
-
-    useEffect(() => {
-        fetchCustomerSpecific(id).then((data) => {
-            setData(data);
-        });
-    }, [id]);
-
-    return (
-        <EuiPortal>
-            <EuiFlyout ownFocus onClose={() => toggleFlyout(false)}>
-                <EuiFlyoutHeader hasBorder>
-                    <EuiTitle size='m'>
-                        <h2>{data?.name}'s details</h2>
-                    </EuiTitle>
-                </EuiFlyoutHeader>
-                <EuiFlyoutBody>
-                    <EuiDescriptionList>
-                        <FlyoutDescriptionList
-                            title='ID'
-                            description={data?.id}
-                        />
-                        <FlyoutDescriptionList
-                            title='Name'
-                            description={data?.name}
-                        />
-                        <FlyoutDescriptionList
-                            title='Tax ID'
-                            description={data?.tax_id}
-                        />
-                        <FlyoutDescriptionList
-                            title='Address'
-                            description={data?.address}
-                        />
-                        <FlyoutDescriptionList
-                            title='City'
-                            description={data?.city_name}
-                        />
-                        <FlyoutDescriptionList
-                            title='Province'
-                            description={data?.province_name}
-                        />
-                        <FlyoutDescriptionList
-                            title='Country'
-                            description={data?.country_name}
-                        />
-                    </EuiDescriptionList>
-                </EuiFlyoutBody>
-            </EuiFlyout>
-        </EuiPortal>
-    );
-};
-
 const CustomerList = () => {
     let navigate = useNavigate();
     let location = useLocation();
@@ -279,7 +75,7 @@ const CustomerList = () => {
     const fetchCustomer = async ({
         pageIndex,
         pageSize,
-        lastId
+        lastId,
     }: {
         pageIndex?: number;
         pageSize?: number;
@@ -333,7 +129,7 @@ const CustomerList = () => {
         }
     };
 
-    const fetchCustomerCount = async (): Promise<number | undefined>  => {
+    const fetchCustomerCount = async (): Promise<number | undefined> => {
         let baseUrl = '/api/v1/customer-count';
         const res = await fetch(baseUrl, {
             method: 'GET',
@@ -369,7 +165,7 @@ const CustomerList = () => {
                 return;
             }
         }
-    }
+    };
 
     const FlyoutRowCell = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
@@ -396,6 +192,7 @@ const CustomerList = () => {
     const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isPopoverOpen, setIsPopoverOpen] = useState(false);
         const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+        const [editModalOpen, setEditModalOpen] = useState(false);
 
         return (
             <div>
@@ -416,7 +213,12 @@ const CustomerList = () => {
                     <EuiPopoverTitle>Actions</EuiPopoverTitle>
                     <div style={{ width: 150 }}>
                         {/* get selected id */}
-                        <button onClick={() => {}}>
+                        <button
+                            onClick={() => {
+                                setEditModalOpen(!editModalOpen);
+                                setIsPopoverOpen(false);
+                            }}
+                        >
                             <EuiFlexGroup
                                 alignItems='center'
                                 component='span'
@@ -457,8 +259,14 @@ const CustomerList = () => {
                     </div>
                 </EuiPopover>
                 {deleteModalOpen ? (
-                    <DeleteModal
+                    <CustomerDeleteModal
                         toggleModal={setDeleteModalOpen}
+                        id={rData[rowIndex.rowIndex as number].id as number}
+                    />
+                ) : null}
+                {editModalOpen ? (
+                    <CustomerEditModal
+                        toggleModal={setEditModalOpen}
                         id={rData[rowIndex.rowIndex as number].id as number}
                     />
                 ) : null}
@@ -534,14 +342,19 @@ const CustomerList = () => {
 
     useEffect(() => {
         // balancer for pagination,
-        // if the last page is 1 and the use press page 3 
+        // if the last page is 1 and the use press page 3
         // balancer will set to 3 - 1 = 2
         let balancer: number;
         const fetchData = async (balancer: number) => {
             // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
-            const last_id = rData.length > 0 ? rData[rData.length - 1].id as number: 0;
+            const last_id =
+                rData.length > 0 ? (rData[rData.length - 1].id as number) : 0;
             const count = await fetchCustomerCount();
-            const data = await fetchCustomer({pageIndex: pagination.pageIndex, pageSize: pagination.pageSize * balancer, lastId: last_id});
+            const data = await fetchCustomer({
+                pageIndex: pagination.pageIndex,
+                pageSize: pagination.pageSize * balancer,
+                lastId: last_id,
+            });
             if (data) {
                 setData((rData) => [...rData, ...data]);
                 if (count) {
@@ -554,7 +367,8 @@ const CustomerList = () => {
             // check the pagination.pageIndex is greater than the last page
             // then set the balancer to pagination.pageIndex - lastpage of the fetchedPage array
             if (pagination.pageIndex > fetchedPage[fetchedPage.length - 1]) {
-                balancer = pagination.pageIndex - fetchedPage[fetchedPage.length - 1];
+                balancer =
+                    pagination.pageIndex - fetchedPage[fetchedPage.length - 1];
             } else {
                 balancer = 1;
             }
@@ -595,7 +409,7 @@ const CustomerList = () => {
                             setPagination({
                                 pageIndex: 0,
                                 pageSize: 20,
-                            })
+                            });
                         }}
                     >
                         Refresh
