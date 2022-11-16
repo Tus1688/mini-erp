@@ -1,22 +1,15 @@
 import {
     EuiButton,
     EuiButtonIcon,
-    EuiConfirmModal,
     EuiDataGrid,
     EuiDataGridCellValueElementProps,
     EuiDataGridColumn,
     EuiDataGridControlColumn,
-    EuiDescriptionList,
     EuiFlexGroup,
     EuiFlexItem,
-    EuiFlyout,
-    EuiFlyoutBody,
-    EuiFlyoutHeader,
-    EuiGlobalToastList,
     EuiPageTemplate,
     EuiPopover,
     EuiPopoverTitle,
-    EuiPortal,
     EuiSpacer,
     EuiText,
     EuiTextColor,
@@ -35,9 +28,6 @@ import { getRefreshToken } from '../api/Authentication';
 import CustomerDeleteModal from '../components/CustomerDelete';
 import CustomerEditModal from '../components/CustomerEdit';
 import CustomerFlyout from '../components/CustomerFlyout';
-import FlyoutDescriptionList from '../components/FlyoutDescriptionList';
-import useToast from '../hooks/useToast';
-import { customerSpecific } from '../type/Customer';
 
 const columns: EuiDataGridColumn[] = [
     {
