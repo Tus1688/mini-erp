@@ -274,13 +274,16 @@ const CustomerList = () => {
         pageSize: 20,
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
+    const [customerCount, setCustomerCount] = useState<number>(20);
 
     const fetchCustomer = async ({
         pageIndex,
         pageSize,
+        lastId
     }: {
         pageIndex?: number;
         pageSize?: number;
+        lastId?: number;
     }): Promise<Array<{ [key: string]: ReactNode }> | undefined> => {
         let baseUrl = '/api/v1/customer';
         // if there is pageINdex then append page= to the url also if there is pageSize then append page_size=
@@ -289,6 +292,9 @@ const CustomerList = () => {
             baseUrl += `?page=${pageIndex + 1}`;
             if (pageSize) {
                 baseUrl += `&page_size=${pageSize}`;
+            }
+            if (lastId) {
+                baseUrl += `&last_id=${lastId}`;
             }
         }
         const res = await fetch(baseUrl, {
@@ -326,6 +332,44 @@ const CustomerList = () => {
             }
         }
     };
+
+    const fetchCustomerCount = async (): Promise<number | undefined>  => {
+        let baseUrl = '/api/v1/customer-count';
+        const res = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (res.status === 200) {
+            const data = await res.json();
+            return data.count;
+        }
+        if (res.status === 401) {
+            const state = await getRefreshToken();
+            if (!state) {
+                navigate('/login', { state: { from: location } });
+                return;
+            }
+            // retry
+            const retry = await fetch(baseUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: sessionStorage.getItem('token') || '',
+                },
+            });
+            if (retry.status === 200) {
+                const data = await retry.json();
+                return data.count;
+            }
+            if (retry.status === 401) {
+                navigate('/login', { state: { from: location.pathname } });
+                return;
+            }
+        }
+    }
 
     const FlyoutRowCell = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
@@ -490,9 +534,15 @@ const CustomerList = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await fetchCustomer(pagination);
+            // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
+            const last_id = rData.length > 0 ? rData[rData.length - 1].id as number: 0;
+            const count = await fetchCustomerCount();
+            const data = await fetchCustomer({pageIndex: pagination.pageIndex, pageSize: pagination.pageSize, lastId: last_id});
             if (data) {
                 setData((rData) => [...rData, ...data]);
+                if (count) {
+                    setCustomerCount(count);
+                }
             }
         };
         // check if the pagination.pageIndex is in the fetchedPage array so the data is not duplicated
@@ -531,6 +581,10 @@ const CustomerList = () => {
                         onClick={() => {
                             setFetchedPage([]);
                             setData([]);
+                            setPagination({
+                                pageIndex: 0,
+                                pageSize: 20,
+                            })
                         }}
                     >
                         Refresh
@@ -548,7 +602,7 @@ const CustomerList = () => {
                         setVisibleColumns,
                     }}
                     height={550}
-                    rowCount={20}
+                    rowCount={customerCount}
                     renderCellValue={renderCellValue}
                     sorting={{ columns: sortingColumns, onSort }}
                     inMemory={{ level: 'sorting' }}
