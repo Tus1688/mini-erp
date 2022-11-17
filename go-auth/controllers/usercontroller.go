@@ -64,7 +64,13 @@ func Login(c *gin.Context) {
 	}
 	c.SetSameSite(http.SameSiteStrictMode)
 	c.SetCookie("refresh_token", refresh_token, 60*60*10, "/", os.Getenv("DOMAIN_NAME"), false, true)
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{
+		"token": tokenString,
+		"inv_u": user.InventoryUser,
+		"fin_u": user.FinanceUser,
+		"inv_a": user.InventoryAdmin,
+		"sys_a": user.SystemAdmin,
+	})
 }
 
 func RegisterUser(c *gin.Context) {
