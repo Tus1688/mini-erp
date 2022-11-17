@@ -9,6 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetTOPCount(c *gin.Context) {
+	var count int64
+	database.Instance.Model(&models.TermOfPayment{}).Count(&count)
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
 func GetTOP(c *gin.Context) {
 	var response models.APIFinanceTOP
 	var responseArr []models.APIFinanceTOP

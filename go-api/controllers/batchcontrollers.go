@@ -9,6 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetBatchCount(c *gin.Context) {
+	var count int64
+	database.Instance.Table("batches").Count(&count)
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
 func GetBatch(c *gin.Context) {
 	var response models.APIInventoryBatchResponse
 	var responseArr []models.APIInventoryBatchResponse

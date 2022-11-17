@@ -9,6 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetItemTransactionLogCount(c *gin.Context) {
+	var count int64
+	database.Instance.Table("item_transaction_logs").Count(&count)
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
 func GetItemTransactionLogs(c *gin.Context) {
 	var response models.APIInventoryTransactionLogResponse
 	var responseArr []models.APIInventoryTransactionLogResponse

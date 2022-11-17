@@ -17,6 +17,18 @@ type helperSelectStock struct {
 	Quantity int
 }
 
+func GetSalesInvoiceDraftCount(c *gin.Context) {
+	var count int64
+	database.Instance.Model(&models.InvoiceDraft{}).Count(&count)
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
+func GetSalesInvoiceCount(c *gin.Context) {
+	var count int64
+	database.Instance.Model(&models.Invoice{}).Count(&count)
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
 func CreateSalesInvoiceDraft(c *gin.Context) {
 	var request models.APIFinanceInvoiceCreate
 	if err := c.ShouldBindJSON(&request); err != nil {

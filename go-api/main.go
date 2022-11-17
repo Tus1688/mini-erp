@@ -47,17 +47,22 @@ func initRouter() *gin.Engine {
 
 		inv := api.Group("/inventory")
 		{
+			inv.GET("/batch-count", controllers.GetBatchCount)
 			inv.GET("/batch", controllers.GetBatch)
 			inv.POST("/batch", controllers.CreateBatch)
 
+			inv.GET("/variant-count", controllers.GetVariantCount)
 			inv.GET("/variant", controllers.GetVariant)
 			inv.POST("/variant", controllers.CreateVariant)
 
 			// real table
+			inv.GET("/item-transaction-log-count", controllers.GetItemTransactionLogCount)
 			inv.GET("/item-transaction-log", controllers.GetItemTransactionLogs) // transaction logs whether it's production or sales
-			inv.GET("/stock", controllers.GetStock)                              // get stock by batch and variant
+			inv.GET("/stock-count", controllers.GetStockCount)
+			inv.GET("/stock", controllers.GetStock) // get stock by batch and variant
 
 			// draft table
+			inv.GET("/production-count", controllers.GetProductionDraftCount)
 			inv.GET("/production", controllers.GetProductionDraft)     // get item transaction log draft
 			inv.POST("/production", controllers.CreateProductionDraft) // add stock to draft table
 
@@ -78,9 +83,11 @@ func initRouter() *gin.Engine {
 
 		fin := api.Group("/finance")
 		{
+			fin.GET("/term-of-payment-count", controllers.GetTOPCount)
 			fin.GET("/term-of-payment", controllers.GetTOP)
 			fin.POST("/term-of-payment", controllers.CreateTOP)
 
+			fin.GET("/sales-invoice-draft-count", controllers.GetSalesInvoiceDraftCount)
 			fin.GET("/sales-invoice-draft", controllers.GetSalesInvoiceDraft)
 			fin.POST("/sales-invoice-draft", controllers.CreateSalesInvoiceDraft)
 

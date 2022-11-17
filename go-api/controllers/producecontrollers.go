@@ -16,6 +16,12 @@ choose variant from variant list or create new variant
 choose quantity
 */
 
+func GetProductionDraftCount(c *gin.Context) {
+	var count int64
+	database.Instance.Model(&models.ItemTransactionLogDraft{}).Count(&count)
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
 func CreateProductionDraft(c *gin.Context) {
 	var request models.APIInventoryItemProductionCreate
 	if err := c.ShouldBindJSON(&request); err != nil {

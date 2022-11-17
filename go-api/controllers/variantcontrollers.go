@@ -9,6 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetVariantCount(c *gin.Context) {
+	var count int64
+	database.Instance.Table("variants").Count(&count)
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
 func GetVariant(c *gin.Context) {
 	var response models.APIInventoryVariantResponse
 	var responseArr []models.APIInventoryVariantResponse
