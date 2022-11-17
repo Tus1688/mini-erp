@@ -1,4 +1,14 @@
-import { EuiConfirmModal, EuiGlobalToastList } from '@elastic/eui';
+import {
+    EuiButton,
+    EuiButtonEmpty,
+    EuiGlobalToastList,
+    EuiModal,
+    EuiModalBody,
+    EuiModalFooter,
+    EuiModalHeader,
+    EuiModalHeaderTitle,
+    EuiText,
+} from '@elastic/eui';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import useToast from '../hooks/useToast';
@@ -12,14 +22,20 @@ const CustomerDeleteModal = ({
 }: {
     id: number;
     toggleModal: (value: React.SetStateAction<boolean>) => void;
-    setFetchedPage: React.Dispatch<React.SetStateAction<number[]>>
-    setPagination: React.Dispatch<React.SetStateAction<{
-        pageIndex: number;
-        pageSize: number;
-    }>>;
-    setData: React.Dispatch<React.SetStateAction<{
-        [key: string]: React.ReactNode;
-    }[]>>
+    setFetchedPage: React.Dispatch<React.SetStateAction<number[]>>;
+    setPagination: React.Dispatch<
+        React.SetStateAction<{
+            pageIndex: number;
+            pageSize: number;
+        }>
+    >;
+    setData: React.Dispatch<
+        React.SetStateAction<
+            {
+                [key: string]: React.ReactNode;
+            }[]
+        >
+    >;
 }) => {
     let location = useLocation();
     let navigate = useNavigate();
@@ -105,28 +121,39 @@ const CustomerDeleteModal = ({
     };
 
     return (
-        <>
-            <EuiConfirmModal
-                title='Delete customer'
-                onCancel={() => toggleModal(false)}
-                onConfirm={() => deleteCustomer(id)}
-                cancelButtonText='Cancel'
-                confirmButtonText='Yes, delete it'
-                buttonColor='danger'
-                defaultFocusedButton='confirm'
-            >
-                <p>
-                    You&rsquo;re about to delete customer
-                    <br />
-                    Are you sure you want to do this?
-                </p>
-            </EuiConfirmModal>
+        <EuiModal onClose={() => toggleModal(false)}>
+            <EuiModalHeader>
+                <EuiModalHeaderTitle>
+                    <h2>Delete Customer</h2>
+                </EuiModalHeaderTitle>
+            </EuiModalHeader>
+            <EuiModalBody>
+                <EuiText>
+                    <p>
+                        You&rsquo;re about to delete customer
+                        <br />
+                        Are you sure you want to do this?
+                    </p>
+                </EuiText>
+            </EuiModalBody>
+            <EuiModalFooter>
+                <EuiButtonEmpty onClick={() => toggleModal(false)}>
+                    Cancel
+                </EuiButtonEmpty>
+                <EuiButton
+                    onClick={() => deleteCustomer(id)}
+                    fill
+                    color='danger'
+                >
+                    Yes, delete it!
+                </EuiButton>
+            </EuiModalFooter>
             <EuiGlobalToastList
                 toasts={getAllToasts()}
                 dismissToast={({ id }) => removeToast(id)}
                 toastLifeTimeMs={6000}
             />
-        </>
+        </EuiModal>
     );
 };
 
