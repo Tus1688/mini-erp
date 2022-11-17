@@ -1,20 +1,19 @@
 import {
+    EuiButton,
     EuiDataGrid,
     EuiDataGridColumn,
+    EuiFlexGroup,
+    EuiFlexItem,
+    EuiGlobalToastList,
     EuiPageTemplate,
     EuiText,
     EuiTextColor,
     EuiTitle,
 } from '@elastic/eui';
-import {
-    ReactNode,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-} from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
+import useToast from '../hooks/useToast';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -25,7 +24,7 @@ const columns: EuiDataGridColumn[] = [
     {
         id: 'batch_id',
         displayAsText: 'Batch ID',
-        initialWidth: 200
+        initialWidth: 200,
     },
     {
         id: 'quantity',
@@ -46,9 +45,14 @@ const StockList = () => {
         pageSize: 20,
     });
     const [fetchedPageCity, setFetchedPageCity] = useState<number[]>([]);
+    const [alreadyFetched, setAlreadyFetched] = useState<boolean>(false);
+    const { addToast, getAllToasts, getNewId, removeToast } = useToast();
 
-    const fetchStock = async (): Promise<Array<{ [key: string]: ReactNode }> | undefined> => {
+    const fetchStock = async (): Promise<
+        Array<{ [key: string]: ReactNode }> | undefined
+    > => {
         let baseUrl = '/api/v1/inventory/stock';
+        let time1 = performance.now();
         const res = await fetch(baseUrl, {
             method: 'GET',
             headers: {
@@ -57,14 +61,26 @@ const StockList = () => {
             },
         });
         if (res.status === 200) {
+            let time2 = performance.now();
             const data = await res.json();
+            addToast({
+                id: getNewId(),
+                title: 'Fully loaded',
+                color: 'primary',
+                text: (
+                    <p>Took {(time2-time1).toPrecision(2)}ms</p>
+                )
+            })
             return data;
         }
         if (res.status === 401) {
             const state = await getRefreshToken();
             if (!state) {
-                navigate('/login', { state: { from: location.pathname }, replace: true });
-                return
+                navigate('/login', {
+                    state: { from: location.pathname },
+                    replace: true,
+                });
+                return;
             }
 
             const retry = await fetch(baseUrl, {
@@ -76,14 +92,26 @@ const StockList = () => {
             });
             if (retry.status === 200) {
                 const data = await retry.json();
+                let time2 = performance.now();
+                addToast({
+                    id: getNewId(),
+                    title: 'Fully loaded',
+                    color: 'primary',
+                    text: (
+                        <p>Took {(time2-time1).toPrecision(2)}ms</p>
+                    )
+                })
                 return data;
             }
             if (retry.status === 401) {
-                navigate('/login', { state: { from: location.pathname }, replace: true });
-                return
+                navigate('/login', {
+                    state: { from: location.pathname },
+                    replace: true,
+                });
+                return;
             }
         }
-    }
+    };
 
     const onChangeItemsPerPage = useCallback(
         (pageSize: number) =>
@@ -137,35 +165,48 @@ const StockList = () => {
         const fetchData = async () => {
             const data = await fetchStock();
             if (data) {
-                setData((rData) => [...rData, ...data]);
+                setData(data);
             }
         };
-        // check if the pagination.pageIndex is in the fetchedPage array so the data is not duplicated
-        if (!fetchedPageCity.includes(paginationCity.pageIndex)) {
+        if (!alreadyFetched) {
             fetchData();
             setFetchedPageCity((fetchedPage) => [
                 ...fetchedPage,
                 paginationCity.pageIndex,
             ]);
+            setAlreadyFetched(true);
             console.log('fetching again');
-        }
-        console.log(rData);
-    }, [paginationCity, fetchedPageCity, rData]);
+        }// eslint-disable-next-line
+    }, [paginationCity, fetchedPageCity, rData, alreadyFetched]);
 
     return (
         <>
             <EuiPageTemplate.Section style={{ height: 0 }}>
-                <EuiTitle size='l'>
-                    <h1>Inventory List</h1>
-                </EuiTitle>
-                <EuiText>
-                    <EuiTextColor color='subdued'>
-                        <p>
-                            In this page you only can see
-                            sum of Inventory List
-                        </p>
-                    </EuiTextColor>
-                </EuiText>
+                <EuiFlexGroup justifyContent='spaceBetween'>
+                    <EuiFlexItem grow={false}>
+                        <EuiTitle size='l'>
+                            <h1>Inventory List</h1>
+                        </EuiTitle>
+                        <EuiText>
+                            <EuiTextColor color='subdued'>
+                                <p>
+                                    In this page you only can see sum of
+                                    Inventory List
+                                </p>
+                            </EuiTextColor>
+                        </EuiText>
+                    </EuiFlexItem>
+                    <EuiButton
+                        iconType={'refresh'}
+                        iconSide='right'
+                        onClick={() => {
+                            setAlreadyFetched(false);
+                            // we don't need to setData to empty array because we already have useEffect to do that
+                        }}
+                    >
+                        Refresh
+                    </EuiButton>
+                </EuiFlexGroup>
             </EuiPageTemplate.Section>
             <EuiPageTemplate.Section>
                 <EuiDataGrid
@@ -188,6 +229,11 @@ const StockList = () => {
                         pageSize: paginationCity.pageSize,
                         pageIndex: paginationCity.pageIndex,
                     }}
+                />
+                <EuiGlobalToastList
+                    toasts={getAllToasts()}
+                    dismissToast={({ id }) => removeToast(id)}
+                    toastLifeTimeMs={6000}
                 />
             </EuiPageTemplate.Section>
         </>

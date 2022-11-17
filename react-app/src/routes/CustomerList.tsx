@@ -373,6 +373,7 @@ const CustomerList = () => {
             console.log('fetching again');
         }
         console.log(rData);
+        // eslint-disable-next-line
     }, [pagination, fetchedPage, rData]);
 
     return (
