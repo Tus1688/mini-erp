@@ -60,7 +60,7 @@ const CustomerList = () => {
         pageSize: 20,
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
-    const [customerCount, setCustomerCount] = useState<number>(20);
+    const [customerCount, setCustomerCount] = useState<number>(0);
 
     const fetchCustomer = async ({
         pageIndex,
@@ -386,7 +386,7 @@ const CustomerList = () => {
                         <EuiText>
                             <EuiTextColor color='subdued'>
                                 <p>
-                                    In this page you can see, add, edit and
+                                    In this page you can see, edit and
                                     delete customers.
                                 </p>
                             </EuiTextColor>

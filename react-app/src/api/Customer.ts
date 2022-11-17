@@ -136,3 +136,83 @@ export const patchCustomerSpecific = async ({
         }
     }
 }
+
+export const createCustomer = async ({
+    name,
+    tax_id,
+    address,
+    city_name,
+    province_name,
+    country_name,
+    navigate,
+    location,
+}: {
+    name: string;
+    tax_id: string;
+    address: string;
+    city_name: string;
+    province_name: string;
+    country_name: string;
+    navigate: NavigateFunction;
+    location: Location;
+}) => {
+    let baseUrl = '/api/v1/customer';
+    const res = await fetch(baseUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+        body: JSON.stringify({
+            name: name,
+            tax_id: tax_id,
+            address: address,
+            city_name: city_name,
+            province_name: province_name,
+            country_name: country_name
+        })
+    })
+    if (res.status === 201) {
+        const data = await res.json();
+        return data;
+    }
+    if (res.status === 409) {
+        const error = await res.json();
+        return error;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+        // retry
+        const retry = await fetch(baseUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+            body: JSON.stringify({
+                name: name,
+                tax_id: tax_id,
+                address: address,
+                city_name: city_name,
+                province_name: province_name,
+                country_name: country_name
+            })
+        })
+        if (retry.status === 201) {
+            const data = await retry.json();
+            return data;
+        }
+        if (retry.status === 409) {
+            const error = await retry.json();
+            return error;
+        }
+        if (retry.status === 401) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+    }
+}

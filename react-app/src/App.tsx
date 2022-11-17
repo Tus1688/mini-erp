@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { isAuthenticatedRequest } from './api/Authentication';
 import CustomerList from './routes/CustomerList';
 import StockList from './routes/StockList';
+import CustomerCreate from './routes/CustomerCreate';
 
 export default function App() {
     const { theme } = useTheme();
@@ -38,6 +39,10 @@ export default function App() {
                 {
                     path: '/customer-list',
                     element: <CustomerList />,
+                },
+                {
+                    path: '/customer-create',
+                    element: <CustomerCreate />
                 },
                 {
                     path: '/stock-list',

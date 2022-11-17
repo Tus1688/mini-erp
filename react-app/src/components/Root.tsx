@@ -210,7 +210,7 @@ const SideNavItem = () => {
                         label='Customers list'
                     />
                     <StyledNavLink
-                        url='/customer-new'
+                        url='/customer-create'
                         label='Create New Customer'
                     />
                 </div>
