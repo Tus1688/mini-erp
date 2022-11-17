@@ -47,3 +47,92 @@ export const fetchCustomerSpecific = async ({
         }
     }
 };
+
+export const patchCustomerSpecific = async ({
+    id,
+    name,
+    tax_id,
+    address,
+    city_name,
+    province_name,
+    country_name,
+    navigate,
+    location,
+}: {
+    id: number;
+    name: string;
+    tax_id: string;
+    address: string;
+    city_name: string;
+    province_name: string;
+    country_name: string;
+    navigate: NavigateFunction;
+    location: Location;
+}) => {
+    let baseUrl = '/api/v1/customer';
+    const res = await fetch(baseUrl, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+        body: JSON.stringify({
+            id: id,
+            name: name,
+            tax_id: tax_id,
+            address: address,
+            city_name: city_name,
+            province_name: province_name,
+            country_name: country_name
+        })
+    })
+    if (res.status === 200) {
+        const data = await res.json();
+        return data;
+    }
+    if (res.status === 404) {
+        return {error: 'Customer Not Found, somebody else might have deleted it!'}
+    }
+    if (res.status === 409) {
+        const error = await res.json();
+        return error;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+        // retry
+        const retry = await fetch(baseUrl, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+            body: JSON.stringify({
+                id: id,
+                tax_id: tax_id,
+                address: address,
+                city_name: city_name,
+                province_name: province_name,
+                country_name: country_name
+            })
+        })
+        if (retry.status === 200) {
+            const data = await retry.json();
+            return data;
+        }
+        if (retry.status === 404) {
+            return {error: 'Customer Not Found, somebody else might have deleted it!'}
+        }
+        if (retry.status === 409) {
+            const error = await retry.json();
+            return error;
+        }
+        if (retry.status === 401) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+    }
+}
