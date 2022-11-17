@@ -14,6 +14,7 @@ import { isAuthenticatedRequest } from './api/Authentication';
 import CustomerList from './routes/CustomerList';
 import StockList from './routes/StockList';
 import CustomerCreate from './routes/CustomerCreate';
+import ProductionDraftList from './routes/ProductionDraftList';
 
 export default function App() {
     const { theme } = useTheme();
@@ -49,8 +50,8 @@ export default function App() {
                     element: <StockList />
                 },
                 {
-                    path: '/finance',
-                    element: <div>finance</div>,
+                    path: '/production-draft',
+                    element: <ProductionDraftList />
                 },
                 {
                     path: '/settings',
