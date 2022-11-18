@@ -21,6 +21,7 @@ import {
     fetchProductionDraft,
     fetchProductionDraftCount,
 } from '../api/ProductionDraft';
+import ProductionDraftApprove from '../components/ProductionDraftApprove';
 import ProductionDraftDelete from '../components/ProductionDraftDelete';
 
 const columns: EuiDataGridColumn[] = [
@@ -147,6 +148,15 @@ const ProductionDraftList = () => {
                 {isDeleteModalOpen && (
                     <ProductionDraftDelete
                         toggleModal={setIsDeleteModalOpen}
+                        id={rData[rowIndex.rowIndex as number].id as number}
+                        setFetchedPage={setFetchedPage}
+                        setPagination={setPagination}
+                        setData={setData}
+                    />
+                )}
+                {isApproveModalOpen && (
+                    <ProductionDraftApprove
+                        toggleModal={setIsApproveModalOpen}
                         id={rData[rowIndex.rowIndex as number].id as number}
                         setFetchedPage={setFetchedPage}
                         setPagination={setPagination}
