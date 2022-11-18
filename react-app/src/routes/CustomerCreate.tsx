@@ -81,9 +81,10 @@ const CustomerCreate = () => {
                         component='form'
                         onSubmit={(e) => handleSubmit(e)}
                     >
-                        <EuiFormRow label='Customer Name'>
+                        <EuiFormRow label='Customer Name' helpText='maximum 50 characters'>
                             <EuiFieldText
                                 name='Customer Name'
+                                placeholder='John Doe'
                                 value={customerName}
                                 onChange={(e) =>
                                     setCustomerName(e.target.value)
@@ -91,33 +92,37 @@ const CustomerCreate = () => {
                                 maxLength={50}
                             />
                         </EuiFormRow>
-                        <EuiFormRow label='Tax ID'>
+                        <EuiFormRow label='Tax ID' helpText='maximum 16 characters'>
                             <EuiFieldText
                                 name='Tax ID'
+                                placeholder='1234567891028374'
                                 value={taxId}
                                 onChange={(e) => setTaxId(e.target.value)}
                                 maxLength={16}
                             />
                         </EuiFormRow>
-                        <EuiFormRow label='Address'>
+                        <EuiFormRow label='Address' helpText='maximum 100 characters'>
                             <EuiFieldText
                                 name='Address'
+                                placeholder='John&rsquo;s office'
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
                                 maxLength={100}
                             />
                         </EuiFormRow>
-                        <EuiFormRow label='City'>
+                        <EuiFormRow label='City' helpText='maximum 50 characters'>
                             <EuiFieldText
                                 name='City'
+                                placeholder='John&rsquo; city'
                                 value={cityName}
                                 onChange={(e) => setCityName(e.target.value)}
                                 maxLength={50}
                             />
                         </EuiFormRow>
-                        <EuiFormRow label='Province'>
+                        <EuiFormRow label='Province' helpText='maximum 50 characters'>
                             <EuiFieldText
                                 name='Province'
+                                placeholder='John&rsquo; province'
                                 value={provinceName}
                                 onChange={(e) =>
                                     setProvinceName(e.target.value)
@@ -125,9 +130,10 @@ const CustomerCreate = () => {
                                 maxLength={50}
                             />
                         </EuiFormRow>
-                        <EuiFormRow label='Country'>
+                        <EuiFormRow label='Country' helpText='maximum 50 characters'>
                             <EuiFieldText
                                 name='Country'
+                                placeholder='Somewhere in Mars'
                                 value={countryName}
                                 onChange={(e) => setCountryName(e.target.value)}
                                 maxLength={50}

@@ -15,6 +15,7 @@ import CustomerList from './routes/CustomerList';
 import StockList from './routes/StockList';
 import CustomerCreate from './routes/CustomerCreate';
 import ProductionDraftList from './routes/ProductionDraftList';
+import ProductionDraftCreate from './routes/ProductionDraftCreate';
 
 export default function App() {
     const { theme } = useTheme();
@@ -52,6 +53,10 @@ export default function App() {
                 {
                     path: '/production-draft',
                     element: <ProductionDraftList />
+                },
+                {
+                    path:'/production-draft-create',
+                    element: <ProductionDraftCreate />
                 },
                 {
                     path: '/settings',
