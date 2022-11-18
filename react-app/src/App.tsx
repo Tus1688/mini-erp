@@ -47,6 +47,9 @@ export default function App() {
                     element: <CustomerCreate />
                 },
                 {
+                    path: '/variant-list',
+                },
+                {
                     path: '/stock-list',
                     element: <StockList />
                 },
