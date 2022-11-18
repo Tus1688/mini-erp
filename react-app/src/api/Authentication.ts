@@ -29,12 +29,10 @@ export const logoutRequest = async(): Promise<void> => {
         }
     });
     if (response.ok) {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('state');
+        sessionStorage.clear();
     }
     if (response.status === 401) {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('state');
+        sessionStorage.clear();
         alert('Any act of unauthorized access will be reported to the local authorities, stop now!');
     }
 }
@@ -53,7 +51,6 @@ export const getRefreshToken = async(): Promise<boolean> => {
         sessionStorage.setItem('token', data.token);
         return true;
     }
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('state');
+    sessionStorage.clear();
     return false
 }

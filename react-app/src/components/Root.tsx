@@ -231,10 +231,6 @@ const SideNavItem = () => {
                         url='/production-draft-create'
                         label='Create Production draft'
                     />
-                    <StyledNavLink
-                        url='/production-draft-approve'
-                        label='Approve Production draft'
-                    />
                 </div>
             </EuiAccordion>
             <EuiAccordion

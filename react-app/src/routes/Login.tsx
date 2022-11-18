@@ -15,7 +15,6 @@ import {
 import React, { Fragment } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useToast from '../hooks/useToast';
-import { Token } from '../hooks/useToken';
 
 const loginUser = async (credentials: {
     username: string;
@@ -54,6 +53,15 @@ const loginUser = async (credentials: {
     }
 };
 
+type LoginProps = {
+    token: string;
+    inv_u: boolean;
+    inv_a: boolean;
+    fin_u: boolean;
+    sys_a: boolean;
+    error?: string | undefined;
+}
+
 const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
@@ -66,7 +74,7 @@ const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const token: Token = await loginUser({
+        const token: LoginProps = await loginUser({
             username,
             password,
         });
@@ -88,6 +96,10 @@ const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
             return;
         }
         setToken(token.token);
+        sessionStorage.setItem("inv_u", token.inv_u.toString());
+        sessionStorage.setItem("inv_a", token.inv_a.toString());
+        sessionStorage.setItem("fin_u", token.fin_u.toString());
+        sessionStorage.setItem("sys_a", token.sys_a.toString());
         navigate(from, { replace: true });
     };
 

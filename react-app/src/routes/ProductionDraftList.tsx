@@ -1,10 +1,16 @@
 import {
     EuiButton,
+    EuiButtonIcon,
     EuiDataGrid,
+    EuiDataGridCellValueElementProps,
     EuiDataGridColumn,
+    EuiDataGridControlColumn,
     EuiFlexGroup,
     EuiFlexItem,
     EuiPageTemplate,
+    EuiPopover,
+    EuiPopoverTitle,
+    EuiSpacer,
     EuiText,
     EuiTextColor,
     EuiTitle,
@@ -15,6 +21,7 @@ import {
     fetchProductionDraft,
     fetchProductionDraftCount,
 } from '../api/ProductionDraft';
+import ProductionDraftDelete from '../components/ProductionDraftDelete';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -53,6 +60,111 @@ const ProductionDraftList = () => {
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [draftCount, setDraftCount] = useState<number>(0);
+
+    const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
+        const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+        const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+        const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
+        const [isInventoryAdmin, setIsInventoryAdmin] = useState(false);
+
+        useEffect(() => {
+            setIsInventoryAdmin(sessionStorage.getItem('inv_a') === 'true');
+            console.log('called');
+        }, []);
+
+        return (
+            <>
+                <EuiPopover
+                    isOpen={isPopoverOpen}
+                    anchorPosition='upCenter'
+                    panelPaddingSize='s'
+                    button={
+                        <EuiButtonIcon
+                            aria-label='show actions'
+                            iconType='boxesHorizontal'
+                            color='text'
+                            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+                        />
+                    }
+                    closePopover={() => setIsPopoverOpen(false)}
+                >
+                    <EuiPopoverTitle>Actions</EuiPopoverTitle>
+                    {!isInventoryAdmin ? (
+                        <EuiText size='s' style={{ width: 150 }}>
+                            <p>
+                                Sorry, You are not authorized to perform this
+                                action
+                            </p>
+                        </EuiText>
+                    ) : (
+                        <div style={{ width: 150 }}>
+                            <button
+                                onClick={() => {
+                                    setIsApproveModalOpen(true);
+                                    setIsPopoverOpen(false);
+                                }}
+                            >
+                                <EuiFlexGroup
+                                    alignItems='center'
+                                    component='span'
+                                    gutterSize='s'
+                                >
+                                    <EuiFlexItem grow={false}>
+                                        <EuiButtonIcon
+                                            aria-label='Approve'
+                                            iconType='check'
+                                            color='text'
+                                        />
+                                    </EuiFlexItem>
+                                    <EuiFlexItem>Approve</EuiFlexItem>
+                                </EuiFlexGroup>
+                            </button>
+                            <EuiSpacer size='s' />
+                            <button
+                                onClick={() => {
+                                    setIsDeleteModalOpen(true);
+                                    setIsPopoverOpen(false);
+                                }}
+                            >
+                                <EuiFlexGroup
+                                    alignItems='center'
+                                    component='span'
+                                    gutterSize='s'
+                                >
+                                    <EuiFlexItem grow={false}>
+                                        <EuiButtonIcon
+                                            aria-label='delete'
+                                            iconType='trash'
+                                            color='text'
+                                        />
+                                    </EuiFlexItem>
+                                    <EuiFlexItem>Delete</EuiFlexItem>
+                                </EuiFlexGroup>
+                            </button>
+                        </div>
+                    )}
+                </EuiPopover>
+                {isDeleteModalOpen && (
+                    <ProductionDraftDelete
+                        toggleModal={setIsDeleteModalOpen}
+                        id={rData[rowIndex.rowIndex as number].id as number}
+                        setFetchedPage={setFetchedPage}
+                        setPagination={setPagination}
+                        setData={setData}
+                    />
+                )}
+            </>
+        );
+    };
+
+    const trailingControlColumns: EuiDataGridControlColumn[] = [
+        {
+            id: 'actions',
+            width: 40,
+            headerCellRender: () => null,
+            rowCellRender: RowCellRender,
+        },
+    ];
 
     const onChangeItemsPerPage = useCallback(
         (pageSize: number) =>
@@ -195,6 +307,7 @@ const ProductionDraftList = () => {
                         pageSize: pagination.pageSize,
                         pageIndex: pagination.pageIndex,
                     }}
+                    trailingControlColumns={trailingControlColumns}
                 />
             </EuiPageTemplate.Section>
         </>
