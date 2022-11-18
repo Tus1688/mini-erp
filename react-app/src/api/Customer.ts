@@ -86,16 +86,12 @@ export const patchCustomerSpecific = async ({
             country_name: country_name
         })
     })
-    if (res.status === 200) {
+    if (res.status === 200 || res.status === 409) {
         const data = await res.json();
         return data;
     }
     if (res.status === 404) {
         return {error: 'Customer Not Found, somebody else might have deleted it!'}
-    }
-    if (res.status === 409) {
-        const error = await res.json();
-        return error;
     }
     if (res.status === 401) {
         const state = await getRefreshToken();
@@ -119,16 +115,12 @@ export const patchCustomerSpecific = async ({
                 country_name: country_name
             })
         })
-        if (retry.status === 200) {
+        if (retry.status === 200 || retry.status === 409) {
             const data = await retry.json();
             return data;
         }
         if (retry.status === 404) {
             return {error: 'Customer Not Found, somebody else might have deleted it!'}
-        }
-        if (retry.status === 409) {
-            const error = await retry.json();
-            return error;
         }
         if (retry.status === 401) {
             navigate('/login', { state: { from: location.pathname } });
@@ -172,13 +164,9 @@ export const createCustomer = async ({
             country_name: country_name
         })
     })
-    if (res.status === 201) {
+    if (res.status === 201 || res.status === 409) {
         const data = await res.json();
         return data;
-    }
-    if (res.status === 409) {
-        const error = await res.json();
-        return error;
     }
     if (res.status === 401) {
         const state = await getRefreshToken();
@@ -202,13 +190,9 @@ export const createCustomer = async ({
                 country_name: country_name
             })
         })
-        if (retry.status === 201) {
+        if (retry.status === 201 || retry.status === 409) {
             const data = await retry.json();
             return data;
-        }
-        if (retry.status === 409) {
-            const error = await retry.json();
-            return error;
         }
         if (retry.status === 401) {
             navigate('/login', { state: { from: location.pathname } });

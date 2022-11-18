@@ -19,6 +19,7 @@ import { useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import VariantDeleteModal from '../components/VariantDelete';
+import VariantEditModal from '../components/VariantEdit';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -232,6 +233,12 @@ const VariantList = () => {
                         setFetchedPage={setFetchedPage}
                         setPagination={setPagination}
                         setData={setData}
+                    />
+                )}
+                {editModalOpen && (
+                    <VariantEditModal
+                        toggleModal={setEditModalOpen}
+                        id={rData[rowIndex.rowIndex as number].id as number}
                     />
                 )}
             </div>
