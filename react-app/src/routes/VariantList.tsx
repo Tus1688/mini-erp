@@ -1,7 +1,24 @@
-import { EuiDataGridColumn } from "@elastic/eui";
-import { useState, ReactNode, useCallback, useMemo, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { getRefreshToken } from "../api/Authentication";
+import {
+    EuiButton,
+    EuiButtonIcon,
+    EuiDataGrid,
+    EuiDataGridCellValueElementProps,
+    EuiDataGridColumn,
+    EuiDataGridControlColumn,
+    EuiFlexGroup,
+    EuiFlexItem,
+    EuiPageTemplate,
+    EuiPopover,
+    EuiPopoverTitle,
+    EuiSpacer,
+    EuiText,
+    EuiTextColor,
+    EuiTitle,
+} from '@elastic/eui';
+import { useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { getRefreshToken } from '../api/Authentication';
+import VariantDeleteModal from '../components/VariantDelete';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -12,13 +29,13 @@ const columns: EuiDataGridColumn[] = [
     {
         id: 'name',
         initialWidth: 250,
-        displayAsText: 'Variant Name'
+        displayAsText: 'Variant Name',
     },
     {
         id: 'description',
         displayAsText: 'Description',
-    }
-]
+    },
+];
 
 const VariantList = () => {
     let navigate = useNavigate();
@@ -126,6 +143,110 @@ const VariantList = () => {
         }
     };
 
+    const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
+        const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+        const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+        const [editModalOpen, setEditModalOpen] = useState(false);
+        const [isInventoryAdmin, setIsInventoryAdmin] = useState(false);
+
+        useEffect(() => {
+            setIsInventoryAdmin(sessionStorage.getItem('inv_a') === 'true');
+        }, []);
+
+        return (
+            <div>
+                <EuiPopover
+                    isOpen={isPopoverOpen}
+                    anchorPosition='upCenter'
+                    panelPaddingSize='s'
+                    button={
+                        <EuiButtonIcon
+                            aria-label='show actions'
+                            iconType='boxesHorizontal'
+                            color='text'
+                            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+                        />
+                    }
+                    closePopover={() => setIsPopoverOpen(false)}
+                >
+                    <EuiPopoverTitle>Actions</EuiPopoverTitle>
+                    {!isInventoryAdmin ? (
+                        <EuiText size='s' style={{ width: 150 }}>
+                            <p>
+                                Sorry, You are not authorized to perform this
+                                action
+                            </p>
+                        </EuiText>
+                    ) : (
+                        <div style={{ width: 150 }}>
+                            <button
+                                onClick={() => {
+                                    setEditModalOpen(!editModalOpen);
+                                    setIsPopoverOpen(false);
+                                }}
+                            >
+                                <EuiFlexGroup
+                                    alignItems='center'
+                                    component='span'
+                                    gutterSize='s'
+                                >
+                                    <EuiFlexItem grow={false}>
+                                        <EuiButtonIcon
+                                            aria-label='edit'
+                                            iconType='indexEdit'
+                                            color='text'
+                                        />
+                                    </EuiFlexItem>
+                                    <EuiFlexItem>Edit</EuiFlexItem>
+                                </EuiFlexGroup>
+                            </button>
+                            <EuiSpacer size='s' />
+                            <button
+                                onClick={() => {
+                                    setDeleteModalOpen(!deleteModalOpen);
+                                    setIsPopoverOpen(false);
+                                }}
+                            >
+                                <EuiFlexGroup
+                                    alignItems='center'
+                                    component='span'
+                                    gutterSize='s'
+                                >
+                                    <EuiFlexItem grow={false}>
+                                        <EuiButtonIcon
+                                            aria-label='delete'
+                                            iconType='trash'
+                                            color='text'
+                                        />
+                                    </EuiFlexItem>
+                                    <EuiFlexItem>Delete</EuiFlexItem>
+                                </EuiFlexGroup>
+                            </button>
+                        </div>
+                    )}
+                </EuiPopover>
+                {deleteModalOpen && (
+                    <VariantDeleteModal
+                        toggleModal={setDeleteModalOpen}
+                        id={rData[rowIndex.rowIndex as number].id as number}
+                        setFetchedPage={setFetchedPage}
+                        setPagination={setPagination}
+                        setData={setData}
+                    />
+                )}
+            </div>
+        );
+    };
+
+    const trailingControlColumns: EuiDataGridControlColumn[] = [
+        {
+            id: 'actions',
+            width: 40,
+            headerCellRender: () => null,
+            rowCellRender: RowCellRender,
+        },
+    ];
+
     const onChangeItemsPerPage = useCallback(
         (pageSize: number) =>
             setPagination((pagination) => ({
@@ -216,4 +337,67 @@ const VariantList = () => {
         console.log(rData);
         // eslint-disable-next-line
     }, [pagination, fetchedPage, rData]);
-}
+
+    return (
+        <>
+            <EuiPageTemplate.Section style={{ height: 0 }}>
+                <EuiFlexGroup justifyContent='spaceBetween'>
+                    <EuiFlexItem grow={false}>
+                        <EuiTitle size='l'>
+                            <h1>Variant List</h1>
+                        </EuiTitle>
+                        <EuiText>
+                            <EuiTextColor color='subdued'>
+                                <p>
+                                    In this page you can see, edit and delete
+                                    variants.
+                                </p>
+                            </EuiTextColor>
+                        </EuiText>
+                    </EuiFlexItem>
+                    <EuiButton
+                        iconType='refresh'
+                        iconSide='right'
+                        // onclick setfetchedpage to empty array
+                        onClick={() => {
+                            setFetchedPage([]);
+                            setData([]);
+                            setPagination({
+                                pageIndex: 0,
+                                pageSize: 20,
+                            });
+                        }}
+                    >
+                        Refresh
+                    </EuiButton>
+                </EuiFlexGroup>
+            </EuiPageTemplate.Section>
+            <EuiPageTemplate.Section>
+                <EuiDataGrid
+                    aria-label='Customer List'
+                    trailingControlColumns={trailingControlColumns}
+                    columns={columns}
+                    columnVisibility={{
+                        visibleColumns,
+                        setVisibleColumns,
+                    }}
+                    height={550}
+                    rowCount={variantCount}
+                    renderCellValue={renderCellValue}
+                    sorting={{ columns: sortingColumns, onSort }}
+                    inMemory={{ level: 'sorting' }}
+                    pagination={{
+                        ...pagination,
+                        // pageSizeOptions: [10, 20, 50],
+                        onChangeItemsPerPage: onChangeItemsPerPage,
+                        onChangePage: onChangePage,
+                        pageSize: pagination.pageSize,
+                        pageIndex: pagination.pageIndex,
+                    }}
+                />
+            </EuiPageTemplate.Section>
+        </>
+    );
+};
+
+export default VariantList;

@@ -70,7 +70,6 @@ const ProductionDraftList = () => {
 
         useEffect(() => {
             setIsInventoryAdmin(sessionStorage.getItem('inv_a') === 'true');
-            console.log('called');
         }, []);
 
         return (

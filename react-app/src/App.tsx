@@ -16,6 +16,7 @@ import StockList from './routes/StockList';
 import CustomerCreate from './routes/CustomerCreate';
 import ProductionDraftList from './routes/ProductionDraftList';
 import ProductionDraftCreate from './routes/ProductionDraftCreate';
+import VariantList from './routes/VariantList';
 
 export default function App() {
     const { theme } = useTheme();
@@ -48,6 +49,7 @@ export default function App() {
                 },
                 {
                     path: '/variant-list',
+                    element: <VariantList />
                 },
                 {
                     path: '/stock-list',

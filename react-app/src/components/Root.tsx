@@ -222,6 +222,7 @@ const SideNavItem = () => {
                 arrowDisplay='none'
             >
                 <div style={childAccordionItemStyle}>
+                    <StyledNavLink url='/variant-list' label='Variant list' />
                     <StyledNavLink url='/stock-list' label='Inventory list' />
                     <StyledNavLink
                         url='/production-draft'
