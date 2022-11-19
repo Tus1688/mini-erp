@@ -21,7 +21,13 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { logoutRequest } from '../api/Authentication';
 import useTheme from '../hooks/useTheme';
 
-const Header = () => {
+const Header = ({
+    toggleSideNav,
+    sideNavState,
+}: {
+    toggleSideNav: (value: React.SetStateAction<boolean>) => void;
+    sideNavState: boolean;
+}) => {
     const [isPopoverThemeOpen, setPopoverThemeOpen] = useState(false);
     const { toggleLightMode, toggleDarkMode } = useTheme();
     const [isPopoverAvatarOpen, setPopoverAvatarOpen] = useState(false);
@@ -126,6 +132,14 @@ const Header = () => {
                     {/* <EuiTitle size='m'>
                         <h1>Bumbuventory</h1>
                     </EuiTitle> */}
+                    {/* hamburger button icon */}
+                    <EuiButtonIcon
+                        aria-label='Menu'
+                        iconType='menu'
+                        iconSize='m'
+                        color='text'
+                        onClick={() => toggleSideNav(!sideNavState)}
+                    />
                 </EuiHeaderSectionItem>
             </EuiHeaderSection>
             <EuiHeaderSection
@@ -271,15 +285,22 @@ const SideNavItem = () => {
 };
 
 const Root = () => {
+    const [isSideNavOpen, setIsSideNavOpen] = useState(true);
+
     return (
         <>
             <EuiPageTemplate panelled={true} grow={true}>
-                <Header />
-                <EuiPageTemplate.Sidebar sticky={true}>
-                    <EuiPageBody>
-                        <SideNavItem />
-                    </EuiPageBody>
-                </EuiPageTemplate.Sidebar>
+                <Header
+                    toggleSideNav={setIsSideNavOpen}
+                    sideNavState={isSideNavOpen}
+                />
+                {isSideNavOpen && (
+                    <EuiPageTemplate.Sidebar sticky={true}>
+                        <EuiPageBody>
+                            <SideNavItem />
+                        </EuiPageBody>
+                    </EuiPageTemplate.Sidebar>
+                )}
                 <Outlet />
             </EuiPageTemplate>
         </>
