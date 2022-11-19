@@ -17,6 +17,7 @@ import CustomerCreate from './routes/CustomerCreate';
 import ProductionDraftList from './routes/ProductionDraftList';
 import ProductionDraftCreate from './routes/ProductionDraftCreate';
 import VariantList from './routes/VariantList';
+import BatchList from './routes/BatchList';
 
 export default function App() {
     const { theme } = useTheme();
@@ -50,6 +51,10 @@ export default function App() {
                 {
                     path: '/variant-list',
                     element: <VariantList />
+                },
+                {
+                    path: '/batch-list',
+                    element: <BatchList />
                 },
                 {
                     path: '/stock-list',
