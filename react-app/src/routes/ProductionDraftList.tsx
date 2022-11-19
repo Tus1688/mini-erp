@@ -1,5 +1,4 @@
 import {
-    EuiButton,
     EuiButtonIcon,
     EuiDataGrid,
     EuiDataGridCellValueElementProps,
@@ -280,9 +279,8 @@ const ProductionDraftList = () => {
                             </EuiTextColor>
                         </EuiText>
                     </EuiFlexItem>
-                    <EuiButton
+                    <EuiButtonIcon
                         iconType='refresh'
-                        iconSide='right'
                         onClick={() => {
                             setFetchedPage([]);
                             setData([]);
@@ -291,9 +289,10 @@ const ProductionDraftList = () => {
                                 pageSize: 20,
                             });
                         }}
-                    >
-                        Refresh
-                    </EuiButton>
+                        color='primary'
+                        display='base'
+                        size='m'
+                    />
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
             <EuiPageTemplate.Section>

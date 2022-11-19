@@ -223,10 +223,6 @@ const SideNavItem = () => {
                         url='/customer-list'
                         label='Customers list'
                     />
-                    <StyledNavLink
-                        url='/customer-create'
-                        label='Create New Customer'
-                    />
                 </div>
             </EuiAccordion>
 

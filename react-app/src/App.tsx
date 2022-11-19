@@ -13,7 +13,6 @@ import React, { useEffect, useState } from 'react';
 import { isAuthenticatedRequest } from './api/Authentication';
 import CustomerList from './routes/CustomerList';
 import StockList from './routes/StockList';
-import CustomerCreate from './routes/CustomerCreate';
 import ProductionDraftList from './routes/ProductionDraftList';
 import ProductionDraftCreate from './routes/ProductionDraftCreate';
 import VariantList from './routes/VariantList';
@@ -43,10 +42,6 @@ export default function App() {
                 {
                     path: '/customer-list',
                     element: <CustomerList />,
-                },
-                {
-                    path: '/customer-create',
-                    element: <CustomerCreate />
                 },
                 {
                     path: '/variant-list',

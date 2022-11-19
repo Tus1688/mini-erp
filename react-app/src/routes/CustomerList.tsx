@@ -25,6 +25,7 @@ import React, {
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
+import CustomerCreateModal from '../components/CustomerCreate';
 import CustomerDeleteModal from '../components/CustomerDelete';
 import CustomerEditModal from '../components/CustomerEdit';
 import CustomerModal from '../components/CustomerModal';
@@ -61,6 +62,7 @@ const CustomerList = () => {
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [customerCount, setCustomerCount] = useState<number>(0);
+    const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(false);
 
     const fetchCustomer = async ({
         pageIndex,
@@ -393,21 +395,34 @@ const CustomerList = () => {
                             </EuiTextColor>
                         </EuiText>
                     </EuiFlexItem>
-                    <EuiButton
-                        iconType={'refresh'}
-                        iconSide='right'
-                        // onclick setfetchedpage to empty array
-                        onClick={() => {
-                            setFetchedPage([]);
-                            setData([]);
-                            setPagination({
-                                pageIndex: 0,
-                                pageSize: 20,
-                            });
-                        }}
-                    >
-                        Refresh
-                    </EuiButton>
+                    <EuiFlexItem grow={false}>
+                        <EuiFlexGroup direction='row'>
+                            <EuiButton
+                                color='success'
+                                iconType='plusInCircleFilled'
+                                iconSide='right'
+                                onClick={() =>
+                                    setModalCreateOpen(!modalCreateOpen)
+                                }
+                            >
+                                Create
+                            </EuiButton>
+                            <EuiButtonIcon
+                                iconType='refresh'
+                                onClick={() => {
+                                    setFetchedPage([]);
+                                    setData([]);
+                                    setPagination({
+                                        pageIndex: 0,
+                                        pageSize: 20,
+                                    });
+                                }}
+                                color='primary'
+                                display='base'
+                                size='m'
+                            />
+                        </EuiFlexGroup>
+                    </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
             <EuiPageTemplate.Section>
@@ -435,6 +450,14 @@ const CustomerList = () => {
                     }}
                 />
             </EuiPageTemplate.Section>
+            {modalCreateOpen && (
+                <CustomerCreateModal
+                    toggleModal={setModalCreateOpen}
+                    setFetchedPage={setFetchedPage}
+                    setPagination={setPagination}
+                    setData={setData}
+                />
+            )}
         </>
     );
 };

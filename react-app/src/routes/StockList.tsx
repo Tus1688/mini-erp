@@ -1,5 +1,5 @@
 import {
-    EuiButton,
+    EuiButtonIcon,
     EuiDataGrid,
     EuiDataGridColumn,
     EuiFlexGroup,
@@ -67,10 +67,8 @@ const StockList = () => {
                 id: getNewId(),
                 title: 'Fully loaded',
                 color: 'primary',
-                text: (
-                    <p>Took {(time2-time1).toPrecision(2)}ms</p>
-                )
-            })
+                text: <p>Took {(time2 - time1).toPrecision(2)}ms</p>,
+            });
             return data;
         }
         if (res.status === 401) {
@@ -97,10 +95,8 @@ const StockList = () => {
                     id: getNewId(),
                     title: 'Fully loaded',
                     color: 'primary',
-                    text: (
-                        <p>Took {(time2-time1).toPrecision(2)}ms</p>
-                    )
-                })
+                    text: <p>Took {(time2 - time1).toPrecision(2)}ms</p>,
+                });
                 return data;
             }
             if (retry.status === 401) {
@@ -176,7 +172,7 @@ const StockList = () => {
             ]);
             setAlreadyFetched(true);
             console.log('fetching again');
-        }// eslint-disable-next-line
+        } // eslint-disable-next-line
     }, [paginationCity, fetchedPageCity, rData, alreadyFetched]);
 
     return (
@@ -196,16 +192,15 @@ const StockList = () => {
                             </EuiTextColor>
                         </EuiText>
                     </EuiFlexItem>
-                    <EuiButton
-                        iconType={'refresh'}
-                        iconSide='right'
+                    <EuiButtonIcon
+                        iconType='refresh'
                         onClick={() => {
                             setAlreadyFetched(false);
-                            // we don't need to setData to empty array because we already have useEffect to do that
                         }}
-                    >
-                        Refresh
-                    </EuiButton>
+                        color='primary'
+                        display='base'
+                        size='m'
+                    />
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
             <EuiPageTemplate.Section>

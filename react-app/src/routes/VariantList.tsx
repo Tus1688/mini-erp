@@ -376,10 +376,8 @@ const VariantList = () => {
                             >
                                 Create
                             </EuiButton>
-                            <EuiButton
+                            <EuiButtonIcon
                                 iconType='refresh'
-                                iconSide='right'
-                                // onclick setfetchedpage to empty array
                                 onClick={() => {
                                     setFetchedPage([]);
                                     setData([]);
@@ -388,9 +386,10 @@ const VariantList = () => {
                                         pageSize: 20,
                                     });
                                 }}
-                            >
-                                Refresh
-                            </EuiButton>
+                                color='primary'
+                                display='base'
+                                size='m'
+                            />
                         </EuiFlexGroup>
                     </EuiFlexItem>
                 </EuiFlexGroup>
