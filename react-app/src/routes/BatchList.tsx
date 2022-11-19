@@ -20,9 +20,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import BatchCreateModal from '../components/BatchCreate';
 import BatchDeleteModal from '../components/BatchDelete';
-import VariantCreateModal from '../components/VariantCreate';
-import VariantDeleteModal from '../components/VariantDelete';
-import VariantEditModal from '../components/VariantEdit';
+import BatchEditModal from '../components/BatchEdit';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -239,7 +237,7 @@ const BatchList = () => {
                     />
                 )}
                 {editModalOpen && (
-                    <VariantEditModal
+                    <BatchEditModal
                         toggleModal={setEditModalOpen}
                         id={rData[rowIndex.rowIndex as number].id as number}
                     />
