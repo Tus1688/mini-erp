@@ -18,6 +18,7 @@ import {
 import { useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
+import VariantCreateModal from '../components/VariantCreate';
 import VariantDeleteModal from '../components/VariantDelete';
 import VariantEditModal from '../components/VariantEdit';
 
@@ -48,6 +49,7 @@ const VariantList = () => {
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [variantCount, setVariantCount] = useState<number>(0);
+    const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(false);
 
     const fetchVariant = async ({
         pageIndex,
@@ -356,27 +358,41 @@ const VariantList = () => {
                         <EuiText>
                             <EuiTextColor color='subdued'>
                                 <p>
-                                    In this page you can see, edit and delete
-                                    variants.
+                                    In this page you can see, add, edit and
+                                    delete variants.
                                 </p>
                             </EuiTextColor>
                         </EuiText>
                     </EuiFlexItem>
-                    <EuiButton
-                        iconType='refresh'
-                        iconSide='right'
-                        // onclick setfetchedpage to empty array
-                        onClick={() => {
-                            setFetchedPage([]);
-                            setData([]);
-                            setPagination({
-                                pageIndex: 0,
-                                pageSize: 20,
-                            });
-                        }}
-                    >
-                        Refresh
-                    </EuiButton>
+                    <EuiFlexItem grow={false}>
+                        <EuiFlexGroup direction='row'>
+                            <EuiButton
+                                color='success'
+                                iconType='plusInCircleFilled'
+                                iconSide='right'
+                                onClick={() =>
+                                    setModalCreateOpen(!modalCreateOpen)
+                                }
+                            >
+                                Create
+                            </EuiButton>
+                            <EuiButton
+                                iconType='refresh'
+                                iconSide='right'
+                                // onclick setfetchedpage to empty array
+                                onClick={() => {
+                                    setFetchedPage([]);
+                                    setData([]);
+                                    setPagination({
+                                        pageIndex: 0,
+                                        pageSize: 20,
+                                    });
+                                }}
+                            >
+                                Refresh
+                            </EuiButton>
+                        </EuiFlexGroup>
+                    </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
             <EuiPageTemplate.Section>
@@ -403,6 +419,14 @@ const VariantList = () => {
                     }}
                 />
             </EuiPageTemplate.Section>
+            {modalCreateOpen && (
+                <VariantCreateModal
+                    toggleModal={setModalCreateOpen}
+                    setFetchedPage={setFetchedPage}
+                    setPagination={setPagination}
+                    setData={setData}
+                />
+            )}
         </>
     );
 };

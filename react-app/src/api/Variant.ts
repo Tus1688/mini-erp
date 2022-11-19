@@ -115,3 +115,58 @@ export const patchVariant = async ({
         }
     }
 }
+
+export const createVariant = async ({
+    name,
+    description,
+    navigate,
+    location
+}: {
+    name: string;
+    description: string;
+    navigate: NavigateFunction;
+    location: Location;
+}) => {
+    let baseUrl = '/api/v1/inventory/variant';
+    const res = await fetch(baseUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+        body: JSON.stringify({
+            name: name,
+            description: description,
+        })
+    })
+    if (res.status === 201 || res.status === 409) {
+        const data = await res.json();
+        return data;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+        const retry = await fetch(baseUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+            body: JSON.stringify({
+                name: name,
+                description: description,
+            })
+        })
+        if (retry.status === 201 || retry.status === 409) {
+            const data = await retry.json();
+            return data;
+        }
+        if (retry.status === 401) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+    }
+}
