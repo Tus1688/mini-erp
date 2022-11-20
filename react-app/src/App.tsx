@@ -16,6 +16,7 @@ import StockList from './routes/StockList';
 import ProductionDraftList from './routes/ProductionDraftList';
 import VariantList from './routes/VariantList';
 import BatchList from './routes/BatchList';
+import SOList from './routes/SOList';
 
 export default function App() {
     const { theme } = useTheme();
@@ -57,6 +58,10 @@ export default function App() {
                 {
                     path: '/production-draft',
                     element: <ProductionDraftList />
+                },
+                {
+                    path: '/so-list',
+                    element: <SOList />
                 },
                 {
                     path: '/settings',

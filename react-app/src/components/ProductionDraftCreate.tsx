@@ -7,13 +7,14 @@ import {
     EuiFlexGroup,
     EuiForm,
     EuiFormRow,
+    EuiGlobalToastList,
     EuiModal,
     EuiModalBody,
     EuiModalHeader,
     EuiModalHeaderTitle,
     EuiSpacer,
 } from '@elastic/eui';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchBatchSearch } from '../api/Batch';
 import { createProdutionDraft } from '../api/ProductionDraft';
@@ -79,6 +80,7 @@ const ProductionDraftCreate = ({
     const onSearchVariantChange = useCallback(async (searchValue: string) => {
         setVariantLoading(true);
         clearTimeout(searchTimeout);
+        // eslint-disable-next-line
         searchTimeout = setTimeout(async () => {
             const data: variantPromiseProps[] = await fetchVariantSearch({
                 search: searchValue,
@@ -103,6 +105,7 @@ const ProductionDraftCreate = ({
     const onSearchBatchChange = useCallback(async (searchValue: string) => {
         setBatchLoading(true);
         clearTimeout(searchTimeout);
+        // eslint-disable-next-line
         searchTimeout = setTimeout(async () => {
             const data: batchPromiseProps[] = await fetchBatchSearch({
                 search: searchValue,
@@ -222,6 +225,11 @@ const ProductionDraftCreate = ({
                     </EuiFlexGroup>
                 </EuiForm>
             </EuiModalBody>
+            <EuiGlobalToastList
+                toasts={getAllToasts()}
+                dismissToast={({ id }) => removeToast(id)}
+                toastLifeTimeMs={6000}
+            />
         </EuiModal>
     );
 };
