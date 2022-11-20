@@ -14,7 +14,6 @@ import { isAuthenticatedRequest } from './api/Authentication';
 import CustomerList from './routes/CustomerList';
 import StockList from './routes/StockList';
 import ProductionDraftList from './routes/ProductionDraftList';
-import ProductionDraftCreate from './routes/ProductionDraftCreate';
 import VariantList from './routes/VariantList';
 import BatchList from './routes/BatchList';
 
@@ -58,10 +57,6 @@ export default function App() {
                 {
                     path: '/production-draft',
                     element: <ProductionDraftList />
-                },
-                {
-                    path:'/production-draft-create',
-                    element: <ProductionDraftCreate />
                 },
                 {
                     path: '/settings',

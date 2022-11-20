@@ -193,6 +193,7 @@ const StockList = () => {
                         </EuiText>
                     </EuiFlexItem>
                     <EuiButtonIcon
+                        aria-label='refresh button'
                         iconType='refresh'
                         onClick={() => {
                             setAlreadyFetched(false);

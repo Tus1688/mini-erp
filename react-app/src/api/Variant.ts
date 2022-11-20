@@ -5,7 +5,7 @@ type variantProps = {
     id: number;
     name: string;
     description: string;
-}
+};
 
 export const fetchVariantSpecific = async ({
     id,
@@ -56,7 +56,7 @@ export const patchVariant = async ({
     name,
     description,
     navigate,
-    location
+    location,
 }: {
     id: number;
     name: string;
@@ -75,14 +75,16 @@ export const patchVariant = async ({
             id: id,
             name: name,
             description: description,
-        })
-    })
+        }),
+    });
     if (res.status === 200 || res.status === 409) {
         const data = await res.json();
         return data;
     }
     if (res.status === 404) {
-        return {error: "Variant not found, somebody else might have deleted it!"}
+        return {
+            error: 'Variant not found, somebody else might have deleted it!',
+        };
     }
     if (res.status === 401) {
         const state = await getRefreshToken();
@@ -100,27 +102,29 @@ export const patchVariant = async ({
                 id: id,
                 name: name,
                 description: description,
-            })
-        })
+            }),
+        });
         if (retry.status === 200 || retry.status === 409) {
             const data = await retry.json();
             return data;
         }
         if (retry.status === 404) {
-            return {error: "Variant not found, somebody else might have deleted it!"}
+            return {
+                error: 'Variant not found, somebody else might have deleted it!',
+            };
         }
         if (retry.status === 401) {
             navigate('/login', { state: { from: location } });
             return;
         }
     }
-}
+};
 
 export const createVariant = async ({
     name,
     description,
     navigate,
-    location
+    location,
 }: {
     name: string;
     description: string;
@@ -137,8 +141,8 @@ export const createVariant = async ({
         body: JSON.stringify({
             name: name,
             description: description,
-        })
-    })
+        }),
+    });
     if (res.status === 201 || res.status === 409) {
         const data = await res.json();
         return data;
@@ -158,8 +162,8 @@ export const createVariant = async ({
             body: JSON.stringify({
                 name: name,
                 description: description,
-            })
-        })
+            }),
+        });
         if (retry.status === 201 || retry.status === 409) {
             const data = await retry.json();
             return data;
@@ -169,4 +173,50 @@ export const createVariant = async ({
             return;
         }
     }
-}
+};
+
+export const fetchVariantSearch = async ({
+    search,
+    location,
+    navigate,
+}: {
+    search: string;
+    location: Location;
+    navigate: NavigateFunction;
+}) => {
+    let baseUrl = `/api/v1/inventory/variant?search=${search}`;
+    const res = await fetch(baseUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+    });
+    if (res.status === 200) {
+        const data = await res.json();
+        return data;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+        // retry
+        const retry = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (retry.status === 200) {
+            const data = await retry.json();
+            return data;
+        }
+        if (retry.status === 401) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+    }
+};

@@ -377,6 +377,7 @@ const VariantList = () => {
                                 Create
                             </EuiButton>
                             <EuiButtonIcon
+                                aria-label='refresh button'
                                 iconType='refresh'
                                 onClick={() => {
                                     setFetchedPage([]);

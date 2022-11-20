@@ -46,7 +46,7 @@ const BatchEditModal = ({
             if (data.message) {
                 addToast({
                     id: getNewId(),
-                    title: 'Updated variant',
+                    title: 'Updated batch',
                     color: 'success',
                     text: (
                         <>

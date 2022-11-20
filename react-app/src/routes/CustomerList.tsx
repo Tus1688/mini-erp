@@ -175,7 +175,7 @@ const CustomerList = () => {
                     <CustomerModal
                         id={rData[rowIndex.rowIndex as number].id as number}
                         toggleModal={setIsModalOpen}
-                        />
+                    />
                 ) : null}
             </Fragment>
         );
@@ -389,8 +389,8 @@ const CustomerList = () => {
                         <EuiText>
                             <EuiTextColor color='subdued'>
                                 <p>
-                                    In this page you can see, edit and
-                                    delete customers.
+                                    In this page you can see, edit and delete
+                                    customers.
                                 </p>
                             </EuiTextColor>
                         </EuiText>
@@ -408,6 +408,7 @@ const CustomerList = () => {
                                 Create
                             </EuiButton>
                             <EuiButtonIcon
+                                aria-label='refresh button'
                                 iconType='refresh'
                                 onClick={() => {
                                     setFetchedPage([]);

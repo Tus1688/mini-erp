@@ -1,4 +1,5 @@
 import {
+    EuiButton,
     EuiButtonIcon,
     EuiDataGrid,
     EuiDataGridCellValueElementProps,
@@ -21,6 +22,7 @@ import {
     fetchProductionDraftCount,
 } from '../api/ProductionDraft';
 import ProductionDraftApprove from '../components/ProductionDraftApprove';
+import ProductionDraftCreate from '../components/ProductionDraftCreate';
 import ProductionDraftDelete from '../components/ProductionDraftDelete';
 
 const columns: EuiDataGridColumn[] = [
@@ -60,6 +62,7 @@ const ProductionDraftList = () => {
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [draftCount, setDraftCount] = useState<number>(0);
+    const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(false);
 
     const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -273,26 +276,41 @@ const ProductionDraftList = () => {
                         <EuiText>
                             <EuiTextColor color='subdued'>
                                 <p>
-                                    In this page you can delete / approve
-                                    production draft.
+                                    In this page you can create, delete /
+                                    approve production draft.
                                 </p>
                             </EuiTextColor>
                         </EuiText>
                     </EuiFlexItem>
-                    <EuiButtonIcon
-                        iconType='refresh'
-                        onClick={() => {
-                            setFetchedPage([]);
-                            setData([]);
-                            setPagination({
-                                pageIndex: 0,
-                                pageSize: 20,
-                            });
-                        }}
-                        color='primary'
-                        display='base'
-                        size='m'
-                    />
+                    <EuiFlexItem grow={false}>
+                        <EuiFlexGroup direction='row'>
+                            <EuiButton
+                                color='success'
+                                iconType='plusInCircleFilled'
+                                iconSide='right'
+                                onClick={() =>
+                                    setModalCreateOpen(!modalCreateOpen)
+                                }
+                            >
+                                Create
+                            </EuiButton>
+                            <EuiButtonIcon
+                                aria-label='refresh button'
+                                iconType='refresh'
+                                onClick={() => {
+                                    setFetchedPage([]);
+                                    setData([]);
+                                    setPagination({
+                                        pageIndex: 0,
+                                        pageSize: 20,
+                                    });
+                                }}
+                                color='primary'
+                                display='base'
+                                size='m'
+                            />
+                        </EuiFlexGroup>
+                    </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
             <EuiPageTemplate.Section>
@@ -318,6 +336,14 @@ const ProductionDraftList = () => {
                     trailingControlColumns={trailingControlColumns}
                 />
             </EuiPageTemplate.Section>
+            {modalCreateOpen && (
+                <ProductionDraftCreate
+                    toggleModal={setModalCreateOpen}
+                    setFetchedPage={setFetchedPage}
+                    setPagination={setPagination}
+                    setData={setData}
+                />
+            )}
         </>
     );
 };
