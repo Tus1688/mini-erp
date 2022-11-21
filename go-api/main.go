@@ -4,6 +4,7 @@ import (
 	"go-api/auth"
 	"go-api/controllers"
 	"go-api/database"
+	"go-api/middlewares"
 	"go-api/models"
 	"log"
 	"os"
@@ -34,8 +35,8 @@ func loadEnv() {
 func initRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
-	// router.Use(middlewares.ValidateCsrf())
-	// router.Use(middlewares.TokenExpired(60))
+	router.Use(middlewares.ValidateCsrf())
+	router.Use(middlewares.TokenExpired(5))
 
 	api := router.Group("/api/v1")
 	{
@@ -46,6 +47,7 @@ func initRouter() *gin.Engine {
 		api.PATCH("/customer", controllers.UpdateCustomer)
 
 		inv := api.Group("/inventory")
+		inv.Use(middlewares.UserIsInventoryUser())
 		{
 			inv.GET("/batch-count", controllers.GetBatchCount)
 			inv.GET("/batch", controllers.GetBatch)
@@ -67,7 +69,7 @@ func initRouter() *gin.Engine {
 			inv.POST("/production", controllers.CreateProductionDraft) // add stock to draft table
 
 			admin := inv.Group("/") // admin only (inv_a is true)
-			// admin.Use(middlewares.UserIsInventoryAdmin())
+			admin.Use(middlewares.UserIsInventoryAdmin())
 			{
 				admin.DELETE("/batch", controllers.DeleteBatch)
 				admin.PATCH("/batch", controllers.UpdateBatch)
@@ -82,6 +84,7 @@ func initRouter() *gin.Engine {
 		}
 
 		fin := api.Group("/finance")
+		fin.Use(middlewares.UserIsFinanceUser())
 		{
 			fin.GET("/term-of-payment-count", controllers.GetTOPCount)
 			fin.GET("/term-of-payment", controllers.GetTOP)
@@ -94,7 +97,7 @@ func initRouter() *gin.Engine {
 			fin.GET("/sales-invoice", controllers.GetSalesInvoice)
 
 			admin := fin.Group("/") // admin only (fin_a is true)
-			// admin.User(middlewares.UserIsFinanceAdmin())
+			admin.Use(middlewares.UserIsFinanceAdmin())
 			{
 				admin.PATCH("/term-of-payment", controllers.UpdateTOP)
 				admin.DELETE("/term-of-payment", controllers.DeleteTOP)

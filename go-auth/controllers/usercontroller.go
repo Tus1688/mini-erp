@@ -54,6 +54,7 @@ func Login(c *gin.Context) {
 		user.Username,
 		user.InventoryUser,
 		user.FinanceUser,
+		user.FinanceAdmin,
 		user.InventoryAdmin,
 		user.SystemAdmin,
 		csrf_token,
@@ -68,6 +69,7 @@ func Login(c *gin.Context) {
 		"token": tokenString,
 		"inv_u": user.InventoryUser,
 		"fin_u": user.FinanceUser,
+		"fin_a": user.FinanceAdmin,
 		"inv_a": user.InventoryAdmin,
 		"sys_a": user.SystemAdmin,
 	})

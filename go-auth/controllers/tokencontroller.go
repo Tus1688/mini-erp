@@ -45,6 +45,7 @@ func RefreshToken(c *gin.Context) {
 		claims.Username,
 		claims.Inv_u,
 		claims.Fin_u,
+		claims.Fin_a,
 		claims.Inv_a,
 		claims.Sys_a,
 		csrf_token,

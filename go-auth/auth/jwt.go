@@ -13,6 +13,7 @@ type JWTClaim struct {
 	Username   string // username
 	Inv_u      *bool  // inventory user
 	Fin_u      *bool  // finance user
+	Fin_a      *bool  // finance admin
 	Inv_a      *bool  // inventory admin
 	Sys_a      *bool  // system admin
 	Csrf_token string // provided csrf_token cookie value
@@ -23,6 +24,7 @@ func GenerateJWT(
 	username string,
 	inv_u *bool,
 	fin_u *bool,
+	fin_a *bool,
 	inv_a *bool,
 	sys_a *bool,
 	csrf_token string,
@@ -32,6 +34,7 @@ func GenerateJWT(
 		Username:   username,
 		Inv_u:      inv_u,
 		Fin_u:      fin_u,
+		Fin_a:      fin_a,
 		Inv_a:      inv_a,
 		Sys_a:      sys_a,
 		Csrf_token: encryptedCsrf,
