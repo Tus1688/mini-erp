@@ -89,7 +89,7 @@ func CreateTOP(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "TOP created"})
+	c.JSON(http.StatusCreated, gin.H{"message": "TOP created"})
 }
 
 func UpdateTOP(c *gin.Context) {
