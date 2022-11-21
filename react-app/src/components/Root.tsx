@@ -247,6 +247,7 @@ const SideNavItem = () => {
                 arrowDisplay='none'
             >
                 <div style={childAccordionItemStyle}>
+                    <StyledNavLink url='/top-list' label='Term Of Payment' />
                     <StyledNavLink url='/so-list' label='Sales Invoice list' />
                     <StyledNavLink
                         url='/so-draft-list'
