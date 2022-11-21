@@ -161,7 +161,19 @@ const StockList = () => {
         const fetchData = async () => {
             const data = await fetchStock();
             if (data) {
-                setData(data);
+                // setData(data); data.expired_date map to localestring and data.quantity with thousand separator
+                setData(
+                    data.map((item: any) => {
+                        return {
+                            ...item,
+                            expired_date: new Date(
+                                item.expired_date
+                            ).toLocaleDateString(),
+                            // quantity: item.quantity.toLocaleString('id-ID'),
+                            // we cant use toLocaleString because we can't sort it
+                        };
+                    })
+                );
             }
         };
         if (!alreadyFetched) {

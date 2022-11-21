@@ -42,36 +42,33 @@ const CustomerModal = ({
                 </EuiModalHeaderTitle>
             </EuiModalHeader>
             <EuiModalBody>
-            <EuiDescriptionList>
-                        <FlyoutDescriptionList
-                            title='ID'
-                            description={data?.id}
-                        />
-                        <FlyoutDescriptionList
-                            title='Name'
-                            description={data?.name}
-                        />
-                        <FlyoutDescriptionList
-                            title='Tax ID'
-                            description={data?.tax_id}
-                        />
-                        <FlyoutDescriptionList
-                            title='Address'
-                            description={data?.address}
-                        />
-                        <FlyoutDescriptionList
-                            title='City'
-                            description={data?.city_name}
-                        />
-                        <FlyoutDescriptionList
-                            title='Province'
-                            description={data?.province_name}
-                        />
-                        <FlyoutDescriptionList
-                            title='Country'
-                            description={data?.country_name}
-                        />
-                    </EuiDescriptionList>
+                <EuiDescriptionList>
+                    <FlyoutDescriptionList title='ID' description={data?.id} />
+                    <FlyoutDescriptionList
+                        title='Name'
+                        description={data?.name}
+                    />
+                    <FlyoutDescriptionList
+                        title='Tax ID'
+                        description={data?.tax_id}
+                    />
+                    <FlyoutDescriptionList
+                        title='Address'
+                        description={data?.address}
+                    />
+                    <FlyoutDescriptionList
+                        title='City'
+                        description={data?.city_name}
+                    />
+                    <FlyoutDescriptionList
+                        title='Province'
+                        description={data?.province_name}
+                    />
+                    <FlyoutDescriptionList
+                        title='Country'
+                        description={data?.country_name}
+                    />
+                </EuiDescriptionList>
             </EuiModalBody>
             <EuiModalFooter>
                 <EuiButton onClick={() => toggleModal(false)}>Close</EuiButton>

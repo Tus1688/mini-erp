@@ -269,16 +269,13 @@ const CustomerList = () => {
         );
     };
 
-    const leadingControlColumns: EuiDataGridControlColumn[] = [
+    const trailingControlColumns: EuiDataGridControlColumn[] = [
         {
             id: 'view',
             width: 36,
             headerCellRender: () => null,
             rowCellRender: EyeRowCell,
         },
-    ];
-
-    const trailingControlColumns: EuiDataGridControlColumn[] = [
         {
             id: 'actions',
             width: 40,
@@ -429,7 +426,6 @@ const CustomerList = () => {
             <EuiPageTemplate.Section>
                 <EuiDataGrid
                     aria-label='Customer List'
-                    leadingControlColumns={leadingControlColumns}
                     trailingControlColumns={trailingControlColumns}
                     columns={columns}
                     columnVisibility={{

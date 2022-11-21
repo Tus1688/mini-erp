@@ -124,13 +124,13 @@ const TOPDeleteModal = ({
         <EuiModal onClose={() => toggleModal(false)}>
             <EuiModalHeader>
                 <EuiModalHeaderTitle>
-                    <h2>Delete Customer</h2>
+                    <h2>Delete Term Of Payment</h2>
                 </EuiModalHeaderTitle>
             </EuiModalHeader>
             <EuiModalBody>
                 <EuiText>
                     <p>
-                        You&rsquo;re about to delete customer
+                        You&rsquo;re about to delete Term Of Payment
                         <br />
                         Are you sure you want to do this?
                     </p>

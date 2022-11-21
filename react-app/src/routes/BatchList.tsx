@@ -319,7 +319,15 @@ const BatchList = () => {
                 lastId: last_id,
             });
             if (data) {
-                setData((rData) => [...rData, ...data]);
+                // setData((rData) => [...rData, ...data]) and data.expired_date and data.created_at map it to local string
+                setData((rData) => [
+                    ...rData,
+                    ...data.map((d: any) => ({
+                        ...d,
+                        expired_date: new Date(d.expired_date).toLocaleDateString('id-ID'),
+                        created_at: new Date(d.created_at).toLocaleString('id-ID'),
+                    })),
+                ]);
                 if (count) {
                     setVariantCount(count);
                 }

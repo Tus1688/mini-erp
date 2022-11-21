@@ -1,9 +1,27 @@
-import { EuiPageTemplate, EuiFlexGroup, EuiFlexItem, EuiTitle, EuiText, EuiTextColor, EuiButton, EuiButtonIcon, EuiDataGrid, EuiDataGridCellValueElementProps, EuiDataGridControlColumn, EuiPopover, EuiPopoverTitle, EuiSpacer, EuiDataGridColumn } from "@elastic/eui";
-import { useState, ReactNode, Fragment, useCallback, useEffect, useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import CustomerDeleteModal from "../components/CustomerDelete";
-import CustomerEditModal from "../components/CustomerEdit";
-import CustomerModal from "../components/CustomerModal";
+import {
+    EuiPageTemplate,
+    EuiFlexGroup,
+    EuiFlexItem,
+    EuiTitle,
+    EuiText,
+    EuiTextColor,
+    EuiButtonIcon,
+    EuiDataGrid,
+    EuiDataGridCellValueElementProps,
+    EuiDataGridControlColumn,
+    EuiDataGridColumn,
+} from '@elastic/eui';
+import {
+    useState,
+    ReactNode,
+    Fragment,
+    useCallback,
+    useEffect,
+    useMemo,
+} from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { getRefreshToken } from '../api/Authentication';
+import SalesInvoiceModal from '../components/SalesInvoiceModal';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -11,7 +29,31 @@ const columns: EuiDataGridColumn[] = [
         initialWidth: 50,
         displayAsText: 'ID',
     },
-]
+    {
+        id: 'customer_name',
+        initialWidth: 250,
+        displayAsText: 'Customer Name',
+    },
+    {
+        id: 'top_name',
+        initialWidth: 150,
+        displayAsText: 'Term Of Payment',
+    },
+    {
+        id: 'date',
+        initialWidth: 200,
+        displayAsText: 'Date',
+    },
+    {
+        id: 'created_by',
+        initialWidth: 150,
+        displayAsText: 'Created By',
+    },
+    {
+        id: 'total',
+        displayAsText: 'Total',
+    },
+];
 
 const SOList = () => {
     let navigate = useNavigate();
@@ -23,7 +65,101 @@ const SOList = () => {
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [SOCount, setSOCount] = useState<number>(0);
-    const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(false);
+
+    const fetchSO = async ({
+        pageIndex,
+        pageSize,
+        lastId,
+    }: {
+        pageIndex?: number;
+        pageSize?: number;
+        lastId?: number;
+    }): Promise<Array<{ [key: string]: ReactNode }> | undefined> => {
+        let baseUrl = '/api/v1/finance/sales-invoice';
+        // if there is pageINdex then append page= to the url also if there is pageSize then append page_size=
+        if (pageIndex !== undefined && pageSize !== undefined) {
+            // because the page index starts at 0 but the api starts at 1
+            baseUrl += `?page=${pageIndex + 1}`;
+            if (pageSize) {
+                baseUrl += `&page_size=${pageSize}`;
+            }
+            if (lastId) {
+                baseUrl += `&last_id=${lastId}`;
+            }
+        }
+        const res = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (res.status === 200) {
+            const data = await res.json();
+            return data;
+        }
+        if (res.status === 401) {
+            const state = await getRefreshToken();
+            if (!state) {
+                navigate('/login', { state: { from: location } });
+                return;
+            }
+            // retry
+            const retry = await fetch(baseUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: sessionStorage.getItem('token') || '',
+                },
+            });
+            if (retry.status === 200) {
+                const data = await retry.json();
+                return data;
+            }
+            if (retry.status === 401) {
+                navigate('/login', { state: { from: location.pathname } });
+                return;
+            }
+        }
+    };
+
+    const fetchSOCount = async (): Promise<number | undefined> => {
+        let baseUrl = '/api/v1/finance/sales-invoice-count';
+        const res = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (res.status === 200) {
+            const data = await res.json();
+            return data.count;
+        }
+        if (res.status === 401) {
+            const state = await getRefreshToken();
+            if (!state) {
+                navigate('/login', { state: { from: location } });
+                return;
+            }
+            // retry
+            const retry = await fetch(baseUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: sessionStorage.getItem('token') || '',
+                },
+            });
+            if (retry.status === 200) {
+                const data = await retry.json();
+                return data.count;
+            }
+            if (retry.status === 401) {
+                navigate('/login', { state: { from: location.pathname } });
+                return;
+            }
+        }
+    };
 
     const EyeRowCell = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,7 +174,7 @@ const SOList = () => {
                     onClick={() => setIsModalOpen(!isModalOpen)}
                 />
                 {isModalOpen ? (
-                    <CustomerModal
+                    <SalesInvoiceModal
                         id={rData[rowIndex.rowIndex as number].id as number}
                         toggleModal={setIsModalOpen}
                     />
@@ -47,109 +183,12 @@ const SOList = () => {
         );
     };
 
-    const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
-        const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-        const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-        const [editModalOpen, setEditModalOpen] = useState(false);
-
-        return (
-            <div>
-                <EuiPopover
-                    isOpen={isPopoverOpen}
-                    anchorPosition='upCenter'
-                    panelPaddingSize='s'
-                    button={
-                        <EuiButtonIcon
-                            aria-label='show actions'
-                            iconType='boxesHorizontal'
-                            color='text'
-                            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-                        />
-                    }
-                    closePopover={() => setIsPopoverOpen(false)}
-                >
-                    <EuiPopoverTitle>Actions</EuiPopoverTitle>
-                    <div style={{ width: 150 }}>
-                        {/* get selected id */}
-                        <button
-                            onClick={() => {
-                                setEditModalOpen(!editModalOpen);
-                                setIsPopoverOpen(false);
-                            }}
-                        >
-                            <EuiFlexGroup
-                                alignItems='center'
-                                component='span'
-                                gutterSize='s'
-                            >
-                                <EuiFlexItem grow={false}>
-                                    <EuiButtonIcon
-                                        aria-label='edit'
-                                        iconType='indexEdit'
-                                        color='text'
-                                    />
-                                </EuiFlexItem>
-                                <EuiFlexItem>Edit</EuiFlexItem>
-                            </EuiFlexGroup>
-                        </button>
-                        <EuiSpacer size='s' />
-                        <button
-                            onClick={() => {
-                                setDeleteModalOpen(!deleteModalOpen);
-                                setIsPopoverOpen(false);
-                            }}
-                        >
-                            <EuiFlexGroup
-                                alignItems='center'
-                                component='span'
-                                gutterSize='s'
-                            >
-                                <EuiFlexItem grow={false}>
-                                    <EuiButtonIcon
-                                        aria-label='delete'
-                                        iconType='trash'
-                                        color='text'
-                                    />
-                                </EuiFlexItem>
-                                <EuiFlexItem>Delete</EuiFlexItem>
-                            </EuiFlexGroup>
-                        </button>
-                    </div>
-                </EuiPopover>
-                {deleteModalOpen ? (
-                    <CustomerDeleteModal
-                        toggleModal={setDeleteModalOpen}
-                        id={rData[rowIndex.rowIndex as number].id as number}
-                        setFetchedPage={setFetchedPage}
-                        setPagination={setPagination}
-                        setData={setData}
-                    />
-                ) : null}
-                {editModalOpen ? (
-                    <CustomerEditModal
-                        toggleModal={setEditModalOpen}
-                        id={rData[rowIndex.rowIndex as number].id as number}
-                    />
-                ) : null}
-            </div>
-        );
-    };
-
-    const leadingControlColumns: EuiDataGridControlColumn[] = [
+    const trailingControlColumns: EuiDataGridControlColumn[] = [
         {
             id: 'view',
             width: 36,
             headerCellRender: () => null,
             rowCellRender: EyeRowCell,
-        },
-    ];
-
-    const trailingControlColumns: EuiDataGridControlColumn[] = [
-        {
-            id: 'actions',
-            width: 40,
-            headerCellRender: () => null,
-            rowCellRender: RowCellRender,
         },
     ];
 
@@ -210,18 +249,26 @@ const SOList = () => {
             // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
             const last_id =
                 rData.length > 0 ? (rData[rData.length - 1].id as number) : 0;
-            // const count = await fetchCustomerCount();
-            // const data = await fetchCustomer({
-            //     pageIndex: pagination.pageIndex,
-            //     pageSize: pagination.pageSize * balancer,
-            //     lastId: last_id,
-            // });
-            // if (data) {
-            //     setData((rData) => [...rData, ...data]);
-            //     if (count) {
-            //         setCustomerCount(count);
-            //     }
-            // }
+            const count = await fetchSOCount();
+            const data = await fetchSO({
+                pageIndex: pagination.pageIndex,
+                pageSize: pagination.pageSize * balancer,
+                lastId: last_id,
+            });
+            if (data) {
+                // setData((rData) => [...rData, ...data]) and data.date map it to local string
+                setData((rData) => [
+                    ...rData,
+                    ...data.map((d: any) => ({
+                        ...d,
+                        date: new Date(d.date).toLocaleDateString(),
+                        total: d.total.toLocaleString('id-ID'),
+                    })),
+                ]);
+                if (count) {
+                    setSOCount(count);
+                }
+            }
         };
         // check if the pagination.pageIndex is in the fetchedPage array so the data is not duplicated
         if (!fetchedPage.includes(pagination.pageIndex)) {
@@ -250,29 +297,19 @@ const SOList = () => {
                 <EuiFlexGroup justifyContent='spaceBetween'>
                     <EuiFlexItem grow={false}>
                         <EuiTitle size='l'>
-                            <h1>Customer List</h1>
+                            <h1>Sales Invoices List</h1>
                         </EuiTitle>
                         <EuiText>
                             <EuiTextColor color='subdued'>
                                 <p>
-                                    In this page you can see, edit and delete
-                                    customers.
+                                    In this page you can see, and print all the
+                                    Sales Invoices.
                                 </p>
                             </EuiTextColor>
                         </EuiText>
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}>
                         <EuiFlexGroup direction='row'>
-                            <EuiButton
-                                color='success'
-                                iconType='plusInCircleFilled'
-                                iconSide='right'
-                                onClick={() =>
-                                    setModalCreateOpen(!modalCreateOpen)
-                                }
-                            >
-                                Create
-                            </EuiButton>
                             <EuiButtonIcon
                                 aria-label='refresh button'
                                 iconType='refresh'
@@ -295,7 +332,6 @@ const SOList = () => {
             <EuiPageTemplate.Section>
                 <EuiDataGrid
                     aria-label='Customer List'
-                    leadingControlColumns={leadingControlColumns}
                     trailingControlColumns={trailingControlColumns}
                     columns={columns}
                     columnVisibility={{
@@ -317,14 +353,6 @@ const SOList = () => {
                     }}
                 />
             </EuiPageTemplate.Section>
-            {/* {modalCreateOpen && (
-                <CustomerCreateModal
-                    toggleModal={setModalCreateOpen}
-                    setFetchedPage={setFetchedPage}
-                    setPagination={setPagination}
-                    setData={setData}
-                />
-            )} */}
         </>
     );
 };

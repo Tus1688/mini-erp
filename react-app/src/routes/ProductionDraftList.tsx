@@ -242,7 +242,18 @@ const ProductionDraftList = () => {
                 navigate: navigate,
             });
             if (data) {
-                setData((rData) => [...rData, ...data]);
+                // setData((rData) => [...rData, ...data]);
+                setData(
+                    data.map((item: any) => {
+                        return {
+                            ...item,
+                            quantity: item.quantity.toLocaleString('id-ID'),
+                            created_at: new Date(
+                                item.created_at
+                            ).toLocaleString('id-ID'),
+                        }
+                    })
+                )
                 if (count) {
                     setDraftCount(count);
                 }
