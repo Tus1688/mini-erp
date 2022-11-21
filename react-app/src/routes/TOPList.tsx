@@ -18,9 +18,9 @@ import {
 import { useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
-import BatchDeleteModal from '../components/BatchDelete';
-import BatchEditModal from '../components/BatchEdit';
 import TOPCreateModal from '../components/TOPCreate';
+import TOPDeleteModal from '../components/TOPDelete';
+import TOPEditModal from '../components/TOPEdit';
 
 const columns: EuiDataGridColumn[] = [
     {
@@ -229,7 +229,7 @@ const TOPList = () => {
                     )}
                 </EuiPopover>
                 {deleteModalOpen && (
-                    <BatchDeleteModal
+                    <TOPDeleteModal
                         toggleModal={setDeleteModalOpen}
                         id={rData[rowIndex.rowIndex as number].id as number}
                         setFetchedPage={setFetchedPage}
@@ -238,7 +238,7 @@ const TOPList = () => {
                     />
                 )}
                 {editModalOpen && (
-                    <BatchEditModal
+                    <TOPEditModal
                         toggleModal={setEditModalOpen}
                         id={rData[rowIndex.rowIndex as number].id as number}
                     />

@@ -223,6 +223,7 @@ const ProductionDraftCreate = ({
                             Submit
                         </EuiButton>
                     </EuiFlexGroup>
+                    <EuiSpacer size='m' />
                 </EuiForm>
             </EuiModalBody>
             <EuiGlobalToastList

@@ -42,7 +42,7 @@ const VariantDeleteModal = ({
 
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
-    const deleteCustomer = async (id: number) => {
+    const deleteVariant = async (id: number) => {
         const res = await fetch(`/api/v1/inventory/variant?id=${id}`, {
             method: 'DELETE',
             headers: {
@@ -76,7 +76,7 @@ const VariantDeleteModal = ({
             return;
         }
         if (res.status === 401) {
-            const state = getRefreshToken();
+            const state = await getRefreshToken();
             if (!state) {
                 navigate('/login', { state: { from: location } });
                 return;
@@ -141,7 +141,7 @@ const VariantDeleteModal = ({
                     Cancel
                 </EuiButtonEmpty>
                 <EuiButton
-                    onClick={() => deleteCustomer(id)}
+                    onClick={() => deleteVariant(id)}
                     fill
                     color='danger'
                 >

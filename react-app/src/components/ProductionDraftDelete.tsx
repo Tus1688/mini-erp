@@ -76,7 +76,7 @@ const ProductionDraftDelete = ({
             return;
         }
         if (res.status === 401) {
-            const state = getRefreshToken();
+            const state = await getRefreshToken();
             if (!state) {
                 navigate('/login', { state: { from: location } });
                 return;

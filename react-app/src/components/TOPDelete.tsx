@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import useToast from '../hooks/useToast';
 
-const BatchDeleteModal = ({
+const TOPDeleteModal = ({
     id,
     toggleModal,
     setFetchedPage,
@@ -42,8 +42,8 @@ const BatchDeleteModal = ({
 
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
-    const deleteCustomer = async (id: number) => {
-        const res = await fetch(`/api/v1/inventory/batch?id=${id}`, {
+    const deleteTOP = async (id: number) => {
+        const res = await fetch(`api/v1/finance/term-of-payment?id=${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const BatchDeleteModal = ({
                 navigate('/login', { state: { from: location } });
                 return;
             }
-            const retry = await fetch(`/api/v1/inventory/batch?id=${id}`, {
+            const retry = await fetch(`api/v1/finance/term-of-payment?id=${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -124,13 +124,13 @@ const BatchDeleteModal = ({
         <EuiModal onClose={() => toggleModal(false)}>
             <EuiModalHeader>
                 <EuiModalHeaderTitle>
-                    <h2>Delete Batch</h2>
+                    <h2>Delete Customer</h2>
                 </EuiModalHeaderTitle>
             </EuiModalHeader>
             <EuiModalBody>
                 <EuiText>
                     <p>
-                        You&rsquo;re about to delete batch
+                        You&rsquo;re about to delete customer
                         <br />
                         Are you sure you want to do this?
                     </p>
@@ -141,7 +141,7 @@ const BatchDeleteModal = ({
                     Cancel
                 </EuiButtonEmpty>
                 <EuiButton
-                    onClick={() => deleteCustomer(id)}
+                    onClick={() => deleteTOP(id)}
                     fill
                     color='danger'
                 >
@@ -157,4 +157,4 @@ const BatchDeleteModal = ({
     );
 };
 
-export default BatchDeleteModal;
+export default TOPDeleteModal;
