@@ -61,6 +61,7 @@ func InitAdminAccount() {
 		Password:       password,
 		InventoryUser:  boolPointer(true),
 		FinanceUser:    boolPointer(true),
+		FinanceAdmin:   boolPointer(true),
 		InventoryAdmin: boolPointer(true),
 		SystemAdmin:    boolPointer(true),
 		Active:         boolPointer(true),

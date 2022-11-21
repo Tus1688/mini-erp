@@ -13,6 +13,7 @@ type JWTClaim struct {
 	Username   string // username
 	Inv_u      *bool  // inventory user
 	Fin_u      *bool  // finance user
+	Fin_a      *bool  // finance admin
 	Inv_a      *bool  // inventory admin
 	Sys_a      *bool  // system admin
 	Csrf_token string // provided csrf_token cookie value
@@ -61,6 +62,18 @@ func TokenIsFinanceUser(signedToken string) (err error) {
 	isFinanceUser := *claims.Fin_u
 	if !isFinanceUser {
 		err = errors.New("not finance user")
+	}
+	return
+}
+
+func TokenIsFinanceAdmin(signedToken string) (err error) {
+	claims, err := ExtractClaims(signedToken)
+	if err != nil {
+		return
+	}
+	isFinanceAdmin := *claims.Fin_a
+	if !isFinanceAdmin {
+		err = errors.New("not finance admin")
 	}
 	return
 }
