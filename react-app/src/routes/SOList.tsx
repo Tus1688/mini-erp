@@ -262,7 +262,7 @@ const SOList = () => {
                     ...data.map((d: any) => ({
                         ...d,
                         date: new Date(d.date).toLocaleDateString(),
-                        total: d.total.toLocaleString('id-ID'),
+                        total: 'Rp. ' + d.total.toLocaleString('id-ID'),
                     })),
                 ]);
                 if (count) {

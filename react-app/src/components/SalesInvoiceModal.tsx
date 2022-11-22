@@ -11,12 +11,13 @@ import {
     EuiModalHeaderTitle,
     EuiSpacer,
 } from '@elastic/eui';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import { ReactNode, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchSalesInvoiceSpecific } from '../api/SalesInvoice';
 import { salesInvoiceSpecific } from '../type/SalesInvoice';
 import FlyoutDescriptionList from './FlyoutDescriptionList';
-import SalesInvoiceDownload from './SalesInvoiceDownload';
+import SalesInvoicePdfDownload from './SalesInvoiceDownload';
 
 const columns: EuiBasicTableColumn<any>[] = [
     {
@@ -62,7 +63,6 @@ const SalesInvoiceModal = ({
     let navigate = useNavigate();
     const [data, setData] = useState<salesInvoiceSpecific>();
     const [items, setItems] = useState<Array<{ [key: string]: ReactNode }>>([]); // accountable for items in table
-    const [pdfModal, setPdfModal] = useState<boolean>(false);
 
     useEffect(() => {
         console.log('here');
@@ -139,15 +139,15 @@ const SalesInvoiceModal = ({
                 <EuiButton
                     iconType='download'
                     color='text'
-                    onClick={() => setPdfModal(!pdfModal)}
                 >
-                    Download PDF
+                    <PDFDownloadLink document={<SalesInvoicePdfDownload data={data} />} fileName={'invoice-'+data?.id+'.pdf'}>
+                        {({ loading }) =>
+                            loading ? 'Loading document...' : 'Download PDF'
+                        }
+                    </PDFDownloadLink>
                 </EuiButton>
                 <EuiButton onClick={() => toggleModal(false)}>Close</EuiButton>
             </EuiModalFooter>
-            {pdfModal && (
-                <SalesInvoiceDownload data={data} toggleModal={setPdfModal} />
-            )}
         </EuiModal>
     );
 };
