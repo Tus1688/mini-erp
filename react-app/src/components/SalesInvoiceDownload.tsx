@@ -197,7 +197,7 @@ const SalesInvoicePdfDownload = ({
                                         borderRight: '0.5px solid black',
                                     }}
                                 >
-                                    Rp .{' '}
+                                    Rp.{' '}
                                     {itemProps.total.toLocaleString('id-ID')}
                                 </Text>
                             </View>

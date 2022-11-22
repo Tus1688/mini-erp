@@ -11,13 +11,11 @@ import {
     EuiModalHeaderTitle,
     EuiSpacer,
 } from '@elastic/eui';
-import { PDFDownloadLink } from '@react-pdf/renderer';
 import { ReactNode, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchSalesInvoiceSpecific } from '../api/SalesInvoice';
 import { salesInvoiceSpecific } from '../type/SalesInvoice';
 import FlyoutDescriptionList from './FlyoutDescriptionList';
-import SalesInvoicePdfDownload from './SalesInvoiceDownload';
 
 const columns: EuiBasicTableColumn<any>[] = [
     {
@@ -52,7 +50,7 @@ const columns: EuiBasicTableColumn<any>[] = [
     },
 ];
 
-const SalesInvoiceModal = ({
+const SalesInvoiceDraftModal = ({
     id,
     toggleModal,
 }: {
@@ -70,7 +68,7 @@ const SalesInvoiceModal = ({
             id: id,
             navigate: navigate,
             location: location,
-            draft: false
+            draft: true
         }).then((data) => {
             if (data) {
                 setData(data);
@@ -95,7 +93,7 @@ const SalesInvoiceModal = ({
         <EuiModal onClose={() => toggleModal(false)}>
             <EuiModalHeader>
                 <EuiModalHeaderTitle>
-                    <h1>Sales Invoice {id}'s details</h1>
+                    <h1>Draft {id}'s details</h1>
                 </EuiModalHeaderTitle>
             </EuiModalHeader>
             <EuiModalBody>
@@ -137,20 +135,10 @@ const SalesInvoiceModal = ({
                 <EuiBasicTable items={items} columns={columns} />
             </EuiModalBody>
             <EuiModalFooter>
-                <EuiButton
-                    iconType='download'
-                    color='text'
-                >
-                    <PDFDownloadLink document={<SalesInvoicePdfDownload data={data} />} fileName={'invoice-'+data?.id+'.pdf'}>
-                        {({ loading }) =>
-                            loading ? 'Loading document...' : 'Download PDF'
-                        }
-                    </PDFDownloadLink>
-                </EuiButton>
                 <EuiButton onClick={() => toggleModal(false)}>Close</EuiButton>
             </EuiModalFooter>
         </EuiModal>
     );
 };
 
-export default SalesInvoiceModal;
+export default SalesInvoiceDraftModal;

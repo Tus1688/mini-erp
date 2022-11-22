@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import useToast from '../hooks/useToast';
 
-const ProductionDraftApprove = ({
+const SalesInvoiceDraftApprove = ({
     id,
     toggleModal,
     setFetchedPage,
@@ -42,8 +42,8 @@ const ProductionDraftApprove = ({
 
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
-    const approveProductionDraft = async (id: number) => {
-        let baseUrl = `/api/v1/inventory/production?id=${id}`;
+    const approveSODraft = async (id: number) => {
+        let baseUrl = `/api/v1/finance/sales-invoice-draft?id=${id}`;
         const res = await fetch(baseUrl, {
             method: 'PUT',
             headers: {
@@ -61,6 +61,19 @@ const ProductionDraftApprove = ({
                 text: (
                     <>
                         <p>{data.error}<br /> Somebody must have delete/approve it</p>
+                    </>
+                )
+            })
+        }
+        if (res.status === 500) {
+            let data = await res.json();
+            addToast({
+                id: getNewId(),
+                title: 'Error',
+                color: 'danger',
+                text: (
+                    <>
+                        <p>Uh-oh, {data.error}</p>
                     </>
                 )
             })
@@ -98,6 +111,20 @@ const ProductionDraftApprove = ({
                 });
                 return;
             }
+            if (retry.status === 500) {
+                let data = await retry.json();
+                addToast({
+                    id: getNewId(),
+                    title: 'Error',
+                    color: 'danger',
+                    text: (
+                        <>
+                            <p>Uh-oh, {data.error}</p>
+                        </>
+                    )
+                })
+
+            }
             if (retry.status === 404) {
                 let data = await retry.json();
 
@@ -123,13 +150,13 @@ const ProductionDraftApprove = ({
         <EuiModal onClose={() => toggleModal(false)}>
             <EuiModalHeader>
                 <EuiModalHeaderTitle>
-                    <h2>Approve production draft</h2>
+                    <h2>Approve sales invoice draft</h2>
                 </EuiModalHeaderTitle>
             </EuiModalHeader>
             <EuiModalBody>
                 <EuiText>
                     <p>
-                        You&rsquo;re about to approve production draft
+                        You&rsquo;re about to approve sales invoice draft
                         <br />
                         Are you sure you want to do this?
                     </p>
@@ -139,7 +166,7 @@ const ProductionDraftApprove = ({
                 <EuiButtonEmpty onClick={() => toggleModal(false)}>
                     Cancel
                 </EuiButtonEmpty>
-                <EuiButton onClick={() => approveProductionDraft(id)} fill color='success'>
+                <EuiButton onClick={() => approveSODraft(id)} fill color='success'>
                     Yes, approve
                 </EuiButton>
             </EuiModalFooter>
@@ -152,4 +179,4 @@ const ProductionDraftApprove = ({
     );
 };
 
-export default ProductionDraftApprove;
+export default SalesInvoiceDraftApprove;

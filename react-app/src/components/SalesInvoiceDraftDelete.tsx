@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import useToast from '../hooks/useToast';
 
-const ProductionDraftApprove = ({
+const SalesInvoiceDraftDelete = ({
     id,
     toggleModal,
     setFetchedPage,
@@ -42,10 +42,10 @@ const ProductionDraftApprove = ({
 
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
-    const approveProductionDraft = async (id: number) => {
-        let baseUrl = `/api/v1/inventory/production?id=${id}`;
+    const deleteSODraft = async (id: number) => {
+        let baseUrl = `/api/v1/finance/sales-invoice-draft?id=${id}`;
         const res = await fetch(baseUrl, {
-            method: 'PUT',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: sessionStorage.getItem('token') || '',
@@ -82,7 +82,7 @@ const ProductionDraftApprove = ({
                 return;
             }
             const retry = await fetch(baseUrl, {
-                method: 'PUT',
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: sessionStorage.getItem('token') || '',
@@ -99,7 +99,7 @@ const ProductionDraftApprove = ({
                 return;
             }
             if (retry.status === 404) {
-                let data = await retry.json();
+                let data = await res.json();
 
                 addToast({
                     id: getNewId(),
@@ -123,13 +123,13 @@ const ProductionDraftApprove = ({
         <EuiModal onClose={() => toggleModal(false)}>
             <EuiModalHeader>
                 <EuiModalHeaderTitle>
-                    <h2>Approve production draft</h2>
+                    <h2>Delete sales invoice draft</h2>
                 </EuiModalHeaderTitle>
             </EuiModalHeader>
             <EuiModalBody>
                 <EuiText>
                     <p>
-                        You&rsquo;re about to approve production draft
+                        You&rsquo;re about to delete sales invoice draft
                         <br />
                         Are you sure you want to do this?
                     </p>
@@ -139,8 +139,8 @@ const ProductionDraftApprove = ({
                 <EuiButtonEmpty onClick={() => toggleModal(false)}>
                     Cancel
                 </EuiButtonEmpty>
-                <EuiButton onClick={() => approveProductionDraft(id)} fill color='success'>
-                    Yes, approve
+                <EuiButton onClick={() => deleteSODraft(id)} fill color='danger'>
+                    Yes, delete it!
                 </EuiButton>
             </EuiModalFooter>
             <EuiGlobalToastList
@@ -152,4 +152,4 @@ const ProductionDraftApprove = ({
     );
 };
 
-export default ProductionDraftApprove;
+export default SalesInvoiceDraftDelete;

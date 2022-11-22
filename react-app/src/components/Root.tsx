@@ -253,14 +253,6 @@ const SideNavItem = () => {
                         url='/so-draft-list'
                         label='Sales Invoice Draft list'
                     />
-                    <StyledNavLink
-                        url='/so-draft-create'
-                        label='Create Sales Invoice Draft'
-                    />
-                    <StyledNavLink
-                        url='/so-draft-approve'
-                        label='Approve Sales Invoice Draft'
-                    />
                 </div>
             </EuiAccordion>
             <EuiAccordion

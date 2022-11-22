@@ -18,6 +18,7 @@ import VariantList from './routes/VariantList';
 import BatchList from './routes/BatchList';
 import SOList from './routes/SOList';
 import TOPList from './routes/TOPList';
+import SoDraftList from './routes/SODraftList';
 
 export default function App() {
     const { theme } = useTheme();
@@ -67,6 +68,10 @@ export default function App() {
                 {
                     path: '/so-list',
                     element: <SOList />
+                },
+                {
+                    path: '/so-draft-list',
+                    element: <SoDraftList />
                 },
                 {
                     path: '/settings',

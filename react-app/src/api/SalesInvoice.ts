@@ -2,16 +2,25 @@ import { Location, NavigateFunction } from 'react-router-dom';
 import { salesInvoiceSpecific } from '../type/SalesInvoice';
 import { getRefreshToken } from './Authentication';
 
+// combine draft and approved invoices @draft = boolean (true = draft, false = approved)
 export const fetchSalesInvoiceSpecific = async ({
     id,
     navigate,
     location,
+    draft
 }: {
     id: number;
     navigate: NavigateFunction;
     location: Location;
+    draft: boolean
 }): Promise<salesInvoiceSpecific | undefined> => {
-    let baseUrl = `/api/v1/finance/sales-invoice?id=${id}`;
+    let baseUrl;
+    if (!draft) {
+        baseUrl = `/api/v1/finance/sales-invoice?id=${id}`;
+    } else {
+        baseUrl = `/api/v1/finance/sales-invoice-draft?id=${id}`;
+    }
+
     const res = await fetch(baseUrl, {
         method: 'GET',
         headers: {
