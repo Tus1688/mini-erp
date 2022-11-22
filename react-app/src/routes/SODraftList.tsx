@@ -185,6 +185,9 @@ const SoDraftList = () => {
                     <SalesInvoiceDraftModal
                         id={rData[rowIndex.rowIndex as number].id as number}
                         toggleModal={setIsModalOpen}
+                        setFetchedPage={setFetchedPage}
+                        setPagination={setPagination}
+                        setData={setData}
                     />
                 ) : null}
             </Fragment>

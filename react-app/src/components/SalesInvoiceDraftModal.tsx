@@ -2,6 +2,7 @@ import {
     EuiBasicTable,
     EuiBasicTableColumn,
     EuiButton,
+    EuiButtonEmpty,
     EuiFlexGroup,
     EuiFlexItem,
     EuiModal,
@@ -16,6 +17,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchSalesInvoiceSpecific } from '../api/SalesInvoice';
 import { salesInvoiceSpecific } from '../type/SalesInvoice';
 import FlyoutDescriptionList from './FlyoutDescriptionList';
+import SalesInvoiceDraftApprove from './SalesInvoiceDraftApprove';
 
 const columns: EuiBasicTableColumn<any>[] = [
     {
@@ -53,14 +55,32 @@ const columns: EuiBasicTableColumn<any>[] = [
 const SalesInvoiceDraftModal = ({
     id,
     toggleModal,
+    setFetchedPage,
+    setPagination,
+    setData,
 }: {
     id: number;
     toggleModal: (value: React.SetStateAction<boolean>) => void;
+    setFetchedPage: React.Dispatch<React.SetStateAction<number[]>>;
+    setPagination: React.Dispatch<
+        React.SetStateAction<{
+            pageIndex: number;
+            pageSize: number;
+        }>
+    >;
+    setData: React.Dispatch<
+        React.SetStateAction<
+            {
+                [key: string]: React.ReactNode;
+            }[]
+        >
+    >;
 }) => {
     let location = useLocation();
     let navigate = useNavigate();
-    const [data, setData] = useState<salesInvoiceSpecific>();
+    const [data, setChildData] = useState<salesInvoiceSpecific>();
     const [items, setItems] = useState<Array<{ [key: string]: ReactNode }>>([]); // accountable for items in table
+    const [approveModal, setApproveModal] = useState<boolean>(false);
 
     useEffect(() => {
         console.log('here');
@@ -68,10 +88,10 @@ const SalesInvoiceDraftModal = ({
             id: id,
             navigate: navigate,
             location: location,
-            draft: true
+            draft: true,
         }).then((data) => {
             if (data) {
-                setData(data);
+                setChildData(data);
                 setItems(
                     data.items.map((item) => {
                         return {
@@ -135,8 +155,20 @@ const SalesInvoiceDraftModal = ({
                 <EuiBasicTable items={items} columns={columns} />
             </EuiModalBody>
             <EuiModalFooter>
-                <EuiButton onClick={() => toggleModal(false)}>Close</EuiButton>
+                <EuiButtonEmpty onClick={() => toggleModal(false)}>Close</EuiButtonEmpty>
+                <EuiButton color='success' onClick={() => setApproveModal(!approveModal)}>
+                    Approve
+                </EuiButton>
             </EuiModalFooter>
+            {approveModal && (
+                <SalesInvoiceDraftApprove
+                    id={id}
+                    toggleModal={setApproveModal}
+                    setFetchedPage={setFetchedPage}
+                    setPagination={setPagination}
+                    setData={setData}
+                />
+            )}
         </EuiModal>
     );
 };
