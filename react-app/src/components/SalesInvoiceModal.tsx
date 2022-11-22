@@ -16,6 +16,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchSalesInvoiceSpecific } from '../api/SalesInvoice';
 import { salesInvoiceSpecific } from '../type/SalesInvoice';
 import FlyoutDescriptionList from './FlyoutDescriptionList';
+import SalesInvoiceDownload from './SalesInvoiceDownload';
 
 const columns: EuiBasicTableColumn<any>[] = [
     {
@@ -25,7 +26,7 @@ const columns: EuiBasicTableColumn<any>[] = [
     {
         field: 'batch_id',
         name: 'Batch ID',
-        width: '10%'
+        width: '10%',
     },
     {
         field: 'description',
@@ -46,7 +47,7 @@ const columns: EuiBasicTableColumn<any>[] = [
     {
         field: 'total',
         name: 'Total',
-        width: '16%'
+        width: '16%',
     },
 ];
 
@@ -61,6 +62,7 @@ const SalesInvoiceModal = ({
     let navigate = useNavigate();
     const [data, setData] = useState<salesInvoiceSpecific>();
     const [items, setItems] = useState<Array<{ [key: string]: ReactNode }>>([]); // accountable for items in table
+    const [pdfModal, setPdfModal] = useState<boolean>(false);
 
     useEffect(() => {
         console.log('here');
@@ -77,10 +79,10 @@ const SalesInvoiceModal = ({
                             name: item.name,
                             batch_id: item.batch_id,
                             description: item.description,
-                            price: "Rp. " + item.price.toLocaleString('id-ID'),
-                            discount: item.discount + "%",
+                            price: 'Rp. ' + item.price.toLocaleString('id-ID'),
+                            discount: item.discount + '%',
                             quantity: item.quantity.toLocaleString('id-ID'),
-                            total: "Rp. " + item.total.toLocaleString('id-ID'),
+                            total: 'Rp. ' + item.total.toLocaleString('id-ID'),
                         };
                     })
                 );
@@ -124,7 +126,9 @@ const SalesInvoiceModal = ({
                         />
                         <FlyoutDescriptionList
                             title='Total'
-                            description={"Rp. " + data?.total?.toLocaleString('id-ID')}
+                            description={
+                                'Rp. ' + data?.total?.toLocaleString('id-ID')
+                            }
                         />
                     </EuiFlexItem>
                 </EuiFlexGroup>
@@ -132,8 +136,18 @@ const SalesInvoiceModal = ({
                 <EuiBasicTable items={items} columns={columns} />
             </EuiModalBody>
             <EuiModalFooter>
+                <EuiButton
+                    iconType='download'
+                    color='text'
+                    onClick={() => setPdfModal(!pdfModal)}
+                >
+                    Download PDF
+                </EuiButton>
                 <EuiButton onClick={() => toggleModal(false)}>Close</EuiButton>
             </EuiModalFooter>
+            {pdfModal && (
+                <SalesInvoiceDownload data={data} toggleModal={setPdfModal} />
+            )}
         </EuiModal>
     );
 };

@@ -35,20 +35,28 @@ const columns: EuiDataGridColumn[] = [
         id: 'id',
         initialWidth: 50,
         displayAsText: 'ID',
+        schema: 'numeric',
+        isSortable: true,
     },
     {
         id: 'name',
         initialWidth: 250,
         displayAsText: 'Name',
+        schema: 'string',
+        isSortable: false
     },
     {
         id: 'tax_id',
         initialWidth: 200,
         displayAsText: 'Tax ID',
+        schema: 'string',
+        isSortable: false
     },
     {
         id: 'address',
         displayAsText: 'Address',
+        schema: 'string',
+        isSortable: false
     },
 ];
 
