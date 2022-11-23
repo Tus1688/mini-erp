@@ -75,6 +75,10 @@ const TOPDeleteModal = ({
             });
             return;
         }
+        if (res.status === 403 ) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
         if (res.status === 401) {
             const state = await getRefreshToken();
             if (!state) {
@@ -113,7 +117,7 @@ const TOPDeleteModal = ({
                 });
                 return;
             }
-            if (retry.status === 401) {
+            if (retry.status === 401 || retry.status === 403) {
                 navigate('/login', { state: { from: location } });
                 return;
             }

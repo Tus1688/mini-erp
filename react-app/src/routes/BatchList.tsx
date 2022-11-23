@@ -82,6 +82,10 @@ const BatchList = () => {
             const data = await res.json();
             return data;
         }
+        if (res.status === 403 ) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
         if (res.status === 401) {
             const state = await getRefreshToken();
             if (!state) {
@@ -100,7 +104,7 @@ const BatchList = () => {
                 const data = await retry.json();
                 return data;
             }
-            if (retry.status === 401) {
+            if (retry.status === 401 || retry.status === 403) {
                 navigate('/login', { state: { from: location.pathname } });
                 return;
             }
@@ -120,6 +124,10 @@ const BatchList = () => {
             const data = await res.json();
             return data.count;
         }
+        if (res.status === 403 ) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
         if (res.status === 401) {
             const state = await getRefreshToken();
             if (!state) {
@@ -138,7 +146,7 @@ const BatchList = () => {
                 const data = await retry.json();
                 return data.count;
             }
-            if (retry.status === 401) {
+            if (retry.status === 401 || retry.status === 403) {
                 navigate('/login', { state: { from: location.pathname } });
                 return;
             }

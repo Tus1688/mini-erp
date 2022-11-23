@@ -28,6 +28,10 @@ export const fetchVariantSpecific = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -45,7 +49,7 @@ export const fetchVariantSpecific = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -81,6 +85,10 @@ export const patchVariant = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 404) {
         return {
             error: 'Variant not found, somebody else might have deleted it!',
@@ -113,7 +121,7 @@ export const patchVariant = async ({
                 error: 'Variant not found, somebody else might have deleted it!',
             };
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -147,6 +155,10 @@ export const createVariant = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -168,7 +180,7 @@ export const createVariant = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -196,6 +208,10 @@ export const fetchVariantSearch = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -214,7 +230,7 @@ export const fetchVariantSearch = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location.pathname } });
             return;
         }

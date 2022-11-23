@@ -17,3 +17,14 @@ export type salesInvoiceSpecific = {
     total: number;
     items: itemsProps[];
 };
+
+// for creating new sales invoice (table)
+export type itemsDisplayProps = {
+    name: string;
+    variant_id: number;
+    batch_id: number;
+    price: number;
+    discount: number;
+    quantity: number;
+    total: number;
+}

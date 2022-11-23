@@ -47,7 +47,7 @@ const loginUser = async (credentials: {
         if (retry.status === 200) {
             return retry.json();
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             return { error: 'Invalid username or password' };
         }
     }

@@ -27,6 +27,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import CustomerCreateModal from '../components/CustomerCreate';
 import SalesInvoiceDraftApprove from '../components/SalesInvoiceDraftApprove';
+import SalesInvoiceCreateModal from '../components/SalesInvoiceDraftCreate';
 import SalesInvoiceDraftDelete from '../components/SalesInvoiceDraftDelete';
 import SalesInvoiceDraftModal from '../components/SalesInvoiceDraftModal';
 
@@ -106,6 +107,10 @@ const SoDraftList = () => {
             const data = await res.json();
             return data;
         }
+        if (res.status === 403 ) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
         if (res.status === 401) {
             const state = await getRefreshToken();
             if (!state) {
@@ -124,7 +129,7 @@ const SoDraftList = () => {
                 const data = await retry.json();
                 return data;
             }
-            if (retry.status === 401) {
+            if (retry.status === 401 || retry.status === 403) {
                 navigate('/login', { state: { from: location.pathname } });
                 return;
             }
@@ -144,6 +149,10 @@ const SoDraftList = () => {
             const data = await res.json();
             return data.count;
         }
+        if (res.status === 403 ) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
         if (res.status === 401) {
             const state = await getRefreshToken();
             if (!state) {
@@ -162,7 +171,7 @@ const SoDraftList = () => {
                 const data = await retry.json();
                 return data.count;
             }
-            if (retry.status === 401) {
+            if (retry.status === 401 || retry.status === 403) {
                 navigate('/login', { state: { from: location.pathname } });
                 return;
             }
@@ -485,7 +494,7 @@ const SoDraftList = () => {
                 />
             </EuiPageTemplate.Section>
             {modalCreateOpen && (
-                <CustomerCreateModal
+                <SalesInvoiceCreateModal
                     toggleModal={setModalCreateOpen}
                     setFetchedPage={setFetchedPage}
                     setPagination={setPagination}

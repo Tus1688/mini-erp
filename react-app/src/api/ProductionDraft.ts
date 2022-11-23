@@ -21,6 +21,10 @@ export const fetchProductionDraftCount = async ({
         const data = await res.json();
         return data.count;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -39,7 +43,7 @@ export const fetchProductionDraftCount = async ({
             const data = await retry.json();
             return data.count;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location.pathname } });
             return;
         }
@@ -77,6 +81,10 @@ export const fetchProductionDraft = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -95,7 +103,7 @@ export const fetchProductionDraft = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location.pathname } });
             return;
         }
@@ -133,6 +141,10 @@ export const createProdutionDraft = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -152,7 +164,7 @@ export const createProdutionDraft = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location.pathname } });
             return;
         }

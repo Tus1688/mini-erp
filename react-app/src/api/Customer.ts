@@ -23,6 +23,10 @@ export const fetchCustomerSpecific = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -41,7 +45,7 @@ export const fetchCustomerSpecific = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location.pathname } });
             return;
         }
@@ -90,6 +94,10 @@ export const patchCustomerSpecific = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 404) {
         return {error: 'Customer Not Found, somebody else might have deleted it!'}
     }
@@ -122,7 +130,7 @@ export const patchCustomerSpecific = async ({
         if (retry.status === 404) {
             return {error: 'Customer Not Found, somebody else might have deleted it!'}
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location.pathname } });
             return;
         }
@@ -168,6 +176,10 @@ export const createCustomer = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -194,7 +206,7 @@ export const createCustomer = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location.pathname } });
             return;
         }

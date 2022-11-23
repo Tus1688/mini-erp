@@ -25,6 +25,10 @@ export const createBatch = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -45,7 +49,7 @@ export const createBatch = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -72,6 +76,10 @@ export const fetchBatchSpecific = async ({
     if (res.status === 200) {
         const data = await res.json();
         return data;
+    }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
     }
     if (res.status === 404) {
         return {
@@ -100,7 +108,7 @@ export const fetchBatchSpecific = async ({
                 error: 'Batch not found, somebody else might have deleted it!',
             };
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -134,6 +142,10 @@ export const patchBatch = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -155,7 +167,7 @@ export const patchBatch = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -182,6 +194,10 @@ export const fetchBatchSearch = async ({
     if (res.status === 200) {
         const data = await res.json();
         return data;
+    }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
     }
     if (res.status === 404) {
         return {
@@ -210,7 +226,7 @@ export const fetchBatchSearch = async ({
                 error: 'Batch not found, somebody else might have deleted it!',
             };
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }

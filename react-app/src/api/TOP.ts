@@ -29,6 +29,10 @@ export const createTOP = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -47,7 +51,7 @@ export const createTOP = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -81,6 +85,10 @@ export const fetchTOPSpecific = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 401) {
         const state = await getRefreshToken();
         if (!state) {
@@ -98,7 +106,7 @@ export const fetchTOPSpecific = async ({
             const data = await retry.json();
             return data;
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -136,6 +144,10 @@ export const patchTOP = async ({
         const data = await res.json();
         return data;
     }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
     if (res.status === 404) {
         return { error: 'TOP not found, somebody else might have deleted it!' };
     }
@@ -162,7 +174,7 @@ export const patchTOP = async ({
                 error: 'TOP not found, somebody else might have deleted it!',
             };
         }
-        if (retry.status === 401) {
+        if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
