@@ -110,6 +110,7 @@ type APIInventoryItemProductionUpdate struct {
 
 type APIInventoryStockReponse struct {
 	Name        string    `json:"variant_name"`
+	VariantID   int       `json:"variant_id"`
 	ID          int       `json:"batch_id"`
 	Quantity    int       `json:"quantity"`
 	ExpiredDate time.Time `json:"expired_date"`

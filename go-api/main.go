@@ -36,6 +36,7 @@ func initRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(middlewares.ValidateCsrf())
+	router.Use(middlewares.EnforceCsrf())
 	router.Use(middlewares.TokenExpired(5))
 
 	api := router.Group("/api/v1")
