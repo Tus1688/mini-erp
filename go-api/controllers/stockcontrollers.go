@@ -20,15 +20,27 @@ func GetStock(c *gin.Context) {
 	var responseArr []models.APIInventoryStockReponse
 	var requestSearch models.APICommonSearch
 
+	// search query is optional and will be used to select and items on sales invoice draft
+	// so the quantity should be greater than 0
+	// union the table with finance_item_transaction_log_drafts as those items are also on awaiting approval sales invoice
 	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		query := "%" + strings.ToLower(requestSearch.Search) + "%"
-		database.Instance.Table("item_transaction_logs").
-			Select("variants.name, batches.id, batches.expired_date, SUM(item_transaction_logs.quantity) as quantity").
-			Joins("LEFT JOIN variants ON variants.id = item_transaction_logs.variant_refer").
-			Joins("LEFT JOIN batches ON batches.id = item_transaction_logs.batch_refer").
-			Where("variants.name LIKE ?", query).
-			Group("item_transaction_logs.variant_refer, item_transaction_logs.batch_refer").
-			Scan(&responseArr)
+		database.Instance.Raw(`
+			select v.name, variant_refer as VariantID, batch_refer as ID, b.expired_date, sum(quantity) as quantity
+			from 
+			(
+				select batch_refer, variant_refer, quantity
+				from item_transaction_logs
+				Union all
+				select batch_refer, variant_refer, quantity
+				from finance_item_transaction_log_drafts
+			) t
+			left join variants v on v.id = t.variant_refer
+			left join batches b on b.id = t.batch_refer
+			where v.name like ?
+			group by t.variant_refer, t.batch_refer
+			having sum(quantity) > 0
+		`, query).Scan(&responseArr)
 
 		if responseArr == nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "No stock found"})
@@ -40,7 +52,7 @@ func GetStock(c *gin.Context) {
 	}
 
 	database.Instance.Table("item_transaction_logs").
-		Select("variants.name, batches.id, batches.expired_date, SUM(item_transaction_logs.quantity) as quantity").
+		Select("variants.name, item_transaction_logs.variant_refer as VariantID, batches.id, batches.expired_date, SUM(item_transaction_logs.quantity) as quantity").
 		Joins("LEFT JOIN variants ON variants.id = item_transaction_logs.variant_refer").
 		Joins("LEFT JOIN batches ON batches.id = item_transaction_logs.batch_refer").
 		Group("item_transaction_logs.variant_refer, item_transaction_logs.batch_refer").
