@@ -7,3 +7,10 @@ export type customerSpecific = {
     province_name: string;
     country_name: string;
 };
+
+export type customerProps = {
+    id: number;
+    name: string;
+    tax_id: string;
+    address: string;
+}

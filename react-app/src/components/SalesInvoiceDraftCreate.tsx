@@ -2,14 +2,14 @@ import {
     EuiBasicTable,
     EuiButton,
     EuiButtonEmpty,
+    EuiButtonIcon,
     EuiComboBox,
-    EuiComboBoxOption,
     EuiComboBoxOptionOption,
+    EuiDatePicker,
     EuiFieldNumber,
     EuiFlexGroup,
     EuiFlexItem,
     EuiForm,
-    EuiFormLegend,
     EuiFormRow,
     EuiModal,
     EuiModalBody,
@@ -21,9 +21,15 @@ import {
 } from '@elastic/eui';
 import { EuiBasicTableColumn } from '@elastic/eui/src/components/basic_table';
 import moment, { Moment } from 'moment';
-import { useState } from 'react';
+import { useCallback,  useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { itemsDisplayProps, itemsProps } from '../type/SalesInvoice';
+import { fetchCustomerSearch } from '../api/Customer';
+import { fetchStockSearch } from '../api/Stock';
+import { fetchTOPSearch } from '../api/TOP';
+import { customerProps } from '../type/Customer';
+import { itemsDisplayProps } from '../type/SalesInvoice';
+import { stockProps } from '../type/Stock';
+import { topProps } from '../type/TOP';
 
 const columns: EuiBasicTableColumn<any>[] = [
     {
@@ -85,23 +91,22 @@ const SalesInvoiceCreateModal = ({
     let navigate = useNavigate();
 
     // selected global
+    // top = term of payment
     const [topSelected, setTopSelected] = useState<
         EuiComboBoxOptionOption<any>[]
     >([]);
     const [customerSelected, setCustomerSelected] = useState<
         EuiComboBoxOptionOption<any>[]
     >([]);
-    const [date, setDate] = useState<Moment>(moment());
+    const [date, setDate] = useState<Moment | null>(moment());
 
-    const [items, setItems] = useState<itemsDisplayProps[]>([]); // incharge of the items in the table
+    const [carts, setCarts] = useState<itemsDisplayProps[]>([]); // incharge of the items in the table
     // selected items
-    const [variantSelected, setVariantSelected] = useState<
-        EuiComboBoxOptionOption<any>[]
-    >([]);
-    const [batchSelected, setBatchSelected] = useState<
+    const [selectedItems, setSelectedItems] = useState<
         EuiComboBoxOptionOption<any>[]
     >([]);
     const [quantity, setQuantity] = useState<number>();
+    const [maxQuantity, setMaxQuantity] = useState<number>(0);
     const [price, setPrice] = useState<number>();
     const [discount, setDiscount] = useState<number>();
 
@@ -109,40 +114,120 @@ const SalesInvoiceCreateModal = ({
     const [customerOptions, setCustomerOptions] = useState<
         EuiComboBoxOptionOption<any>[]
     >([]);
-    const [variantOptions, setVariantOptions] = useState<
+    const [itemOptions, setItemOptions] = useState<
         EuiComboBoxOptionOption<any>[]
     >([]);
-    const [batchOptions, setBatchOptions] = useState<
+    const [topOptions, setTopOptions] = useState<
         EuiComboBoxOptionOption<any>[]
     >([]);
 
-    let searchTimeout: string | number | NodeJS.Timeout | undefined;
+    // loading
+    const [customerLoading, setCustomerLoading] = useState<boolean>(false);
+    const [itemLoading, setItemLoading] = useState<boolean>(false);
+    const [topLoading, setTopLoading] = useState<boolean>(false);
+
+    let searchTimeout: NodeJS.Timeout;
+
+    const onSearchCustomerChange = useCallback(async (searchValue: string) => {
+        setCustomerLoading(true);
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            const data: customerProps[] = await fetchCustomerSearch({
+                search: searchValue,
+                location: location,
+                navigate: navigate,
+            });
+            if (data) {
+                setCustomerOptions(
+                    data.map((customer) => ({
+                        label: customer.name,
+                        value: customer.id,
+                    }))
+                );
+                setCustomerLoading(false);
+                return;
+            }
+        }, 300);
+        setCustomerLoading(false);
+        setCustomerOptions([]);
+    }, []);
+
+    const onSearchTOPChange = useCallback(async (searchValue: string) => {
+        setTopLoading(true);
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            const data: topProps[] = await fetchTOPSearch({
+                search: searchValue,
+                location: location,
+                navigate: navigate,
+            });
+            if (data) {
+                setTopOptions(
+                    data.map((top) => ({
+                        label: top.name,
+                        value: top.id,
+                    }))
+                );
+                setTopLoading(false);
+                return;
+            }
+        }, 300);
+        setTopLoading(false);
+        setTopOptions([]);
+    }, []);
+
+    const onSearchItemChange = useCallback(async (searchValue: string) => {
+        setItemLoading(true);
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            const data: stockProps[] = await fetchStockSearch({
+                search: searchValue,
+                location: location,
+                navigate: navigate,
+            });
+            if (data) {
+                // set Top Options to become
+                // data.variant_name [data.batch id][data.expired_date][data.quantity]
+                setItemOptions(
+                    data.map((item) => ({
+                        label: `${item.variant_name} [${
+                            item.batch_id
+                        }][${new Date(item.expired_date).toLocaleDateString(
+                            'id-ID'
+                        )}][${item.quantity}]`,
+                        value: `${item.variant_id}-${item.batch_id}`,
+                    }))
+                );
+                setItemLoading(false);
+                return;
+            }
+        }, 300);
+        setItemLoading(false);
+        setItemOptions([]);
+    }, []);
 
     const handleSubmitItems = (e: React.FormEvent<HTMLFormElement>) => {
         console.log('here');
         e.preventDefault();
         // append to items and clear selected
         // value is the id of selected combobox whereas label is the shown value
-        setItems([
-            ...items,
-            {
-                name: variantSelected[0].label,
-                variant_id: variantSelected[0].value,
-                batch_id: batchSelected[0].value,
-                price: price || 0,
-                discount: discount || 0,
-                quantity: quantity || 0,
-                total:
-                    (price || 0) * (quantity || 0) -
-                    ((price || 0) * (quantity || 0) * (discount || 0)) / 100,
-            },
-        ]);
+        // check if all the value is filled
+        if (
+            selectedItems.length === 0 ||
+            quantity === undefined ||
+            price === undefined ||
+            discount === undefined
+        ) {
+            return;
+        }
+        console.log(selectedItems);
+        console.log(discount, 'discount');
+        console.log(price, 'price');
+        console.log(quantity, 'qty');
+
         // clean up selected
-        setVariantSelected([]);
-        setBatchSelected([]);
-        setPrice(undefined);
-        setDiscount(undefined);
-        setQuantity(undefined);
+        setSelectedItems([]);
+        setMaxQuantity(0);
     };
 
     return (
@@ -153,21 +238,78 @@ const SalesInvoiceCreateModal = ({
                 </EuiModalHeaderTitle>
             </EuiModalHeader>
             <EuiModalBody>
-                <EuiBasicTable items={items} columns={columns} />
+                <EuiFlexGroup direction='row' justifyContent='spaceEvenly'>
+                    <EuiFlexItem grow={false} style={{ width: '30%' }}>
+                        <EuiFormRow label='Customer name'>
+                            <EuiComboBox
+                                placeholder='john doe'
+                                options={customerOptions}
+                                selectedOptions={customerSelected}
+                                isLoading={customerLoading}
+                                onSearchChange={onSearchCustomerChange}
+                                onChange={(e) => setCustomerSelected(e)}
+                                singleSelection={{ asPlainText: true }}
+                                async
+                            />
+                        </EuiFormRow>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false} style={{ width: '30%' }}>
+                        <EuiFormRow label='Term of payment'>
+                            <EuiComboBox
+                                placeholder='net 30'
+                                options={topOptions}
+                                selectedOptions={topSelected}
+                                isLoading={topLoading}
+                                onSearchChange={onSearchTOPChange}
+                                onChange={(e) => setTopSelected(e)}
+                                singleSelection={{ asPlainText: true }}
+                                async
+                            />
+                        </EuiFormRow>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false} style={{ width: '30%' }}>
+                        <EuiFormRow label='Sales invoice date'>
+                            <EuiDatePicker
+                                selected={date}
+                                onChange={(e) => setDate(e)}
+                            />
+                        </EuiFormRow>
+                    </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiSpacer size='xl' />
+                <EuiBasicTable items={carts} columns={columns} />
                 <EuiSpacer size='xl' />
                 <EuiForm
                     onSubmit={(e) => handleSubmitItems(e)}
                     component='form'
                 >
-                    <EuiFlexGroup direction='row' justifyContent='spaceEvenly'>
-                        <EuiFlexItem grow={false} style={{ width: '150px' }}>
-                            <EuiFormRow label='Variant'>
-                                <EuiComboBox placeholder='rawon' />
-                            </EuiFormRow>
-                        </EuiFlexItem>
-                        <EuiFlexItem grow={false} style={{ width: '150px' }}>
-                            <EuiFormRow label='Batch Id'>
-                                <EuiComboBox placeholder='1 (2022/12/04)' />
+                    <EuiFlexGroup
+                        direction='row'
+                        justifyContent='spaceEvenly'
+                        alignItems='flexEnd'
+                    >
+                        <EuiFlexItem grow={false} style={{ width: '300px' }}>
+                            <EuiFormRow label='Item'>
+                                <EuiComboBox
+                                    placeholder='Rawon [batch id][exp date][quantity]'
+                                    options={itemOptions}
+                                    selectedOptions={selectedItems}
+                                    isLoading={itemLoading}
+                                    onSearchChange={onSearchItemChange}
+                                    onChange={(e) => {
+                                        setSelectedItems(e);
+                                        // set maxQuantity to be the quantity of selected item
+                                        setMaxQuantity(
+                                            parseInt(
+                                                e[0].label
+                                                    .split('[')[3]
+                                                    .split(']')[0]
+                                            )
+                                        );
+                                    }}
+                                    singleSelection={{ asPlainText: true }}
+                                    async
+                                />
                             </EuiFormRow>
                         </EuiFlexItem>
                         <EuiFlexItem grow={false} style={{ width: '130px' }}>
@@ -190,14 +332,34 @@ const SalesInvoiceCreateModal = ({
                                     min={0}
                                     max={100}
                                     value={discount}
-                                    onChange={(e) => setDiscount(e.target.valueAsNumber)}
+                                    onChange={(e) =>
+                                        setDiscount(e.target.valueAsNumber)
+                                    }
                                 />
                             </EuiFormRow>
                         </EuiFlexItem>
                         <EuiFlexItem grow={false} style={{ width: '120px' }}>
                             <EuiFormRow label='Quantity'>
-                                <EuiFieldNumber placeholder='300' min={0} />
+                                <EuiFieldNumber
+                                    placeholder='300'
+                                    value={quantity}
+                                    onChange={(e) =>
+                                        setQuantity(e.target.valueAsNumber)
+                                    }
+                                    min={0}
+                                    max={maxQuantity}
+                                />
                             </EuiFormRow>
+                        </EuiFlexItem>
+                        <EuiFlexItem grow={false} style={{ width: '50px' }}>
+                            <EuiButtonIcon
+                                aria-label='add item to cart'
+                                iconType='plusInCircleFilled'
+                                type='submit'
+                                color='primary'
+                                size='m'
+                                display='base'
+                            />
                         </EuiFlexItem>
                     </EuiFlexGroup>
                 </EuiForm>

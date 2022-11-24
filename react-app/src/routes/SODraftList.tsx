@@ -25,7 +25,6 @@ import React, {
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
-import CustomerCreateModal from '../components/CustomerCreate';
 import SalesInvoiceDraftApprove from '../components/SalesInvoiceDraftApprove';
 import SalesInvoiceCreateModal from '../components/SalesInvoiceDraftCreate';
 import SalesInvoiceDraftDelete from '../components/SalesInvoiceDraftDelete';
