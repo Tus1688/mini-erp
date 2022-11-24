@@ -50,13 +50,21 @@ func GetStock(c *gin.Context) {
 		c.JSON(http.StatusOK, responseArr)
 		return
 	}
-
-	database.Instance.Table("item_transaction_logs").
-		Select("variants.name, item_transaction_logs.variant_refer as VariantID, batches.id, batches.expired_date, SUM(item_transaction_logs.quantity) as quantity").
-		Joins("LEFT JOIN variants ON variants.id = item_transaction_logs.variant_refer").
-		Joins("LEFT JOIN batches ON batches.id = item_transaction_logs.batch_refer").
-		Group("item_transaction_logs.variant_refer, item_transaction_logs.batch_refer").
-		Scan(&responseArr)
+	database.Instance.Raw(`
+		select v.name, variant_refer as VariantID, batch_refer as ID, b.expired_date, sum(quantity) as quantity
+		from 
+		(
+			select batch_refer, variant_refer, quantity
+			from item_transaction_logs
+			Union all
+			select batch_refer, variant_refer, quantity
+			from finance_item_transaction_log_drafts
+		) t
+		left join variants v on v.id = t.variant_refer
+		left join batches b on b.id = t.batch_refer
+		group by t.variant_refer, t.batch_refer
+		having sum(quantity) > 0
+	`).Scan(&responseArr)
 
 	if responseArr == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Stock not found"})
