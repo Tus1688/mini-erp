@@ -131,7 +131,7 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "successfully created invoice"})
+	c.JSON(http.StatusCreated, gin.H{"message": "successfully created invoice"})
 }
 
 func DeleteSalesInvoiceDraft(c *gin.Context) {
