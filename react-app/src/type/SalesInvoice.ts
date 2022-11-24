@@ -18,7 +18,7 @@ export type salesInvoiceSpecific = {
     items: itemsProps[];
 };
 
-// for creating new sales invoice (table)
+// for creating new sales invoice (EuiBasicTable)
 export type itemsDisplayProps = {
     name: string;
     variant_id: number;
@@ -27,4 +27,20 @@ export type itemsDisplayProps = {
     discount: number;
     quantity: number;
     total: number;
+}
+
+// for creating new sales invoice (POST request)
+export type salesInvoiceOnCreate = {
+    top_id: number;
+    customer_id: number;
+    date: string;
+    items: itemsOnCreateProps[];
+};
+
+export type itemsOnCreateProps = {
+    variant_id: number;
+    batch_id: number;
+    quantity: number;
+    price: number;
+    discount: number;
 }

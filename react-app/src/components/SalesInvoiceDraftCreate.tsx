@@ -11,6 +11,7 @@ import {
     EuiFlexItem,
     EuiForm,
     EuiFormRow,
+    EuiGlobalToastList,
     EuiModal,
     EuiModalBody,
     EuiModalFooter,
@@ -21,16 +22,22 @@ import {
 import { EuiBasicTableColumn } from '@elastic/eui/src/components/basic_table';
 import { Action } from '@elastic/eui/src/components/basic_table/action_types';
 import moment, { Moment } from 'moment';
-import { useCallback,  useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchCustomerSearch } from '../api/Customer';
+import { createSalesInvoice } from '../api/SalesInvoice';
 import { fetchStockSearch } from '../api/Stock';
 import { fetchTOPSearch } from '../api/TOP';
+import useToast from '../hooks/useToast';
 import { customerProps } from '../type/Customer';
-import { itemsDisplayProps } from '../type/SalesInvoice';
+import { formatTimeZoneWithoutTime } from '../type/FormatTZ';
+import {
+    itemsDisplayProps,
+    itemsOnCreateProps,
+    salesInvoiceOnCreate,
+} from '../type/SalesInvoice';
 import { stockProps } from '../type/Stock';
 import { topProps } from '../type/TOP';
-
 
 const SalesInvoiceCreateModal = ({
     toggleModal,
@@ -94,6 +101,7 @@ const SalesInvoiceCreateModal = ({
     const [topLoading, setTopLoading] = useState<boolean>(false);
 
     let searchTimeout: NodeJS.Timeout;
+    const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
     const onSearchCustomerChange = useCallback(async (searchValue: string) => {
         setCustomerLoading(true);
@@ -191,16 +199,9 @@ const SalesInvoiceCreateModal = ({
         }
         // selectedItems[0].value then split by - to get variant_id and batch_id
         let variant_name = selectedItems[0].label.split('[')[0].trim();
-        let variant_id = selectedItems[0].value.split('-')[0];
-        let batch_id = selectedItems[0].value.split('-')[1];
+        let variant_id: number = parseInt(selectedItems[0].value.split('-')[0]);
+        let batch_id:number = parseInt(selectedItems[0].value.split('-')[1]);
         let total = price * quantity * (1 - discount / 100);
-        // console.log('variant name: ', variant_name);
-        // console.log('variant id :', variant_id);
-        // console.log('batch id :', batch_id);
-        // console.log('price: ', price);
-        // console.log('discount: ', discount);
-        // console.log('qty: ', quantity);
-        // console.log('total: ', total);
 
         setCarts((prev) => [
             ...prev,
@@ -220,7 +221,66 @@ const SalesInvoiceCreateModal = ({
         setMaxQuantity(0);
     };
 
-    const actions:Action<any>[] = [
+    // act like a useEffect
+    const handleCreate = async () => {
+        // check if all the value is filled
+        if (
+            customerSelected.length === 0 ||
+            topSelected.length === 0 ||
+            date === null ||
+            carts.length === 0
+        ) {
+            addToast({
+                id: getNewId(),
+                title: 'Error',
+                color: 'danger',
+                text: <p>Please fill all field</p>,
+            });
+            return;
+        }
+
+        // from carts map it to match itemsOnCreateProps type
+        const items: itemsOnCreateProps[] = carts.map((item) => ({
+            variant_id: item.variant_id,
+            batch_id: item.batch_id,
+            price: item.price,
+            discount: item.discount,
+            quantity: item.quantity,
+        }));
+
+        // map all data to match salesInvoiceOnCreateProps type
+        const data: salesInvoiceOnCreate = {
+            customer_id: customerSelected[0].value,
+            top_id: topSelected[0].value,
+            date: date.format(formatTimeZoneWithoutTime),
+            items: items,
+        };
+        await createSalesInvoice({
+            data: data,
+            location: location,
+            navigate: navigate,
+        }).then((data) => {
+            if (data.error) {
+                addToast({
+                    id: getNewId(),
+                    title: 'Error',
+                    color: 'danger',
+                    text: <p>{data.error}</p>,
+                });
+                return;
+            }
+            toggleModal(false);
+            setFetchedPage([]);
+            setData([]);
+            setPagination({
+                pageIndex: 0,
+                pageSize: 20,
+            });
+            console.log('here i am');
+        });
+    };
+
+    const actions: Action<any>[] = [
         {
             name: 'delete',
             description: 'delete this item',
@@ -229,9 +289,9 @@ const SalesInvoiceCreateModal = ({
             color: 'danger',
             onClick: (item) => {
                 setCarts((prev) => prev.filter((cart) => cart !== item));
-            }
-        }
-    ]
+            },
+        },
+    ];
     const columns: EuiBasicTableColumn<any>[] = [
         {
             field: 'name',
@@ -251,34 +311,36 @@ const SalesInvoiceCreateModal = ({
             field: 'price',
             name: 'Price',
             render: (price: number) => {
-                return "Rp. " +  price.toLocaleString('id-ID')
-            }
+                return 'Rp. ' + price.toLocaleString('id-ID');
+            },
         },
         {
             field: 'discount',
             name: 'Discount (%)',
             render: (discount: number) => {
-                return discount + " %"
-            }
+                return discount + ' %';
+            },
         },
         {
             field: 'quantity',
             name: 'Quantity',
             render: (quantity: number) => {
-                return quantity.toLocaleString('id-ID')
-            }
+                return quantity.toLocaleString('id-ID');
+            },
         },
         {
             field: 'total',
             name: 'Total',
             width: '16%',
             render: (total: number) => {
-                return "Rp. " + total.toLocaleString('id-ID')
-            }
+                return 'Rp. ' + total.toLocaleString('id-ID');
+            },
         },
         {
+            // witdh to 50px
+            width: '40px',
             actions,
-        }
+        },
     ];
 
     return (
@@ -418,8 +480,15 @@ const SalesInvoiceCreateModal = ({
                 <EuiButtonEmpty onClick={() => toggleModal(false)}>
                     Cancel
                 </EuiButtonEmpty>
-                <EuiButton color='success'>Create</EuiButton>
+                <EuiButton color='success' type='submit' onClick={() => handleCreate()}>
+                    Create
+                </EuiButton>
             </EuiModalFooter>
+            <EuiGlobalToastList
+                toasts={getAllToasts()}
+                dismissToast={({ id }) => removeToast(id)}
+                toastLifeTimeMs={3000}
+            />
         </EuiModal>
     );
 };

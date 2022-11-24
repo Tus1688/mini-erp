@@ -1,5 +1,5 @@
 import { Location, NavigateFunction } from 'react-router-dom';
-import { salesInvoiceSpecific } from '../type/SalesInvoice';
+import { salesInvoiceOnCreate, salesInvoiceSpecific } from '../type/SalesInvoice';
 import { getRefreshToken } from './Authentication';
 
 // combine draft and approved invoices @draft = boolean (true = draft, false = approved)
@@ -60,3 +60,56 @@ export const fetchSalesInvoiceSpecific = async ({
         }
     }
 };
+
+export const createSalesInvoice = async ({
+    data,
+    navigate,
+    location,
+}: {
+    data: salesInvoiceOnCreate;
+    navigate: NavigateFunction;
+    location: Location;
+}) => {
+    let baseUrl = '/api/v1/finance/sales-invoice-draft';
+    let body = JSON.stringify(data);
+    const res = await fetch(baseUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+        body: body
+    });
+    if (res.status === 201 || res.status === 404 || res.status === 409) {
+        const data = await res.json();
+        return data;
+    }
+    if (res.status === 403 ) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+        // retry
+        const retry = await fetch(baseUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+            body: body
+        });
+        if (retry.status === 201 || retry.status === 404 || retry.status === 409) {
+            const data = await retry.json();
+            return data;
+        }
+        if (retry.status === 401 || retry.status === 403) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+    }
+}
