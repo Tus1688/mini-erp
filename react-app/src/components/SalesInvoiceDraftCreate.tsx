@@ -207,7 +207,6 @@ const SalesInvoiceCreateModal = ({
     }, []);
 
     const handleSubmitItems = (e: React.FormEvent<HTMLFormElement>) => {
-        console.log('here');
         e.preventDefault();
         // append to items and clear selected
         // value is the id of selected combobox whereas label is the shown value
@@ -220,10 +219,31 @@ const SalesInvoiceCreateModal = ({
         ) {
             return;
         }
-        console.log(selectedItems);
-        console.log(discount, 'discount');
-        console.log(price, 'price');
-        console.log(quantity, 'qty');
+        // selectedItems[0].value then split by - to get variant_id and batch_id
+        let variant_name = selectedItems[0].label.split('[')[0].trim();
+        let variant_id = selectedItems[0].value.split('-')[0];
+        let batch_id = selectedItems[0].value.split('-')[1];
+        let total = price * quantity * (1 - discount / 100);
+        console.log('variant name: ', variant_name);
+        console.log('variant id :', variant_id);
+        console.log('batch id :', batch_id);
+        console.log('price: ', price);
+        console.log('discount: ', discount);
+        console.log('qty: ', quantity);
+        console.log('total: ', total);
+
+        setCarts((prev) => [
+            ...prev,
+            {
+                name: variant_name,
+                variant_id: variant_id,
+                batch_id: batch_id,
+                price: price,
+                discount: discount,
+                quantity: quantity,
+                total: total,
+            },
+        ]);
 
         // clean up selected
         setSelectedItems([]);
@@ -277,8 +297,6 @@ const SalesInvoiceCreateModal = ({
                     </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size='xl' />
-                <EuiBasicTable items={carts} columns={columns} />
-                <EuiSpacer size='xl' />
                 <EuiForm
                     onSubmit={(e) => handleSubmitItems(e)}
                     component='form'
@@ -288,7 +306,7 @@ const SalesInvoiceCreateModal = ({
                         justifyContent='spaceEvenly'
                         alignItems='flexEnd'
                     >
-                        <EuiFlexItem grow={false} style={{ width: '300px' }}>
+                        <EuiFlexItem grow={false} style={{ width: '320px' }}>
                             <EuiFormRow label='Item'>
                                 <EuiComboBox
                                     placeholder='Rawon [batch id][exp date][quantity]'
@@ -325,10 +343,9 @@ const SalesInvoiceCreateModal = ({
                             </EuiFormRow>
                         </EuiFlexItem>
                         <EuiFlexItem grow={false} style={{ width: '110px' }}>
-                            <EuiFormRow label='Discount'>
+                            <EuiFormRow label='Discount (%)'>
                                 <EuiFieldNumber
                                     placeholder='10'
-                                    append={<EuiText>%</EuiText>}
                                     min={0}
                                     max={100}
                                     value={discount}
@@ -363,6 +380,8 @@ const SalesInvoiceCreateModal = ({
                         </EuiFlexItem>
                     </EuiFlexGroup>
                 </EuiForm>
+                <EuiSpacer size='xl' />
+                <EuiBasicTable items={carts} columns={columns} />
             </EuiModalBody>
             <EuiModalFooter>
                 <EuiButtonEmpty onClick={() => toggleModal(false)}>
