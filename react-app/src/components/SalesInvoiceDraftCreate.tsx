@@ -17,9 +17,9 @@ import {
     EuiModalHeader,
     EuiModalHeaderTitle,
     EuiSpacer,
-    EuiText,
 } from '@elastic/eui';
 import { EuiBasicTableColumn } from '@elastic/eui/src/components/basic_table';
+import { Action } from '@elastic/eui/src/components/basic_table/action_types';
 import moment, { Moment } from 'moment';
 import { useCallback,  useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -31,39 +31,6 @@ import { itemsDisplayProps } from '../type/SalesInvoice';
 import { stockProps } from '../type/Stock';
 import { topProps } from '../type/TOP';
 
-const columns: EuiBasicTableColumn<any>[] = [
-    {
-        field: 'name',
-        name: 'Variant Name',
-    },
-    {
-        field: 'variant_id',
-        name: 'Variant ID',
-        width: '10%',
-    },
-    {
-        field: 'batch_id',
-        name: 'Batch ID',
-        width: '10%',
-    },
-    {
-        field: 'price',
-        name: 'Price',
-    },
-    {
-        field: 'discount',
-        name: 'Discount (%)',
-    },
-    {
-        field: 'quantity',
-        name: 'Quantity',
-    },
-    {
-        field: 'total',
-        name: 'Total',
-        width: '16%',
-    },
-];
 
 const SalesInvoiceCreateModal = ({
     toggleModal,
@@ -131,6 +98,7 @@ const SalesInvoiceCreateModal = ({
     const onSearchCustomerChange = useCallback(async (searchValue: string) => {
         setCustomerLoading(true);
         clearTimeout(searchTimeout);
+        // eslint-disable-next-line
         searchTimeout = setTimeout(async () => {
             const data: customerProps[] = await fetchCustomerSearch({
                 search: searchValue,
@@ -155,6 +123,7 @@ const SalesInvoiceCreateModal = ({
     const onSearchTOPChange = useCallback(async (searchValue: string) => {
         setTopLoading(true);
         clearTimeout(searchTimeout);
+        // eslint-disable-next-line
         searchTimeout = setTimeout(async () => {
             const data: topProps[] = await fetchTOPSearch({
                 search: searchValue,
@@ -179,6 +148,7 @@ const SalesInvoiceCreateModal = ({
     const onSearchItemChange = useCallback(async (searchValue: string) => {
         setItemLoading(true);
         clearTimeout(searchTimeout);
+        // eslint-disable-next-line
         searchTimeout = setTimeout(async () => {
             const data: stockProps[] = await fetchStockSearch({
                 search: searchValue,
@@ -224,13 +194,13 @@ const SalesInvoiceCreateModal = ({
         let variant_id = selectedItems[0].value.split('-')[0];
         let batch_id = selectedItems[0].value.split('-')[1];
         let total = price * quantity * (1 - discount / 100);
-        console.log('variant name: ', variant_name);
-        console.log('variant id :', variant_id);
-        console.log('batch id :', batch_id);
-        console.log('price: ', price);
-        console.log('discount: ', discount);
-        console.log('qty: ', quantity);
-        console.log('total: ', total);
+        // console.log('variant name: ', variant_name);
+        // console.log('variant id :', variant_id);
+        // console.log('batch id :', batch_id);
+        // console.log('price: ', price);
+        // console.log('discount: ', discount);
+        // console.log('qty: ', quantity);
+        // console.log('total: ', total);
 
         setCarts((prev) => [
             ...prev,
@@ -249,6 +219,67 @@ const SalesInvoiceCreateModal = ({
         setSelectedItems([]);
         setMaxQuantity(0);
     };
+
+    const actions:Action<any>[] = [
+        {
+            name: 'delete',
+            description: 'delete this item',
+            icon: 'trash',
+            type: 'icon',
+            color: 'danger',
+            onClick: (item) => {
+                setCarts((prev) => prev.filter((cart) => cart !== item));
+            }
+        }
+    ]
+    const columns: EuiBasicTableColumn<any>[] = [
+        {
+            field: 'name',
+            name: 'Variant Name',
+        },
+        {
+            field: 'variant_id',
+            name: 'Variant ID',
+            width: '10%',
+        },
+        {
+            field: 'batch_id',
+            name: 'Batch ID',
+            width: '10%',
+        },
+        {
+            field: 'price',
+            name: 'Price',
+            render: (price: number) => {
+                return "Rp. " +  price.toLocaleString('id-ID')
+            }
+        },
+        {
+            field: 'discount',
+            name: 'Discount (%)',
+            render: (discount: number) => {
+                return discount + " %"
+            }
+        },
+        {
+            field: 'quantity',
+            name: 'Quantity',
+            render: (quantity: number) => {
+                return quantity.toLocaleString('id-ID')
+            }
+        },
+        {
+            field: 'total',
+            name: 'Total',
+            width: '16%',
+            render: (total: number) => {
+                return "Rp. " + total.toLocaleString('id-ID')
+            }
+        },
+        {
+            actions,
+        }
+    ];
 
     return (
         <EuiModal onClose={() => toggleModal(false)}>
