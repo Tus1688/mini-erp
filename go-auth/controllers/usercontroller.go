@@ -124,7 +124,7 @@ func ChangePasswordUser(c *gin.Context) {
 	// update password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), 10)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while creating user"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error while creating password"})
 		return
 	}
 	update := database.Instance.Model(&models.User{}).Where("username = ?", username).Update("password", string(hashedPassword))
