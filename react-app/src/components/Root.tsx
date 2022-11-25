@@ -17,7 +17,7 @@ import {
     EuiSpacer,
 } from '@elastic/eui';
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { logoutRequest } from '../api/Authentication';
 import useTheme from '../hooks/useTheme';
 
@@ -28,6 +28,7 @@ const Header = ({
     toggleSideNav: (value: React.SetStateAction<boolean>) => void;
     sideNavState: boolean;
 }) => {
+    const navigate = useNavigate();
     const [isPopoverThemeOpen, setPopoverThemeOpen] = useState(false);
     const { toggleLightMode, toggleDarkMode } = useTheme();
     const [isPopoverAvatarOpen, setPopoverAvatarOpen] = useState(false);
@@ -93,7 +94,13 @@ const Header = ({
     ];
 
     const avatarItems = [
-        <EuiContextMenuItem key='profile-setting' onClick={closeAvatarPopover}>
+        <EuiContextMenuItem
+            key='profile-setting'
+            onClick={() => {
+                closeAvatarPopover();
+                navigate('/profile-settings');
+            }}
+        >
             <EuiIcon type='user' style={{ marginRight: '1rem' }} />
             <EuiTextColor>Profile Settings</EuiTextColor>
         </EuiContextMenuItem>,
@@ -129,10 +136,6 @@ const Header = ({
                 }}
             >
                 <EuiHeaderSectionItem>
-                    {/* <EuiTitle size='m'>
-                        <h1>Bumbuventory</h1>
-                    </EuiTitle> */}
-                    {/* hamburger button icon */}
                     <EuiButtonIcon
                         aria-label='Menu'
                         iconType='menu'

@@ -19,6 +19,7 @@ import BatchList from './routes/BatchList';
 import SOList from './routes/SOList';
 import TOPList from './routes/TOPList';
 import SoDraftList from './routes/SODraftList';
+import ProfileSettings from './routes/ProfileSettings';
 
 export default function App() {
     const { theme } = useTheme();
@@ -47,35 +48,35 @@ export default function App() {
                 },
                 {
                     path: '/variant-list',
-                    element: <VariantList />
+                    element: <VariantList />,
                 },
                 {
                     path: '/batch-list',
-                    element: <BatchList />
+                    element: <BatchList />,
                 },
                 {
                     path: '/stock-list',
-                    element: <StockList />
+                    element: <StockList />,
                 },
                 {
                     path: '/production-draft',
-                    element: <ProductionDraftList />
+                    element: <ProductionDraftList />,
                 },
                 {
                     path: '/top-list',
-                    element: <TOPList />
+                    element: <TOPList />,
                 },
                 {
                     path: '/so-list',
-                    element: <SOList />
+                    element: <SOList />,
                 },
                 {
                     path: '/so-draft-list',
-                    element: <SoDraftList />
+                    element: <SoDraftList />,
                 },
                 {
-                    path: '/settings',
-                    element: <div>settings</div>,
+                    path: '/profile-settings',
+                    element: <ProfileSettings />,
                 },
             ],
         },
