@@ -12,7 +12,7 @@ import {
     EuiTextColor,
     EuiTitle,
 } from '@elastic/eui';
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useToast from '../hooks/useToast';
 
@@ -61,11 +61,12 @@ type LoginProps = {
     fin_a: boolean;
     sys_a: boolean;
     error?: string | undefined;
-}
+};
 
 const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
-    const [username, setUsername] = React.useState('');
-    const [password, setPassword] = React.useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [dual] = useState<boolean>(true);
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
     let navigate = useNavigate();
@@ -97,11 +98,11 @@ const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
             return;
         }
         setToken(token.token);
-        sessionStorage.setItem("inv_u", token.inv_u.toString());
-        sessionStorage.setItem("inv_a", token.inv_a.toString());
-        sessionStorage.setItem("fin_u", token.fin_u.toString());
-        sessionStorage.setItem("fin_a", token.fin_a.toString());
-        sessionStorage.setItem("sys_a", token.sys_a.toString());
+        sessionStorage.setItem('inv_u', token.inv_u.toString());
+        sessionStorage.setItem('inv_a', token.inv_a.toString());
+        sessionStorage.setItem('fin_u', token.fin_u.toString());
+        sessionStorage.setItem('fin_a', token.fin_a.toString());
+        sessionStorage.setItem('sys_a', token.sys_a.toString());
         navigate(from, { replace: true });
     };
 
@@ -138,6 +139,7 @@ const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
                             placeholder='Enter Password here'
                             onChange={(e) => setPassword(e.target.value)}
                             value={password}
+                            type={dual ? 'dual' : undefined}
                         />
                     </EuiFormRow>
                     <EuiButton type='submit' fullWidth>

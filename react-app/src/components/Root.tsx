@@ -16,7 +16,7 @@ import {
     EuiButtonEmpty,
     EuiSpacer,
 } from '@elastic/eui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { logoutRequest } from '../api/Authentication';
 import useTheme from '../hooks/useTheme';
@@ -203,6 +203,16 @@ const StyledNavLink = ({ url, label }: { url: string; label: string }) => {
 };
 
 const SideNavItem = () => {
+    const [isInventoryUser, setIsInventoryUser] = useState(false);
+    const [isFinanceUser, setIsFinanceUser] = useState(false);
+    const [isSystemAdmin, setIsSystemAdmin] = useState(false);
+
+    useEffect(() => {
+        setIsInventoryUser(sessionStorage.getItem('inv_u') === 'true');
+        setIsFinanceUser(sessionStorage.getItem('fin_u') === 'true');
+        setIsSystemAdmin(sessionStorage.getItem('sys_a') === 'true');
+    },[]);
+
     const childAccordionItemStyle: React.CSSProperties = {
         display: 'flex',
         flexDirection: 'column',
@@ -229,45 +239,66 @@ const SideNavItem = () => {
                 </div>
             </EuiAccordion>
 
-            <EuiAccordion
-                id='Inventory'
-                buttonContent='Inventory Management'
-                arrowDisplay='none'
-            >
-                <div style={childAccordionItemStyle}>
-                    <StyledNavLink url='/variant-list' label='Variant list' />
-                    <StyledNavLink url='/batch-list' label='Batch list' />
-                    <StyledNavLink url='/stock-list' label='Inventory list' />
-                    <StyledNavLink
-                        url='/production-draft'
-                        label='Production draft list'
-                    />
-                </div>
-            </EuiAccordion>
-            <EuiAccordion
-                id='Finance'
-                buttonContent='Finance Management'
-                arrowDisplay='none'
-            >
-                <div style={childAccordionItemStyle}>
-                    <StyledNavLink url='/top-list' label='Term Of Payment' />
-                    <StyledNavLink url='/so-list' label='Sales Invoice list' />
-                    <StyledNavLink
-                        url='/so-draft-list'
-                        label='Sales Invoice Draft list'
-                    />
-                </div>
-            </EuiAccordion>
-            <EuiAccordion
-                id='User'
-                buttonContent='User Management'
-                arrowDisplay='none'
-            >
-                <div style={childAccordionItemStyle}>
-                    <StyledNavLink url='/users' label='User list' />
-                    <StyledNavLink url='/user-create' label='Create New User' />
-                </div>
-            </EuiAccordion>
+            {isInventoryUser && (
+                <EuiAccordion
+                    id='Inventory'
+                    buttonContent='Inventory Management'
+                    arrowDisplay='none'
+                >
+                    <div style={childAccordionItemStyle}>
+                        <StyledNavLink
+                            url='/variant-list'
+                            label='Variant list'
+                        />
+                        <StyledNavLink url='/batch-list' label='Batch list' />
+                        <StyledNavLink
+                            url='/stock-list'
+                            label='Inventory list'
+                        />
+                        <StyledNavLink
+                            url='/production-draft'
+                            label='Production draft list'
+                        />
+                    </div>
+                </EuiAccordion>
+            )}
+            {isFinanceUser && (
+                <EuiAccordion
+                    id='Finance'
+                    buttonContent='Finance Management'
+                    arrowDisplay='none'
+                >
+                    <div style={childAccordionItemStyle}>
+                        <StyledNavLink
+                            url='/top-list'
+                            label='Term Of Payment'
+                        />
+                        <StyledNavLink
+                            url='/so-list'
+                            label='Sales Invoice list'
+                        />
+                        <StyledNavLink
+                            url='/so-draft-list'
+                            label='Sales Invoice Draft list'
+                        />
+                    </div>
+                </EuiAccordion>
+            )}
+            {isSystemAdmin && (
+                <EuiAccordion
+                    id='User'
+                    buttonContent='User Management'
+                    arrowDisplay='none'
+                >
+                    <div style={childAccordionItemStyle}>
+                        <StyledNavLink url='/users' label='User list' />
+                        <StyledNavLink
+                            url='/user-create'
+                            label='Create New User'
+                        />
+                    </div>
+                </EuiAccordion>
+            )}
         </>
     );
 };

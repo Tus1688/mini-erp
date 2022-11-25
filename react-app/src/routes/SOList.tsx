@@ -98,7 +98,7 @@ const SOList = () => {
             const data = await res.json();
             return data;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -140,7 +140,7 @@ const SOList = () => {
             const data = await res.json();
             return data.count;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -221,7 +221,9 @@ const SOList = () => {
     );
 
     // Sorting
-    const [sortingColumns, setSortingColumns] = useState([]);
+    const [sortingColumns, setSortingColumns] = useState<
+        { id: string; direction: 'desc' | 'asc' }[]
+    >([{ id: 'id', direction: 'asc' }]);
     const onSort = useCallback(
         (sortingColumns: any) => {
             setSortingColumns(sortingColumns);

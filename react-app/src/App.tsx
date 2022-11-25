@@ -9,17 +9,20 @@ import Root from './components/Root';
 import useTheme from './hooks/useTheme';
 import Login from './routes/Login';
 import useToken from './hooks/useToken';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { isAuthenticatedRequest } from './api/Authentication';
-import CustomerList from './routes/CustomerList';
-import StockList from './routes/StockList';
-import ProductionDraftList from './routes/ProductionDraftList';
-import VariantList from './routes/VariantList';
-import BatchList from './routes/BatchList';
-import SOList from './routes/SOList';
-import TOPList from './routes/TOPList';
-import SoDraftList from './routes/SODraftList';
-import ProfileSettings from './routes/ProfileSettings';
+
+const CustomerList = React.lazy(() => import('./routes/CustomerList'));
+const StockList = React.lazy(() => import('./routes/StockList'));
+const ProductionDraftList = React.lazy(
+    () => import('./routes/ProductionDraftList')
+);
+const VariantList = React.lazy(() => import('./routes/VariantList'));
+const BatchList = React.lazy(() => import('./routes/BatchList'));
+const SOList = React.lazy(() => import('./routes/SOList'));
+const TOPList = React.lazy(() => import('./routes/TOPList'));
+const SoDraftList = React.lazy(() => import('./routes/SODraftList'));
+const ProfileSettings = React.lazy(() => import('./routes/ProfileSettings'));
 
 export default function App() {
     const { theme } = useTheme();
@@ -84,7 +87,9 @@ export default function App() {
 
     return (
         <EuiProvider colorMode={theme} theme={EuiThemeAmsterdam}>
-            <RouterProvider router={router} />
+            <Suspense fallback={<div>Loading...</div>}>
+                <RouterProvider router={router} />
+            </Suspense>
         </EuiProvider>
     );
 }
