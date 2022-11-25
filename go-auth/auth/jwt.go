@@ -83,42 +83,6 @@ func GetUsernameFromToken(signedToken string) (username string, err error) {
 	return
 }
 
-func TokenIsFinanceUser(signedToken string) (err error) {
-	claims, err := ExtractClaims(signedToken)
-	if err != nil {
-		return
-	}
-	isFinanceUser := *claims.Fin_u
-	if !isFinanceUser {
-		err = errors.New("not finance user")
-	}
-	return
-}
-
-func TokenIsInventoryUser(signedToken string) (err error) {
-	claims, err := ExtractClaims(signedToken)
-	if err != nil {
-		return
-	}
-	isInventoryUser := *claims.Inv_u
-	if !isInventoryUser {
-		err = errors.New("not inventory user")
-	}
-	return
-}
-
-func TokenIsInventoryAdmin(signedToken string) (err error) {
-	claims, err := ExtractClaims(signedToken)
-	if err != nil {
-		return
-	}
-	isInventoryAdmin := *claims.Inv_a
-	if !isInventoryAdmin {
-		err = errors.New("not inventory admin")
-	}
-	return
-}
-
 func TokenIsSystemAdmin(signedToken string) (err error) {
 	claims, err := ExtractClaims(signedToken)
 	if err != nil {

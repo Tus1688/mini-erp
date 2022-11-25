@@ -16,7 +16,7 @@ func UserIsFinanceUser() gin.HandlerFunc {
 		}
 		err := auth.TokenIsFinanceUser(tokenString)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 		c.Next()
@@ -32,7 +32,7 @@ func UserIsFinanceAdmin() gin.HandlerFunc {
 		}
 		err := auth.TokenIsInventoryAdmin(tokenString)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 		c.Next()
@@ -48,7 +48,7 @@ func UserIsInventoryUser() gin.HandlerFunc {
 		}
 		err := auth.TokenIsInventoryUser(tokenString)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 		c.Next()
@@ -64,7 +64,7 @@ func UserIsInventoryAdmin() gin.HandlerFunc {
 		}
 		err := auth.TokenIsInventoryAdmin(tokenString)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 		c.Next()
