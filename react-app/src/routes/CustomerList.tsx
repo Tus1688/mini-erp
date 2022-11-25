@@ -393,7 +393,7 @@ const CustomerList = () => {
 
     return (
         <>
-            <EuiPageTemplate.Section style={{ height: 0 }}>
+            <EuiPageTemplate.Section>
                 <EuiFlexGroup justifyContent='spaceBetween'>
                     <EuiFlexItem grow={false}>
                         <EuiTitle size='l'>
@@ -438,8 +438,7 @@ const CustomerList = () => {
                         </EuiFlexGroup>
                     </EuiFlexItem>
                 </EuiFlexGroup>
-            </EuiPageTemplate.Section>
-            <EuiPageTemplate.Section>
+                <EuiSpacer size='s' />
                 <EuiDataGrid
                     aria-label='Customer List'
                     trailingControlColumns={trailingControlColumns}
@@ -448,7 +447,7 @@ const CustomerList = () => {
                         visibleColumns,
                         setVisibleColumns,
                     }}
-                    height={550}
+                    height='calc(100vh - 270px)'
                     rowCount={customerCount}
                     renderCellValue={renderCellValue}
                     sorting={{ columns: sortingColumns, onSort }}

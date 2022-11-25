@@ -278,7 +278,7 @@ const ProductionDraftList = () => {
 
     return (
         <>
-            <EuiPageTemplate.Section style={{ height: 0 }}>
+            <EuiPageTemplate.Section>
                 <EuiFlexGroup justifyContent='spaceBetween'>
                     <EuiFlexItem grow={false}>
                         <EuiTitle size='l'>
@@ -323,8 +323,7 @@ const ProductionDraftList = () => {
                         </EuiFlexGroup>
                     </EuiFlexItem>
                 </EuiFlexGroup>
-            </EuiPageTemplate.Section>
-            <EuiPageTemplate.Section>
+                <EuiSpacer size='s' />
                 <EuiDataGrid
                     aria-label='Production Draft List'
                     columns={columns}
@@ -332,7 +331,7 @@ const ProductionDraftList = () => {
                         visibleColumns,
                         setVisibleColumns,
                     }}
-                    height={550}
+                    height='calc(100vh - 270px)'
                     rowCount={draftCount}
                     renderCellValue={renderCellValue}
                     sorting={{ columns: sortingColumns, onSort }}

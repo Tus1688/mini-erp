@@ -23,6 +23,7 @@ const SOList = React.lazy(() => import('./routes/SOList'));
 const TOPList = React.lazy(() => import('./routes/TOPList'));
 const SoDraftList = React.lazy(() => import('./routes/SODraftList'));
 const ProfileSettings = React.lazy(() => import('./routes/ProfileSettings'));
+const UserList = React.lazy(() => import('./routes/UserList'));
 
 export default function App() {
     const { theme } = useTheme();
@@ -81,6 +82,10 @@ export default function App() {
                     path: '/profile-settings',
                     element: <ProfileSettings />,
                 },
+                {
+                    path: '/users',
+                    element: <UserList />
+                }
             ],
         },
     ]);

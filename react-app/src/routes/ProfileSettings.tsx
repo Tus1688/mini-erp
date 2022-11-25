@@ -65,7 +65,7 @@ const ProfileSettings = () => {
     }, [newPassword, confirmNewPassword]);
     return (
         <>
-            <EuiPageTemplate.Section style={{ height: 0 }}>
+            <EuiPageTemplate.Section>
                 <EuiTitle size='l'>
                     <h1>Profile Settings</h1>
                 </EuiTitle>

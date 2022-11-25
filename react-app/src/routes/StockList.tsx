@@ -6,6 +6,7 @@ import {
     EuiFlexItem,
     EuiGlobalToastList,
     EuiPageTemplate,
+    EuiSpacer,
     EuiText,
     EuiTextColor,
     EuiTitle,
@@ -193,7 +194,7 @@ const StockList = () => {
 
     return (
         <>
-            <EuiPageTemplate.Section style={{ height: 0 }}>
+            <EuiPageTemplate.Section>
                 <EuiFlexGroup justifyContent='spaceBetween'>
                     <EuiFlexItem grow={false}>
                         <EuiTitle size='l'>
@@ -219,8 +220,7 @@ const StockList = () => {
                         size='m'
                     />
                 </EuiFlexGroup>
-            </EuiPageTemplate.Section>
-            <EuiPageTemplate.Section>
+                <EuiSpacer size='s' />
                 <EuiDataGrid
                     aria-label='City List'
                     columns={columns}
@@ -228,7 +228,7 @@ const StockList = () => {
                         visibleColumns,
                         setVisibleColumns,
                     }}
-                    height={550}
+                    height='calc(100vh - 270px)'
                     rowCount={rData.length}
                     renderCellValue={renderCellValue}
                     sorting={{ columns: sortingColumns, onSort }}

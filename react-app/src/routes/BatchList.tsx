@@ -364,7 +364,7 @@ const BatchList = () => {
 
     return (
         <>
-            <EuiPageTemplate.Section style={{ height: 0 }}>
+            <EuiPageTemplate.Section>
                 <EuiFlexGroup justifyContent='spaceBetween'>
                     <EuiFlexItem grow={false}>
                         <EuiTitle size='l'>
@@ -409,8 +409,7 @@ const BatchList = () => {
                         </EuiFlexGroup>
                     </EuiFlexItem>
                 </EuiFlexGroup>
-            </EuiPageTemplate.Section>
-            <EuiPageTemplate.Section>
+                <EuiSpacer size='s' />
                 <EuiDataGrid
                     aria-label='Customer List'
                     trailingControlColumns={trailingControlColumns}
@@ -419,7 +418,7 @@ const BatchList = () => {
                         visibleColumns,
                         setVisibleColumns,
                     }}
-                    height={550}
+                    height='calc(100vh - 270px)'
                     rowCount={variantCount}
                     renderCellValue={renderCellValue}
                     sorting={{ columns: sortingColumns, onSort }}
