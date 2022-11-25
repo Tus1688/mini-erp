@@ -50,6 +50,8 @@ func initRouter() *gin.Engine {
 			admin.POST("/register", controllers.RegisterUser)              // register new user
 			admin.POST("/reset-password", controllers.AdminChangePassword) // reset user password
 			admin.PUT("/toggle-active", controllers.AdminToggleActive)     // toggle user active status
+			admin.PATCH("/update-role", controllers.AdminPatchUserRole)    // patch user role
+			admin.GET("/users", controllers.AdminGetUsers)                 // get users
 		}
 		user := api.Group("/user")
 		user.Use(middlewares.TokenExpired(10)) // expire token after 10 minutes

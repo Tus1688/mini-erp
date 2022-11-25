@@ -33,6 +33,25 @@ type AdminToggleActiveStatus struct {
 	Active   *bool  `json:"active" binding:"required"`
 }
 
+type AdminPatchUserRole struct {
+	Username       string `json:"username" binding:"required"`
+	InventoryUser  *bool  `json:"inv_user"`
+	FinanceUser    *bool  `json:"fin_user"`
+	FinanceAdmin   *bool  `json:"fin_admin"`
+	InventoryAdmin *bool  `json:"inv_admin"`
+	SystemAdmin    *bool  `json:"sys_admin"`
+}
+
+type AdminResponseUser struct {
+	Username       string `json:"username"`
+	InventoryUser  bool   `json:"inv_user"`
+	FinanceUser    bool   `json:"fin_user"`
+	FinanceAdmin   bool   `json:"fin_admin"`
+	InventoryAdmin bool   `json:"inv_admin"`
+	SystemAdmin    bool   `json:"sys_admin"`
+	Active         bool   `json:"active"`
+}
+
 func (user *User) HashPassword(password string) error {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
