@@ -41,10 +41,33 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 		return
 	}
 
+	// from request.Items, merge the same variant and batch id into one object with quantity
+	// helperItems is for validation only!
+	var helperItems []models.Items
+	for _, item := range request.Items {
+		// if the quantity is 0 send bad request w/o error msg as in frontend it won't be happen
+		if item.Quantity == 0 {
+			c.Status(http.StatusBadRequest)
+			return
+		}
+		// check if item already exist in helper
+		var exist bool
+		for i, h := range helperItems {
+			if h.VariantRefer == item.VariantRefer && h.BatchRefer == item.BatchRefer {
+				helperItems[i].Quantity += item.Quantity
+				exist = true
+				break
+			}
+		}
+		if !exist {
+			helperItems = append(helperItems, item)
+		}
+	}
+
 	// validate stock in ItemTransactionLog group by request.BatchRefer and request.VariantRefer
 	// if stock is not enough, return error
 	// if stock is enough, create ItemTransactionLog
-	for _, item := range request.Items {
+	for _, item := range helperItems {
 		var stock helperSelectStock
 
 		// why we don't include item_transaction_log_drafts? bcs we don't acknowledge awaiting approval production stock
@@ -65,7 +88,9 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 		`, item.BatchRefer, item.VariantRefer).Scan(&stock)
 
 		if stock.ID == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Stock / Item not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "variant id: " + strconv.Itoa(item.VariantRefer) +
+				" batch id: " + strconv.Itoa(item.BatchRefer) +
+				" somebody else might have used it entirely on sales invoice"})
 			return
 		}
 
