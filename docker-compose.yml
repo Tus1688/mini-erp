@@ -1,0 +1,125 @@
+version: '3.7'
+
+services:
+  traefik: 
+    image: traefik:v2.9
+    container_name: traefik
+    security_opt:
+      - no-new-privileges:true
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 80:80
+    command: 
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=proxy
+      - --entrypoints.webinsecure.address=:80
+    networks:
+      - proxy
+  
+  mysqlauth:
+    image: mysql:latest
+    container_name: mysql_auth
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD_AUTH}
+      MYSQL_DATABASE: ${DB_NAME_AUTH}
+    volumes:
+      - mysql-auth:/var/lib/mysql
+    networks:
+      - mysql-auth
+
+  mysqlmain:
+    image: mysql:latest
+    container_name: mysql_main
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD_MAIN}
+      MYSQL_DATABASE: ${DB_NAME_MAIN}
+    volumes:
+      - mysql-main:/var/lib/mysql
+    networks:
+      - mysql-main
+  
+  redisauth:
+    image: redis:alpine
+    container_name: redis_auth
+    restart: always
+    networks:
+      - redis-auth
+  
+  go-api:
+    build: ./go-api
+    depends_on:
+      - mysqlmain
+    environment:
+      GIN_MODE: release
+      DB_HOST: mysqlmain
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD_MAIN}
+      DB_NAME: ${DB_NAME_MAIN}
+      JWT_KEY: ${JWT_KEY}
+    restart: always
+    networks:
+      - mysql-main
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.go-api.rule=Host(`${TRAEFIK_DOMAIN}`) && PathPrefix(`/api/v1`)"
+      - "traefik.http.routers.go-api.entrypoints=webinsecure"
+      # - "traefik.http.services.go-api.loadbalancer.server.port=6000"
+  
+  go-auth:
+    build: ./go-auth
+    depends_on:
+      - mysqlauth
+      - redisauth
+    environment:
+      GIN_MODE: release
+      DB_HOST: mysqlauth
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD_AUTH}
+      DB_NAME: ${DB_NAME_AUTH}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      REDIS_HOST: redisauth
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_PORT: ${REDIS_PORT}
+      JWT_KEY: ${JWT_KEY}
+    restart: always
+    networks:
+      - mysql-auth
+      - redis-auth
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.go-auth.rule=Host(`${TRAEFIK_DOMAIN}`) && PathPrefix(`/api/v1/auth`)"
+      - "traefik.http.routers.go-auth.entrypoints=webinsecure"
+      # - "traefik.http.services.go-auth.loadbalancer.server.port=5000"
+  
+  react-app:
+    build: ./react-app
+    container_name: react-app
+    environment:
+      - GENERATE_SOURCEMAP=false
+    restart: always
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.react-app.rule=Host(`${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.react-app.entrypoints=webinsecure"
+
+networks:
+  proxy:
+    external: true
+  mysql-auth:
+  mysql-main:
+  redis-auth:
+
+volumes:
+  mysql-auth:
+  mysql-main:

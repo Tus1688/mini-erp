@@ -25,9 +25,12 @@ func main() {
 }
 
 func loadEnv() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	// check if GIN_MODE is release
+	if os.Getenv("GIN_MODE") != "release" {
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 	auth.JwtKey = []byte(os.Getenv("JWT_KEY"))
 	log.Print("Loaded env!")
