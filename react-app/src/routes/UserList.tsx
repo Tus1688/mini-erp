@@ -20,6 +20,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchUsers } from '../api/Users';
 import RoleEditTab from '../components/RoleEditTab';
 import StatusEditTab from '../components/StatusEditTab';
+import UserCreateModal from '../components/UserCreate';
 import UserEditModal from '../components/UserEditModal';
 import { Users } from '../type/Users';
 
@@ -247,6 +248,12 @@ const UserList = () => {
             </EuiPageTemplate.Section>
             {editModalOpen && (
                 <UserEditModal toggleModal={setEditModalOpen} tabs={tabs} />
+            )}
+            {modalCreateOpen && (
+                <UserCreateModal
+                    toggleModal={setModalCreateOpen}
+                    setData={setData}
+                />
             )}
         </>
     );

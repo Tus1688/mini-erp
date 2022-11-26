@@ -49,53 +49,91 @@ export default function App() {
                 },
                 {
                     path: '/customer-list',
-                    element: <CustomerList />,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <CustomerList />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: '/variant-list',
-                    element: <VariantList />,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <VariantList />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: '/batch-list',
-                    element: <BatchList />,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <BatchList />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: '/stock-list',
-                    element: <StockList />,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <StockList />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: '/production-draft',
-                    element: <ProductionDraftList />,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <ProductionDraftList />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: '/top-list',
-                    element: <TOPList />,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <TOPList />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: '/so-list',
-                    element: <SOList />,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <SOList />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: '/so-draft-list',
-                    element: <SoDraftList />,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <SoDraftList />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: '/profile-settings',
-                    element: <ProfileSettings />,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <ProfileSettings />
+                        </Suspense>
+                    )
                 },
                 {
                     path: '/users',
-                    element: <UserList />
-                }
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <UserList />
+                        </Suspense>
+                    )
+                },
             ],
         },
     ]);
 
     return (
         <EuiProvider colorMode={theme} theme={EuiThemeAmsterdam}>
-            <Suspense fallback={<Loading />}>
-                <RouterProvider router={router} />
-            </Suspense>
+            <RouterProvider router={router} />
         </EuiProvider>
     );
 }

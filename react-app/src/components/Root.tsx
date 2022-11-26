@@ -292,10 +292,6 @@ const SideNavItem = () => {
                 >
                     <div style={childAccordionItemStyle}>
                         <StyledNavLink url='/users' label='User list' />
-                        <StyledNavLink
-                            url='/user-create'
-                            label='Create New User'
-                        />
                     </div>
                 </EuiAccordion>
             )}
