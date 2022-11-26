@@ -17,7 +17,7 @@ func Login(c *gin.Context) {
 	var user models.User
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -78,7 +78,7 @@ func Login(c *gin.Context) {
 func RegisterUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 	if err := user.HashPassword(user.Password); err != nil {
@@ -87,7 +87,7 @@ func RegisterUser(c *gin.Context) {
 	}
 	record := database.Instance.Create(&user)
 	if record.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
+		c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
@@ -97,7 +97,7 @@ func ChangePasswordUser(c *gin.Context) {
 	var request models.UserForgotPassword
 	var user models.User
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 

@@ -15,7 +15,7 @@ func AdminChangePassword(c *gin.Context) {
 	var user models.User
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -38,7 +38,7 @@ func AdminToggleActive(c *gin.Context) {
 	var request models.AdminToggleActiveStatus
 	var user models.User
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -57,6 +57,7 @@ func AdminToggleActive(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "User activated successfully"})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"message": "User deactivated successfully"})
+		auth.PurgeSessionMatchPattern(request.Username)
 	}
 }
 
@@ -93,6 +94,8 @@ func AdminPatchUserRole(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "User role updated successfully"})
+	// as refresh token is not stored in db, we need to purge all sessions of the user
+	auth.PurgeSessionMatchPattern(request.Username)
 }
 
 func AdminGetUsers(c *gin.Context) {
