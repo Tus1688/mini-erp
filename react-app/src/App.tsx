@@ -11,6 +11,7 @@ import Login from './routes/Login';
 import useToken from './hooks/useToken';
 import React, { Suspense, useEffect, useState } from 'react';
 import { isAuthenticatedRequest } from './api/Authentication';
+import Loading from './components/Loading';
 
 const CustomerList = React.lazy(() => import('./routes/CustomerList'));
 const StockList = React.lazy(() => import('./routes/StockList'));
@@ -92,7 +93,7 @@ export default function App() {
 
     return (
         <EuiProvider colorMode={theme} theme={EuiThemeAmsterdam}>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<Loading />}>
                 <RouterProvider router={router} />
             </Suspense>
         </EuiProvider>

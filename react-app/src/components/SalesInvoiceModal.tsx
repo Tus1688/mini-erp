@@ -70,7 +70,7 @@ const SalesInvoiceModal = ({
             id: id,
             navigate: navigate,
             location: location,
-            draft: false
+            draft: false,
         }).then((data) => {
             if (data) {
                 setData(data);
@@ -137,11 +137,11 @@ const SalesInvoiceModal = ({
                 <EuiBasicTable items={items} columns={columns} />
             </EuiModalBody>
             <EuiModalFooter>
-                <EuiButton
-                    iconType='download'
-                    color='text'
-                >
-                    <PDFDownloadLink document={<SalesInvoicePdfDownload data={data} />} fileName={'invoice-'+data?.id+'.pdf'}>
+                <EuiButton iconType='download' color='text'>
+                    <PDFDownloadLink
+                        document={<SalesInvoicePdfDownload data={data} />}
+                        fileName={'invoice-' + data?.id + '.pdf'}
+                    >
                         {({ loading }) =>
                             loading ? 'Loading document...' : 'Download PDF'
                         }
