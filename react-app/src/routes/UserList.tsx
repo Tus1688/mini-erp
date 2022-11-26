@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchUsers } from '../api/Users';
 import RoleEditTab from '../components/RoleEditTab';
+import StatusEditTab from '../components/StatusEditTab';
 import UserEditModal from '../components/UserEditModal';
 import { Users } from '../type/Users';
 
@@ -146,14 +147,26 @@ const UserList = () => {
         {
             id: 'role',
             name: 'Edit role',
-            prepend: <EuiIcon type="user" size="m" />,
-            content: <RoleEditTab data={selectedItems} toggleModal={setEditModalOpen} />,
+            prepend: <EuiIcon type='user' size='m' />,
+            content: (
+                <RoleEditTab
+                    data={selectedItems}
+                    toggleModal={setEditModalOpen}
+                    setData={setData}
+                />
+            ),
         },
         {
             id: 'status',
             name: 'Edit status',
             prepend: <EuiIcon type='controlsHorizontal' size='m' />,
-            content: <div>Status</div>,
+            content: (
+                <StatusEditTab
+                    data={selectedItems}
+                    toggleModal={setEditModalOpen}
+                    setData={setData}
+                />
+            )
         },
     ];
 
@@ -233,10 +246,7 @@ const UserList = () => {
                 />
             </EuiPageTemplate.Section>
             {editModalOpen && (
-                <UserEditModal
-                    toggleModal={setEditModalOpen}
-                    tabs={tabs}
-                />
+                <UserEditModal toggleModal={setEditModalOpen} tabs={tabs} />
             )}
         </>
     );

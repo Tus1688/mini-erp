@@ -7,10 +7,9 @@ import {
 } from '@elastic/eui';
 import { useState } from 'react';
 
-
 const UserEditModal = ({
     toggleModal,
-    tabs
+    tabs,
 }: {
     toggleModal: (value: React.SetStateAction<boolean>) => void;
     tabs: EuiTabbedContentProps['tabs'];

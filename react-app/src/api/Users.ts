@@ -116,3 +116,60 @@ export const updateUserRole = async ({
         }
     }
 };
+
+export const toggleUserStatus = async ({
+    location,
+    navigate,
+    username,
+    active
+}: {
+    location: Location;
+    navigate: NavigateFunction;
+    username: string;
+    active: boolean;
+}) => {
+    let baseUrl = '/api/v1/auth/admin/toggle-active'
+    let body = JSON.stringify({
+        username: username,
+        active: active
+    })
+    const res = await fetch(baseUrl, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+        body: body
+    });
+    if (res.status === 200 || res.status === 404) {
+        const data = await res.json();
+        return data;
+    }
+    if (res.status === 403) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+        const retry = await fetch(baseUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+            body: body
+        });
+        if (retry.status === 200 || retry.status === 404) {
+            const data = await retry.json();
+            return data;
+        }
+        if (retry.status === 401 || retry.status === 403) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+    }
+}
