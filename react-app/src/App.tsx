@@ -25,6 +25,7 @@ const TOPList = React.lazy(() => import('./routes/TOPList'));
 const SoDraftList = React.lazy(() => import('./routes/SODraftList'));
 const ProfileSettings = React.lazy(() => import('./routes/ProfileSettings'));
 const UserList = React.lazy(() => import('./routes/UserList'));
+const Home = React.lazy(() => import('./routes/Home'));
 
 export default function App() {
     const { theme } = useTheme();
@@ -45,7 +46,11 @@ export default function App() {
             children: [
                 {
                     path: '/',
-                    element: <div>this is home</div>,
+                    element: (
+                        <Suspense fallback={<Loading />}>
+                            <Home />
+                        </Suspense>
+                    )
                 },
                 {
                     path: '/customer-list',

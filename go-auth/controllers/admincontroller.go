@@ -19,6 +19,11 @@ func AdminChangePassword(c *gin.Context) {
 		return
 	}
 
+	if request.Username == "admin" {
+		c.JSON(http.StatusConflict, gin.H{"error": "Cannot change password of admin"})
+		return
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), 10)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while hashing password"})
@@ -26,7 +31,7 @@ func AdminChangePassword(c *gin.Context) {
 	}
 
 	if database.Instance.Model(&user).Where("username = ?", request.Username).Update("password", string(hashedPassword)).RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found, somebody else might have deleted the user"})
 		return
 	}
 
@@ -42,9 +47,14 @@ func AdminToggleActive(c *gin.Context) {
 		return
 	}
 
+	if request.Username == "admin" {
+		c.JSON(http.StatusConflict, gin.H{"error": "Cannot change status of admin"})
+		return
+	}
+
 	query := database.Instance.Where("username = ?", request.Username).First(&user)
 	if query.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found, somebody else might have deleted the user"})
 		return
 	}
 
@@ -65,6 +75,11 @@ func AdminPatchUserRole(c *gin.Context) {
 	var request models.AdminPatchUserRole
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	if request.Username == "admin" {
+		c.JSON(http.StatusConflict, gin.H{"error": "Cannot change role of admin"})
 		return
 	}
 

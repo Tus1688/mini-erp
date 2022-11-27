@@ -60,6 +60,7 @@ type LoginProps = {
     fin_u: boolean;
     fin_a: boolean;
     sys_a: boolean;
+    username: string;
     error?: string | undefined;
 };
 
@@ -103,6 +104,7 @@ const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
         sessionStorage.setItem('fin_u', token.fin_u.toString());
         sessionStorage.setItem('fin_a', token.fin_a.toString());
         sessionStorage.setItem('sys_a', token.sys_a.toString());
+        sessionStorage.setItem('username', token.username);
         navigate(from, { replace: true });
     };
 

@@ -46,7 +46,7 @@ func initRouter() *gin.Engine {
 	{
 		api.POST("/login", controllers.Login) // login
 		admin := api.Group("/admin")
-		admin.Use(middlewares.TokenExpired(10)) // expire token after 10 minutes
+		admin.Use(middlewares.TokenExpired(1))  // expire token after 10 minutes
 		admin.Use(middlewares.EnforceCsrf())    // enforce CSRF_token cookie == CSRF_token in JWT
 		admin.Use(middlewares.UserIsSysAdmin()) // user must be system admin
 		{
@@ -57,8 +57,8 @@ func initRouter() *gin.Engine {
 			admin.GET("/users", controllers.AdminGetUsers)                 // get users
 		}
 		user := api.Group("/user")
-		user.Use(middlewares.TokenExpired(10)) // expire token after 10 minutes
-		user.Use(middlewares.EnforceCsrf())    // enforce CSRF_token cookie == CSRF_token in JWT
+		user.Use(middlewares.TokenExpired(1)) // expire token after 10 minutes
+		user.Use(middlewares.EnforceCsrf())   // enforce CSRF_token cookie == CSRF_token in JWT
 		{
 			user.POST("/changepw", controllers.ChangePasswordUser) // change password as current user
 		}

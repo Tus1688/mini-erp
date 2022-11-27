@@ -84,7 +84,7 @@ export const updateUserRole = async ({
         },
         body: body,
     });
-    if (res.status === 200 || res.status === 404) {
+    if (res.status === 200 || res.status === 404 || res.status === 409) {
         const data = await res.json();
         return data;
     }
@@ -106,7 +106,7 @@ export const updateUserRole = async ({
             },
             body: body,
         });
-        if (retry.status === 200 || retry.status === 404) {
+        if (retry.status === 200 || retry.status === 404 || retry.status === 409) {
             const data = await retry.json();
             return data;
         }
@@ -141,7 +141,7 @@ export const toggleUserStatus = async ({
         },
         body: body,
     });
-    if (res.status === 200 || res.status === 404) {
+    if (res.status === 200 || res.status === 404 || res.status === 409) {
         const data = await res.json();
         return data;
     }
@@ -163,7 +163,7 @@ export const toggleUserStatus = async ({
             },
             body: body,
         });
-        if (retry.status === 200 || retry.status === 404) {
+        if (retry.status === 200 || retry.status === 404 || retry.status === 409) {
             const data = await retry.json();
             return data;
         }
@@ -270,7 +270,7 @@ export const credentialEditUser = async ({
         },
         body: body
     });
-    if (res.status === 200 || res.status === 404) {
+    if (res.status === 200 || res.status === 404 || res.status === 409) {
         const data = await res.json();
         return data;
     }
@@ -292,7 +292,7 @@ export const credentialEditUser = async ({
             },
             body: body
         });
-        if (retry.status === 200 || retry.status === 404) {
+        if (retry.status === 200 || retry.status === 404 || retry.status === 409) {
             const data = await retry.json();
             return data;
         }

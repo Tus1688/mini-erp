@@ -78,7 +78,10 @@ const Header = ({
             aria-label='Avatar'
             onClick={() => setPopoverAvatarOpen(!isPopoverAvatarOpen)}
         >
-            <EuiAvatar name='John Doe' size='m' />
+            <EuiAvatar
+                name={sessionStorage.getItem('username') || ''}
+                size='m'
+            />
         </EuiButtonEmpty>
     );
 
@@ -211,7 +214,7 @@ const SideNavItem = () => {
         setIsInventoryUser(sessionStorage.getItem('inv_u') === 'true');
         setIsFinanceUser(sessionStorage.getItem('fin_u') === 'true');
         setIsSystemAdmin(sessionStorage.getItem('sys_a') === 'true');
-    },[]);
+    }, []);
 
     const childAccordionItemStyle: React.CSSProperties = {
         display: 'flex',
