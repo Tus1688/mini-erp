@@ -50,6 +50,9 @@ func initRouter() *gin.Engine {
 		api.DELETE("/customer", controllers.DeleteCustomer)
 		api.PATCH("/customer", controllers.UpdateCustomer)
 
+		// so finance user can access available stocks
+		api.GET("/inventory/stock", controllers.GetStock) // get stock by batch and variant
+
 		inv := api.Group("/inventory")
 		inv.Use(middlewares.UserIsInventoryUser())
 		{
@@ -65,7 +68,6 @@ func initRouter() *gin.Engine {
 			inv.GET("/item-transaction-log-count", controllers.GetItemTransactionLogCount)
 			inv.GET("/item-transaction-log", controllers.GetItemTransactionLogs) // transaction logs whether it's production or sales
 			inv.GET("/stock-count", controllers.GetStockCount)
-			inv.GET("/stock", controllers.GetStock) // get stock by batch and variant
 
 			// draft table
 			inv.GET("/production-count", controllers.GetProductionDraftCount)

@@ -1,5 +1,8 @@
 import { Location, NavigateFunction } from 'react-router-dom';
-import { salesInvoiceOnCreate, salesInvoiceSpecific } from '../type/SalesInvoice';
+import {
+    salesInvoiceOnCreate,
+    salesInvoiceSpecific,
+} from '../type/SalesInvoice';
 import { getRefreshToken } from './Authentication';
 
 // combine draft and approved invoices @draft = boolean (true = draft, false = approved)
@@ -7,12 +10,12 @@ export const fetchSalesInvoiceSpecific = async ({
     id,
     navigate,
     location,
-    draft
+    draft,
 }: {
     id: number;
     navigate: NavigateFunction;
     location: Location;
-    draft: boolean
+    draft: boolean;
 }): Promise<salesInvoiceSpecific | undefined> => {
     let baseUrl;
     if (!draft) {
@@ -32,7 +35,7 @@ export const fetchSalesInvoiceSpecific = async ({
         const data = await res.json();
         return data;
     }
-    if (res.status === 403 ) {
+    if (res.status === 403) {
         navigate('/login', { state: { from: location } });
         return;
     }
@@ -78,13 +81,13 @@ export const createSalesInvoice = async ({
             'Content-Type': 'application/json',
             Authorization: sessionStorage.getItem('token') || '',
         },
-        body: body
+        body: body,
     });
     if (res.status === 201 || res.status === 404 || res.status === 409) {
         const data = await res.json();
         return data;
     }
-    if (res.status === 403 ) {
+    if (res.status === 403) {
         navigate('/login', { state: { from: location } });
         return;
     }
@@ -101,9 +104,13 @@ export const createSalesInvoice = async ({
                 'Content-Type': 'application/json',
                 Authorization: sessionStorage.getItem('token') || '',
             },
-            body: body
+            body: body,
         });
-        if (retry.status === 201 || retry.status === 404 || retry.status === 409) {
+        if (
+            retry.status === 201 ||
+            retry.status === 404 ||
+            retry.status === 409
+        ) {
             const data = await retry.json();
             return data;
         }
@@ -112,4 +119,100 @@ export const createSalesInvoice = async ({
             return;
         }
     }
-}
+};
+
+export const fetchSOCount = async ({
+    location,
+    navigate,
+}: {
+    location: Location;
+    navigate: NavigateFunction;
+}): Promise<number | undefined> => {
+    let baseUrl = '/api/v1/finance/sales-invoice-count';
+    const res = await fetch(baseUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+    });
+    if (res.status === 200) {
+        const data = await res.json();
+        return data.count;
+    }
+    if (res.status === 403) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+        // retry
+        const retry = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (retry.status === 200) {
+            const data = await retry.json();
+            return data.count;
+        }
+        if (retry.status === 401 || retry.status === 403) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+    }
+};
+
+export const fetchSODraftCount = async ({
+    location,
+    navigate
+}: {
+    location: Location;
+    navigate: NavigateFunction;
+}): Promise<number | undefined> => {
+    let baseUrl = '/api/v1/finance/sales-invoice-draft-count';
+    const res = await fetch(baseUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+    });
+    if (res.status === 200) {
+        const data = await res.json();
+        return data.count;
+    }
+    if (res.status === 403) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+        // retry
+        const retry = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (retry.status === 200) {
+            const data = await retry.json();
+            return data.count;
+        }
+        if (retry.status === 401 || retry.status === 403) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+    }
+};

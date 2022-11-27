@@ -22,6 +22,7 @@ import {
 } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
+import { fetchSOCount } from '../api/SalesInvoice';
 import SalesInvoiceModal from '../components/SalesInvoiceModal';
 
 const columns: EuiDataGridColumn[] = [
@@ -128,47 +129,6 @@ const SOList = () => {
         }
     };
 
-    const fetchSOCount = async (): Promise<number | undefined> => {
-        let baseUrl = '/api/v1/finance/sales-invoice-count';
-        const res = await fetch(baseUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: sessionStorage.getItem('token') || '',
-            },
-        });
-        if (res.status === 200) {
-            const data = await res.json();
-            return data.count;
-        }
-        if (res.status === 403) {
-            navigate('/login', { state: { from: location } });
-            return;
-        }
-        if (res.status === 401) {
-            const state = await getRefreshToken();
-            if (!state) {
-                navigate('/login', { state: { from: location } });
-                return;
-            }
-            // retry
-            const retry = await fetch(baseUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: sessionStorage.getItem('token') || '',
-                },
-            });
-            if (retry.status === 200) {
-                const data = await retry.json();
-                return data.count;
-            }
-            if (retry.status === 401 || retry.status === 403) {
-                navigate('/login', { state: { from: location.pathname } });
-                return;
-            }
-        }
-    };
 
     const EyeRowCell = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isModalOpen, setIsModalOpen] = useState(false);
@@ -260,7 +220,7 @@ const SOList = () => {
             // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
             const last_id =
                 rData.length > 0 ? (rData[rData.length - 1].id as number) : 0;
-            const count = await fetchSOCount();
+            const count = await fetchSOCount({location: location, navigate: navigate});
             const data = await fetchSO({
                 pageIndex: pagination.pageIndex,
                 pageSize: pagination.pageSize * balancer,

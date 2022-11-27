@@ -242,29 +242,38 @@ const SideNavItem = () => {
                 </div>
             </EuiAccordion>
 
-            {isInventoryUser && (
+            {isInventoryUser || isFinanceUser ? (
                 <EuiAccordion
                     id='Inventory'
                     buttonContent='Inventory Management'
                     arrowDisplay='none'
                 >
                     <div style={childAccordionItemStyle}>
-                        <StyledNavLink
-                            url='/variant-list'
-                            label='Variant list'
-                        />
-                        <StyledNavLink url='/batch-list' label='Batch list' />
+                        {isInventoryUser ? (
+                            <>
+                                <StyledNavLink
+                                    url='/variant-list'
+                                    label='Variant list'
+                                />
+                                <StyledNavLink
+                                    url='/batch-list'
+                                    label='Batch list'
+                                />
+                            </>
+                        ) : null}
                         <StyledNavLink
                             url='/stock-list'
                             label='Inventory list'
                         />
-                        <StyledNavLink
-                            url='/production-draft'
-                            label='Production draft list'
-                        />
+                        {isInventoryUser ? (
+                            <StyledNavLink
+                                url='/production-draft'
+                                label='Production draft list'
+                            />
+                        ) : null}
                     </div>
                 </EuiAccordion>
-            )}
+            ) : null}
             {isFinanceUser && (
                 <EuiAccordion
                     id='Finance'

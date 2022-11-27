@@ -7,15 +7,15 @@ import {
 } from '@elastic/eui';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { fetchSOCount } from '../../api/SalesInvoice';
+import { fetchProductionDraftCount } from '../../api/ProductionDraft';
 
-const TotalSalesInvoicePanel = () => {
+const TotalProductionDraftPanel = () => {
     const [data, setData] = useState<number>(0);
     let location = useLocation();
     let navigate = useNavigate();
 
     useEffect(() => {
-        fetchSOCount({
+        fetchProductionDraftCount({
             location: location,
             navigate: navigate,
         }).then((data) => {
@@ -28,12 +28,14 @@ const TotalSalesInvoicePanel = () => {
         <EuiPanel paddingSize='l'>
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
-                    <h2>Total Sales Invoice:</h2>
+                    <h2>Awaiting Approval Production:</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 <EuiButtonEmpty
                     onClick={() =>
-                        navigate('/so-list', { state: { from: location } })
+                        navigate('/production-draft', {
+                            state: { from: location },
+                        })
                     }
                 >
                     <EuiTitle size='m'>
@@ -45,4 +47,4 @@ const TotalSalesInvoicePanel = () => {
     );
 };
 
-export default TotalSalesInvoicePanel;
+export default TotalProductionDraftPanel;

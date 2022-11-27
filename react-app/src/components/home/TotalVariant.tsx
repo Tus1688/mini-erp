@@ -7,15 +7,15 @@ import {
 } from '@elastic/eui';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { fetchSOCount } from '../../api/SalesInvoice';
+import { fetchVariantCount } from '../../api/Variant';
 
-const TotalSalesInvoicePanel = () => {
+const TotalVariantPanel = () => {
     const [data, setData] = useState<number>(0);
     let location = useLocation();
     let navigate = useNavigate();
 
     useEffect(() => {
-        fetchSOCount({
+        fetchVariantCount({
             location: location,
             navigate: navigate,
         }).then((data) => {
@@ -28,12 +28,12 @@ const TotalSalesInvoicePanel = () => {
         <EuiPanel paddingSize='l'>
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
-                    <h2>Total Sales Invoice:</h2>
+                    <h2>Total Variant:</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 <EuiButtonEmpty
                     onClick={() =>
-                        navigate('/so-list', { state: { from: location } })
+                        navigate('/variant-list', { state: { from: location } })
                     }
                 >
                     <EuiTitle size='m'>
@@ -45,4 +45,4 @@ const TotalSalesInvoicePanel = () => {
     );
 };
 
-export default TotalSalesInvoicePanel;
+export default TotalVariantPanel;

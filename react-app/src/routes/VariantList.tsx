@@ -18,6 +18,7 @@ import {
 import { useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
+import { fetchVariantCount } from '../api/Variant';
 import VariantCreateModal from '../components/VariantCreate';
 import VariantDeleteModal from '../components/VariantDelete';
 import VariantEditModal from '../components/VariantEdit';
@@ -112,47 +113,6 @@ const VariantList = () => {
         }
     };
 
-    const fetchVariantCount = async (): Promise<number | undefined> => {
-        let baseUrl = '/api/v1/inventory/variant-count';
-        const res = await fetch(baseUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: sessionStorage.getItem('token') || '',
-            },
-        });
-        if (res.status === 200) {
-            const data = await res.json();
-            return data.count;
-        }
-        if (res.status === 403 ) {
-            navigate('/login', { state: { from: location } });
-            return;
-        }
-        if (res.status === 401) {
-            const state = await getRefreshToken();
-            if (!state) {
-                navigate('/login', { state: { from: location } });
-                return;
-            }
-            // retry
-            const retry = await fetch(baseUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: sessionStorage.getItem('token') || '',
-                },
-            });
-            if (retry.status === 200) {
-                const data = await retry.json();
-                return data.count;
-            }
-            if (retry.status === 401 || retry.status === 403) {
-                navigate('/login', { state: { from: location.pathname } });
-                return;
-            }
-        }
-    };
 
     const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -321,7 +281,10 @@ const VariantList = () => {
             // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
             const last_id =
                 rData.length > 0 ? (rData[rData.length - 1].id as number) : 0;
-            const count = await fetchVariantCount();
+            const count = await fetchVariantCount({
+                location: location,
+                navigate: navigate,
+            });
             const data = await fetchVariant({
                 pageIndex: pagination.pageIndex,
                 pageSize: pagination.pageSize * balancer,

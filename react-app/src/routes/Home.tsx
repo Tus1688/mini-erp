@@ -1,5 +1,17 @@
-import { EuiFlexGroup, EuiFlexItem, EuiPageTemplate, EuiPanel, EuiText, EuiTextColor, EuiTitle } from '@elastic/eui';
+import {
+    EuiFlexGroup,
+    EuiFlexItem,
+    EuiPageTemplate,
+    EuiPanel,
+    EuiSpacer,
+    EuiText,
+    EuiTextColor,
+    EuiTitle,
+} from '@elastic/eui';
+import TotalProductionDraftPanel from '../components/home/TotalProductionDraft';
 import TotalSalesInvoicePanel from '../components/home/TotalSalesInvoice';
+import TotalSalesInvoiceDraftPanel from '../components/home/TotalSalesInvoiceDraft';
+import TotalVariantPanel from '../components/home/TotalVariant';
 
 const Home = () => {
     return (
@@ -15,9 +27,19 @@ const Home = () => {
                         </p>
                     </EuiTextColor>
                 </EuiText>
-                <EuiFlexGroup>
+                <EuiSpacer size='s' />
+                <EuiFlexGroup wrap={true}>
                     <EuiFlexItem grow={false}>
                         <TotalSalesInvoicePanel />
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                        <TotalSalesInvoiceDraftPanel />
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                        <TotalVariantPanel />
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                        <TotalProductionDraftPanel />
                     </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
