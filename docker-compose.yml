@@ -11,6 +11,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - 80:80
+    # fix selinux socket issue
+    privileged: true
     command: 
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
