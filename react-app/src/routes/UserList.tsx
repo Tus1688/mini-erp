@@ -18,6 +18,7 @@ import { Action } from '@elastic/eui/src/components/basic_table/action_types';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchUsers } from '../api/Users';
+import CredentialEditTab from '../components/CredentialEditTab';
 import RoleEditTab from '../components/RoleEditTab';
 import StatusEditTab from '../components/StatusEditTab';
 import UserCreateModal from '../components/UserCreate';
@@ -169,6 +170,18 @@ const UserList = () => {
                 />
             )
         },
+        {
+            id: 'credential',
+            name: 'Edit credential',
+            prepend: <EuiIcon type='lock' size='m' />,
+            content: (
+                <CredentialEditTab
+                    data={selectedItems}
+                    toggleModal={setEditModalOpen}
+                    setData={setData}
+                />
+            )
+        }
     ];
 
     useEffect(() => {

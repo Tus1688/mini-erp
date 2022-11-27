@@ -287,7 +287,7 @@ const SideNavItem = () => {
             {isSystemAdmin && (
                 <EuiAccordion
                     id='User'
-                    buttonContent='User Management'
+                    buttonContent='System Management'
                     arrowDisplay='none'
                 >
                     <div style={childAccordionItemStyle}>
