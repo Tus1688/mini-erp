@@ -74,6 +74,9 @@ func initRouter() *gin.Engine {
 			inv.GET("/production", controllers.GetProductionDraft)     // get item transaction log draft
 			inv.POST("/production", controllers.CreateProductionDraft) // add stock to draft table
 
+			// low stock
+			inv.GET("/low-stock", controllers.GetLowStock)
+
 			admin := inv.Group("/") // admin only (inv_a is true)
 			admin.Use(middlewares.UserIsInventoryAdmin())
 			{
