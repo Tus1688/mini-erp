@@ -23,12 +23,12 @@ const TotalSalesInvoiceDraftPanel = () => {
                 setData(data);
             }
         });
-    }, []);
+    }, [location, navigate]);
     return (
         <EuiPanel paddingSize='l'>
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
-                    <h2>Awaiting Approval Sales Invoice:</h2>
+                    <h2>Awaiting Approval Sales Invoice</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 <EuiButtonEmpty

@@ -2,12 +2,12 @@ import {
     EuiFlexGroup,
     EuiFlexItem,
     EuiPageTemplate,
-    EuiPanel,
     EuiSpacer,
     EuiText,
     EuiTextColor,
     EuiTitle,
 } from '@elastic/eui';
+import LowStockPanel from '../components/home/LowStock';
 import TotalProductionDraftPanel from '../components/home/TotalProductionDraft';
 import TotalSalesInvoicePanel from '../components/home/TotalSalesInvoice';
 import TotalSalesInvoiceDraftPanel from '../components/home/TotalSalesInvoiceDraft';
@@ -40,6 +40,9 @@ const Home = () => {
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}>
                         <TotalProductionDraftPanel />
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                        <LowStockPanel />
                     </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>

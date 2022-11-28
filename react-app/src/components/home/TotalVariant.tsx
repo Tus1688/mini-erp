@@ -23,12 +23,12 @@ const TotalVariantPanel = () => {
                 setData(data);
             }
         });
-    }, []);
+    }, [location, navigate]);
     return (
         <EuiPanel paddingSize='l'>
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
-                    <h2>Total Variant:</h2>
+                    <h2>Total Variant</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 <EuiButtonEmpty

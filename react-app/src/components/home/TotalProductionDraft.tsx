@@ -23,12 +23,12 @@ const TotalProductionDraftPanel = () => {
                 setData(data);
             }
         });
-    }, []);
+    }, [location, navigate]);
     return (
         <EuiPanel paddingSize='l'>
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
-                    <h2>Awaiting Approval Production:</h2>
+                    <h2>Awaiting Approval Production</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 <EuiButtonEmpty

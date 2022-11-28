@@ -55,6 +55,8 @@ const columns: EuiDataGridColumn[] = [
 const ProductionDraftList = () => {
     let navigate = useNavigate();
     let location = useLocation();
+    const { state } = useLocation();
+    const { createModal } = state || {};
     const [rData, setData] = useState<Array<{ [key: string]: ReactNode }>>([]);
     const [pagination, setPagination] = useState({
         pageIndex: 0,
@@ -62,7 +64,7 @@ const ProductionDraftList = () => {
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [draftCount, setDraftCount] = useState<number>(0);
-    const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(false);
+    const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(createModal || false);
 
     const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isPopoverOpen, setIsPopoverOpen] = useState(false);
