@@ -124,6 +124,11 @@ type APIInventoryTransactionLogResponse struct {
 	CreatedAt  time.Time `json:"created_at"`
 }
 
+type APIInventoryMonthlyStockSoldResponse struct {
+	Name     string `json:"variant_name"`
+	Quantity int    `json:"quantity"`
+}
+
 func (t *Batch) BeforeCreate(tx *gorm.DB) (err error) {
 	var current Batch
 	database.Instance.Last(&current)

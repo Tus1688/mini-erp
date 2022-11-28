@@ -51,7 +51,8 @@ func initRouter() *gin.Engine {
 		api.PATCH("/customer", controllers.UpdateCustomer)
 
 		// so finance user can access available stocks
-		api.GET("/inventory/stock", controllers.GetStock) // get stock by batch and variant
+		api.GET("/inventory/stock", controllers.GetStock)                         // get stock by batch and variant
+		api.GET("/inventory/monthly-sold-stock", controllers.GetMonthlySoldStock) // get monthly sold stock
 
 		inv := api.Group("/inventory")
 		inv.Use(middlewares.UserIsInventoryUser())

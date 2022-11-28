@@ -98,3 +98,20 @@ func GetLowStock(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, responseArr)
 }
+
+func GetMonthlySoldStock(c *gin.Context) {
+	var responseArr []models.APIInventoryMonthlyStockSoldResponse
+	database.Instance.Raw(`
+		select v.name, sum(i.quantity) * -1 as quantity 
+		from item_transaction_logs i, variants v
+		where created_at between DATE_FORMAT(NOW(),"%Y-%m-01") and LAST_DAY(NOW())
+		and i.variant_refer = v.id and i.quantity < 0
+		group by variant_refer;
+	`).Scan(&responseArr)
+
+	if responseArr == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Monthly sold stock not found"})
+		return
+	}
+	c.JSON(http.StatusOK, responseArr)
+}
