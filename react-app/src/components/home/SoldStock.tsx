@@ -67,7 +67,7 @@ const SoldStockMonthlyPanel = () => {
         <EuiPanel paddingSize='l'>
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
-                    <h2>Best selling (30days)</h2>
+                    <h2>Best sellers (30days)</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 {data ? (

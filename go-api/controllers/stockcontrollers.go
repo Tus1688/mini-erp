@@ -106,7 +106,9 @@ func GetMonthlySoldStock(c *gin.Context) {
 		from item_transaction_logs i, variants v
 		where created_at between DATE_FORMAT(NOW(),"%Y-%m-01") and LAST_DAY(NOW())
 		and i.variant_refer = v.id and i.quantity < 0
-		group by variant_refer;
+		group by variant_refer
+		order by sum(i.quantity) * -1 desc
+		limit 5;
 	`).Scan(&responseArr)
 
 	if responseArr == nil {

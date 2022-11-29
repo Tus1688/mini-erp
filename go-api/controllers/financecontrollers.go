@@ -477,7 +477,7 @@ func GetWeeklyRevenue(c *gin.Context) {
 			select i.date, sum(iid.total) as total from invoices i
 			left join invoice_items iid
 			on iid.invoice_refer = i.id
-			where i.date >=  DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND i.date < CURDATE()
+			where i.date >=  DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND i.date <= CURDATE()
 			group by i.id
 		) t
 		group by t.date;

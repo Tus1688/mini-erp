@@ -28,7 +28,7 @@ const TotalSalesInvoiceDraftPanel = () => {
         <EuiPanel paddingSize='l'>
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
-                    <h2>Awaiting Approval Sales Invoice</h2>
+                    <h2>Awaiting Sales Invoice Approval</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 <EuiButtonEmpty

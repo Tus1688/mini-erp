@@ -39,6 +39,7 @@ const LowStockPanel = () => {
                     wrap={true}
                     justifyContent='center'
                     alignItems='center'
+                    direction='column'
                 >
                     {data ? (
                         data.map((item) => (

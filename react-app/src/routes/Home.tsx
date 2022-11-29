@@ -25,7 +25,7 @@ const Home = () => {
                 <EuiText>
                     <EuiTextColor color='subdued'>
                         <p>
-                            The one who always support you - <b>Bumbuventory</b>
+                            The one who always supports you - <b>Bumbuventory</b>
                         </p>
                     </EuiTextColor>
                 </EuiText>
