@@ -2,6 +2,7 @@ import { Location, NavigateFunction } from 'react-router-dom';
 import {
     salesInvoiceOnCreate,
     salesInvoiceSpecific,
+    weeklyRevenue,
 } from '../type/SalesInvoice';
 import { getRefreshToken } from './Authentication';
 
@@ -171,7 +172,7 @@ export const fetchSOCount = async ({
 
 export const fetchSODraftCount = async ({
     location,
-    navigate
+    navigate,
 }: {
     location: Location;
     navigate: NavigateFunction;
@@ -209,6 +210,54 @@ export const fetchSODraftCount = async ({
         if (retry.status === 200) {
             const data = await retry.json();
             return data.count;
+        }
+        if (retry.status === 401 || retry.status === 403) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+    }
+};
+
+export const fetchWeeklyRevenue = async ({
+    location,
+    navigate,
+}: {
+    location: Location;
+    navigate: NavigateFunction;
+}): Promise<weeklyRevenue[] | undefined> => {
+    let baseUrl = '/api/v1/finance/weekly-revenue';
+    const res = await fetch(baseUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+    });
+    if (res.status === 200) {
+        const data = await res.json();
+        return data;
+    }
+    if (res.status === 403) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+        // retry
+        const retry = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (retry.status === 200) {
+            const data = await retry.json();
+            return data;
         }
         if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location.pathname } });

@@ -13,6 +13,7 @@ import TotalProductionDraftPanel from '../components/home/TotalProductionDraft';
 import TotalSalesInvoicePanel from '../components/home/TotalSalesInvoice';
 import TotalSalesInvoiceDraftPanel from '../components/home/TotalSalesInvoiceDraft';
 import TotalVariantPanel from '../components/home/TotalVariant';
+import WeeklyRevenuePanel from '../components/home/WeeklyRevenue';
 
 const Home = () => {
     return (
@@ -47,6 +48,9 @@ const Home = () => {
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}>
                         <SoldStockMonthlyPanel />
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                        <WeeklyRevenuePanel />
                     </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>

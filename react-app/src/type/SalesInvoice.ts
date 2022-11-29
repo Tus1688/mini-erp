@@ -44,3 +44,8 @@ export type itemsOnCreateProps = {
     price: number;
     discount: number;
 }
+
+export type weeklyRevenue = {
+    date: string;
+    total: number;
+}

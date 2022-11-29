@@ -5,8 +5,10 @@ import (
 	"go-api/database"
 	"go-api/models"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -458,4 +460,48 @@ func GetSalesInvoice(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusBadRequest)
+}
+
+func GetWeeklyRevenue(c *gin.Context) {
+	var responseArr []models.APIFinanceTotalRevenueCurrentWeek
+	var date []time.Time
+
+	// fill var date with 7 days ago from today
+	for i := 0; i < 7; i++ {
+		date = append(date, time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()-i, 0, 0, 0, 0, time.Local))
+	}
+
+	database.Instance.Raw(`
+		select t.date, sum(t.total) as total from
+		(
+			select i.date, sum(iid.total) as total from invoices i
+			left join invoice_items iid
+			on iid.invoice_refer = i.id
+			where i.date >=  DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND i.date < CURDATE()
+			group by i.id
+		) t
+		group by t.date;
+	`).Scan(&responseArr)
+
+	// if there is no date in responseArr, fill it with date and total = 0
+	for i := 0; i < len(date); i++ {
+		var found bool
+		for j := 0; j < len(responseArr); j++ {
+			if date[i].Format("2006-01-02") == responseArr[j].Date.Format("2006-01-02") {
+				found = true
+				break
+			}
+		}
+		if !found {
+			responseArr = append(responseArr, models.APIFinanceTotalRevenueCurrentWeek{
+				Date:  date[i],
+				Total: 0,
+			})
+		}
+	}
+	// sort responseArr by date
+	sort.Slice(responseArr, func(i, j int) bool {
+		return responseArr[i].Date.Before(responseArr[j].Date)
+	})
+	c.JSON(http.StatusOK, responseArr)
 }

@@ -107,6 +107,8 @@ func initRouter() *gin.Engine {
 			fin.GET("/sales-invoice", controllers.GetSalesInvoice)
 			fin.GET("/sales-invoice-count", controllers.GetSalesInvoiceCount)
 
+			fin.GET("/weekly-revenue", controllers.GetWeeklyRevenue)
+
 			admin := fin.Group("/") // admin only (fin_a is true)
 			admin.Use(middlewares.UserIsFinanceAdmin())
 			{
