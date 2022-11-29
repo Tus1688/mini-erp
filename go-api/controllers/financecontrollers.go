@@ -474,12 +474,12 @@ func GetWeeklyRevenue(c *gin.Context) {
 	database.Instance.Raw(`
 		select t.date, sum(t.total) as total from
 		(
-			select i.date, sum(iid.total) as total from invoices i
+			select date(i.date) as date, sum(iid.total) as total from invoices i
 			left join invoice_items iid
 			on iid.invoice_refer = i.id
-			where i.date >=  DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND i.date <= CURDATE()
+			where i.date >=  DATE_SUB(now(), INTERVAL 7 DAY) AND i.date <= now()
 			group by i.id
-		) t
+		) as t
 		group by t.date;
 	`).Scan(&responseArr)
 
