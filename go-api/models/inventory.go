@@ -116,6 +116,12 @@ type APIInventoryStockReponse struct {
 	ExpiredDate time.Time `json:"expired_date"`
 }
 
+type APIInventoryLowStockResponse struct {
+	Name      string `json:"variant_name"`
+	VariantID int    `json:"variant_id"`
+	Quantity  int    `json:"quantity"`
+}
+
 type APIInventoryTransactionLogResponse struct {
 	ID         int       `json:"id"`
 	BatchRefer int       `json:"batch_id"`

@@ -10,3 +10,9 @@ export type monthlySoldStockProps = {
     variant_name: string;
     quantity: number;
 }
+
+export type lowStockProps = {
+    variant_name: string;
+    variant_id: number;
+    quantity: number;
+}

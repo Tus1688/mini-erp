@@ -75,20 +75,19 @@ func GetStock(c *gin.Context) {
 }
 
 func GetLowStock(c *gin.Context) {
-	var responseArr []models.APIInventoryStockReponse
+	var responseArr []models.APIInventoryLowStockResponse
 	database.Instance.Raw(`
-		select v.name, variant_refer as VariantID, batch_refer as ID, b.expired_date, sum(quantity) as quantity
+		select v.name, variant_refer as VariantID, sum(quantity) as quantity
 		from 
 		(
-			select batch_refer, variant_refer, quantity
+			select variant_refer, quantity
 			from item_transaction_logs
 			Union all
-			select batch_refer, variant_refer, quantity
+			select variant_refer, quantity
 			from finance_item_transaction_log_drafts
 		) t
 		left join variants v on v.id = t.variant_refer 
-		left join batches b on b.id = t.batch_refer 
-		group by t.variant_refer, t.batch_refer
+		group by t.variant_refer
 		having sum(quantity) > 0 and sum(quantity) < 100;
 	`).Scan(&responseArr)
 

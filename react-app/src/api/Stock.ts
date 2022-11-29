@@ -1,5 +1,5 @@
 import { Location, NavigateFunction } from 'react-router-dom';
-import { monthlySoldStockProps, stockProps } from '../type/Stock';
+import { lowStockProps, monthlySoldStockProps } from '../type/Stock';
 import { getRefreshToken } from './Authentication';
 
 export const fetchStockSearch = async ({
@@ -57,7 +57,7 @@ export const fetchStockLow = async ({
 }: {
     location: Location;
     navigate: NavigateFunction;
-}): Promise<stockProps[] | undefined> => {
+}): Promise<lowStockProps[] | undefined> => {
     let baseUrl = '/api/v1/inventory/low-stock';
     const res = await fetch(baseUrl, {
         method: 'GET',
