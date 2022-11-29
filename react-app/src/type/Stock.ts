@@ -5,3 +5,8 @@ export type stockProps = {
     quantity: number;
     expired_date: string;
 }
+
+export type monthlySoldStockProps = {
+    variant_name: string;
+    quantity: number;
+}

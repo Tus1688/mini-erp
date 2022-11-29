@@ -28,10 +28,11 @@ const LowStockPanel = () => {
         });
     }, [location, navigate]);
     return (
-        <EuiPanel paddingSize='xl'>
+        // max width to 40% of screen size
+        <EuiPanel paddingSize='l'>
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
-                    <h2>Low Stock</h2>
+                    <h2>Low Stock ({'<'}100pcs)</h2>
                 </EuiTitle>
                 <EuiSpacer size='l' />
                 <EuiFlexGroup
@@ -58,7 +59,7 @@ const LowStockPanel = () => {
                                             })
                                         }
                                     >
-                                        <EuiTitle size='s'>
+                                        <EuiTitle size='m'>
                                             <h2>
                                                 {item.variant_name} [
                                                 {item.quantity} pcs]
@@ -69,11 +70,28 @@ const LowStockPanel = () => {
                             </EuiFlexItem>
                         ))
                     ) : (
-                        <EuiButtonEmpty onClick={() => navigate('/stock-list')}>
-                            <EuiTitle size='m'>
-                                <h1>0</h1>
-                            </EuiTitle>
-                        </EuiButtonEmpty>
+                        <EuiFlexItem grow={false}>
+                            <EuiPanel
+                                color='plain'
+                                hasBorder={true}
+                                hasShadow={true}
+                                paddingSize='s'
+                            >
+                                <EuiButtonEmpty
+                                    onClick={() =>
+                                        navigate('/stock-list', {
+                                            state: {
+                                                from: location,
+                                            },
+                                        })
+                                    }
+                                >
+                                    <EuiTitle size='m'>
+                                        <h2>There is no Low Stock</h2>
+                                    </EuiTitle>
+                                </EuiButtonEmpty>
+                            </EuiPanel>
+                        </EuiFlexItem>
                     )}
                 </EuiFlexGroup>
             </EuiTextAlign>

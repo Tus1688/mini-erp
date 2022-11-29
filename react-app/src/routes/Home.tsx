@@ -8,6 +8,7 @@ import {
     EuiTitle,
 } from '@elastic/eui';
 import LowStockPanel from '../components/home/LowStock';
+import SoldStockMonthlyPanel from '../components/home/SoldStock';
 import TotalProductionDraftPanel from '../components/home/TotalProductionDraft';
 import TotalSalesInvoicePanel from '../components/home/TotalSalesInvoice';
 import TotalSalesInvoiceDraftPanel from '../components/home/TotalSalesInvoiceDraft';
@@ -28,7 +29,7 @@ const Home = () => {
                     </EuiTextColor>
                 </EuiText>
                 <EuiSpacer size='s' />
-                <EuiFlexGroup wrap={true}>
+                <EuiFlexGroup wrap={true} justifyContent='center'>
                     <EuiFlexItem grow={false}>
                         <TotalSalesInvoicePanel />
                     </EuiFlexItem>
@@ -41,8 +42,11 @@ const Home = () => {
                     <EuiFlexItem grow={false}>
                         <TotalProductionDraftPanel />
                     </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
+                    <EuiFlexItem grow={false} style={{maxWidth: '600px'}}>
                         <LowStockPanel />
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                        <SoldStockMonthlyPanel />
                     </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
