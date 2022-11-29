@@ -1,5 +1,5 @@
 import { Location, NavigateFunction } from 'react-router-dom';
-import { monthlySoldStockProps } from '../type/Stock';
+import { monthlySoldStockProps, stockProps } from '../type/Stock';
 import { getRefreshToken } from './Authentication';
 
 export const fetchStockSearch = async ({
@@ -57,7 +57,7 @@ export const fetchStockLow = async ({
 }: {
     location: Location;
     navigate: NavigateFunction;
-}) => {
+}): Promise<stockProps[] | undefined> => {
     let baseUrl = '/api/v1/inventory/low-stock';
     const res = await fetch(baseUrl, {
         method: 'GET',
@@ -66,7 +66,7 @@ export const fetchStockLow = async ({
             Authorization: sessionStorage.getItem('token') || '',
         },
     });
-    if (res.status === 200 || res.status === 404) {
+    if (res.status === 200) {
         const data = await res.json();
         return data;
     }
@@ -87,7 +87,7 @@ export const fetchStockLow = async ({
                 Authorization: sessionStorage.getItem('token') || '',
             },
         });
-        if (retry.status === 200 || retry.status === 404) {
+        if (retry.status === 200) {
             const data = await retry.json();
             return data;
         }
