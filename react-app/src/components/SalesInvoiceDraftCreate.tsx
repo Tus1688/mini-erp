@@ -30,7 +30,6 @@ import { fetchStockSearch } from '../api/Stock';
 import { fetchTOPSearch } from '../api/TOP';
 import useToast from '../hooks/useToast';
 import { customerProps } from '../type/Customer';
-import { formatTimeZoneWithoutTime } from '../type/FormatTZ';
 import {
     itemsDisplayProps,
     itemsOnCreateProps,
@@ -252,7 +251,7 @@ const SalesInvoiceCreateModal = ({
         const data: salesInvoiceOnCreate = {
             customer_id: customerSelected[0].value,
             top_id: topSelected[0].value,
-            date: date.format(formatTimeZoneWithoutTime),
+            date: date.toISOString(),
             items: items,
         };
         await createSalesInvoice({

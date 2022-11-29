@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchBatchSpecific, patchBatch } from '../api/Batch';
 import useToast from '../hooks/useToast';
-import { formatTimeZoneWithoutTime } from '../type/FormatTZ';
 
 const BatchEditModal = ({
     id,
@@ -36,7 +35,7 @@ const BatchEditModal = ({
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        let dtString:string = batchExpired?.format(formatTimeZoneWithoutTime) || '';
+        let dtString:string = batchExpired?.toISOString() || '';
         await patchBatch({
             id: id,
             expiredDate: dtString,

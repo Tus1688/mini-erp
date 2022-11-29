@@ -1,7 +1,4 @@
 import {
-    EuiButtonEmpty,
-    EuiFlexGroup,
-    EuiFlexItem,
     EuiPanel,
     EuiSpacer,
     EuiText,
@@ -11,7 +8,6 @@ import {
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchStockLow } from '../../api/Stock';
-import { stockProps } from '../../type/Stock';
 import {
     Chart as ChartJS,
     RadialLinearScale,

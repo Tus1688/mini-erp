@@ -16,7 +16,6 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useToast from '../hooks/useToast';
 import moment, { Moment } from 'moment';
-import { formatTimeZoneWithoutTime } from '../type/FormatTZ';
 import { createBatch } from '../api/Batch';
 
 const BatchCreateModal = ({
@@ -47,7 +46,7 @@ const BatchCreateModal = ({
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        let dtString:string = batchExpired?.format(formatTimeZoneWithoutTime) || '';
+        let dtString:string = batchExpired?.toISOString() || '';
         await createBatch({
             expiredDate: dtString,
             navigate: navigate,
