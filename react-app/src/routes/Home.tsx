@@ -7,7 +7,9 @@ import {
     EuiTextColor,
     EuiTitle,
 } from '@elastic/eui';
+import { useEffect, useState } from 'react';
 import LowStockPanel from '../components/home/LowStock';
+import ProductionVsSales from '../components/home/ProductionVsSales';
 import SoldStockMonthlyPanel from '../components/home/SoldStock';
 import TotalProductionDraftPanel from '../components/home/TotalProductionDraft';
 import TotalSalesInvoicePanel from '../components/home/TotalSalesInvoice';
@@ -16,6 +18,13 @@ import TotalVariantPanel from '../components/home/TotalVariant';
 import WeeklyRevenuePanel from '../components/home/WeeklyRevenue';
 
 const Home = () => {
+    const [financeUser, setFinanceUser] = useState<boolean>(false);
+    const [inventoryUser, setInventoryUser] = useState<boolean>(false);
+
+    useEffect(() => {
+        setFinanceUser(sessionStorage.getItem('fin_u') === 'true');
+        setInventoryUser(sessionStorage.getItem('inv_u') === 'true');
+    }, []);
     return (
         <>
             <EuiPageTemplate.Section>
@@ -25,33 +34,60 @@ const Home = () => {
                 <EuiText>
                     <EuiTextColor color='subdued'>
                         <p>
-                            The one who always supports you - <b>Bumbuventory</b>
+                            The one who always supports you -{' '}
+                            <b>Bumbuventory</b>
                         </p>
                     </EuiTextColor>
                 </EuiText>
                 <EuiSpacer size='s' />
                 <EuiFlexGroup wrap={true} justifyContent='center'>
-                    <EuiFlexItem grow={false}>
-                        <TotalSalesInvoicePanel />
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                        <TotalSalesInvoiceDraftPanel />
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                        <TotalVariantPanel />
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                        <TotalProductionDraftPanel />
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false} style={{maxWidth: '600px'}}>
-                        <LowStockPanel />
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                        <SoldStockMonthlyPanel />
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                        <WeeklyRevenuePanel />
-                    </EuiFlexItem>
+                    {financeUser ? (
+                        <>
+                            <EuiFlexItem grow={false}>
+                                <TotalSalesInvoicePanel />
+                            </EuiFlexItem>
+                            <EuiFlexItem grow={false}>
+                                <TotalSalesInvoiceDraftPanel />
+                            </EuiFlexItem>
+                        </>
+                    ) : null}
+                    {inventoryUser ? (
+                        <>
+                            <EuiFlexItem grow={false}>
+                                <TotalVariantPanel />
+                            </EuiFlexItem>
+                            <EuiFlexItem grow={false}>
+                                <TotalProductionDraftPanel />
+                            </EuiFlexItem>
+                            <EuiFlexItem
+                                grow={true}
+                                style={{ maxWidth: '300px' }}
+                            >
+                                <LowStockPanel />
+                            </EuiFlexItem>
+                        </>
+                    ) : null}
+                    {inventoryUser || financeUser ? (
+                        <>
+                            <EuiFlexItem
+                                grow={true}
+                                style={{ maxWidth: '300px' }}
+                            >
+                                <SoldStockMonthlyPanel />
+                            </EuiFlexItem>
+                            <EuiFlexItem
+                                grow={true}
+                                style={{ maxWidth: '600px' }}
+                            >
+                                <ProductionVsSales />
+                            </EuiFlexItem>
+                        </>
+                    ) : null}
+                    {financeUser ? (
+                        <EuiFlexItem grow={true} style={{ maxWidth: '600px' }}>
+                            <WeeklyRevenuePanel />
+                        </EuiFlexItem>
+                    ) : null}
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
         </>

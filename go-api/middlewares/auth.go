@@ -43,3 +43,10 @@ func EnforceCsrf() gin.HandlerFunc {
 		}
 	}
 }
+
+func SetCSP() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Content-Security-Policy", "default-src 'self'")
+		c.Next()
+	}
+}

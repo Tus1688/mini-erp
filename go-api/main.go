@@ -37,6 +37,7 @@ func loadEnv() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
+	router.Use(middlewares.SetCSP())
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(middlewares.ValidateCsrf())
 	router.Use(middlewares.EnforceCsrf())
@@ -53,6 +54,8 @@ func initRouter() *gin.Engine {
 		// so finance user can access available stocks
 		api.GET("/inventory/stock", controllers.GetStock)                         // get stock by batch and variant
 		api.GET("/inventory/monthly-sold-stock", controllers.GetMonthlySoldStock) // get monthly sold stock
+
+		api.GET("/metrics/monthly-production-sales", controllers.GetMonthlyProductionAndSales)
 
 		inv := api.Group("/inventory")
 		inv.Use(middlewares.UserIsInventoryUser())

@@ -122,6 +122,12 @@ type APIFinanceTotalRevenueCurrentWeek struct {
 	Total int       `json:"total"`
 }
 
+type APIFinanceMonthlyProductionAndSales struct {
+	Date               time.Time `json:"date"`
+	ProductionQuantity int       `json:"production"`
+	SalesQuantity      int       `json:"sales"`
+}
+
 func (t *TermOfPayment) BeforeCreate(tx *gorm.DB) (err error) {
 	var current TermOfPayment
 	database.Instance.Last(&current)

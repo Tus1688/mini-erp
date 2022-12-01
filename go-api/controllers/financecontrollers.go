@@ -505,3 +505,78 @@ func GetWeeklyRevenue(c *gin.Context) {
 	})
 	c.JSON(http.StatusOK, responseArr)
 }
+
+func GetMonthlyProductionAndSales(c *gin.Context) {
+	var responseArr []models.APIFinanceMonthlyProductionAndSales
+	var date []time.Time
+	var production []monthlyProductionAndSalesHelper
+	var sales []monthlyProductionAndSalesHelper
+
+	for i := 0; i < 7; i++ {
+		date = append(date, time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()-i, 0, 0, 0, 0, time.Local))
+	}
+
+	productionRecord := database.Instance.Raw(`
+		select date(created_at) as date, sum(quantity) as quantity from item_transaction_logs
+		where quantity > 0 and created_at >=  DATE_SUB(now(), INTERVAL 7 DAY) AND created_at <= now()
+		group by 1;
+	`).Scan(&production)
+	if productionRecord.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when getting production record"})
+		return
+	}
+
+	salesRecord := database.Instance.Raw(`
+		select date(created_at) as date, sum(quantity) * -1 as quantity from item_transaction_logs
+		where quantity < 0 and created_at >=  DATE_SUB(now(), INTERVAL 7 DAY) AND created_at <= now()
+		group by 1;
+	`).Scan(&sales)
+	if salesRecord.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong when getting sales record"})
+		return
+	}
+
+	for i := 0; i < len(date); i++ {
+		var found bool
+		for j := 0; j < len(production); j++ {
+			if date[i].Format("2006-01-02") == production[j].Date.Format("2006-01-02") {
+				responseArr = append(responseArr, models.APIFinanceMonthlyProductionAndSales{
+					Date:               date[i],
+					ProductionQuantity: production[j].Quantity,
+					SalesQuantity:      0,
+				})
+				found = true
+				break
+			}
+		}
+		if !found {
+			responseArr = append(responseArr, models.APIFinanceMonthlyProductionAndSales{
+				Date:               date[i],
+				ProductionQuantity: 0,
+				SalesQuantity:      0,
+			})
+		}
+	}
+
+	// fill sales quantity
+	for i := 0; i < len(date); i++ {
+		for j := 0; j < len(sales); j++ {
+			if date[i].Format("2006-01-02") == sales[j].Date.Format("2006-01-02") {
+				responseArr[i].SalesQuantity = sales[j].Quantity
+				break
+			}
+		}
+	}
+
+	// sort responseArr by date
+	sort.Slice(responseArr, func(i, j int) bool {
+		return responseArr[i].Date.Before(responseArr[j].Date)
+	})
+
+	c.JSON(http.StatusOK, responseArr)
+}
+
+type monthlyProductionAndSalesHelper struct {
+	Date     time.Time
+	Quantity int
+}

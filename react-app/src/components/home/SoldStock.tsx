@@ -14,13 +14,13 @@ import {
     Legend,
     ChartData,
 } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
+import { Doughnut } from 'react-chartjs-2';
 import { fetchMonthlySoldStock } from '../../api/Stock';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const SoldStockMonthlyPanel = () => {
-    const [data, setData] = useState<ChartData<'pie', number[], string>>();
+    const [data, setData] = useState<ChartData<'doughnut', number[], string>>();
 
     let location = useLocation();
     let navigate = useNavigate();
@@ -71,7 +71,7 @@ const SoldStockMonthlyPanel = () => {
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 {data ? (
-                    <Pie data={data} />
+                    <Doughnut data={data} />
                 ) : (
                     <>
                         <EuiText>There is no data yet ...</EuiText>
