@@ -55,7 +55,8 @@ func initRouter() *gin.Engine {
 		api.GET("/inventory/stock", controllers.GetStock)                         // get stock by batch and variant
 		api.GET("/inventory/monthly-sold-stock", controllers.GetMonthlySoldStock) // get monthly sold stock
 
-		api.GET("/metrics/monthly-production-sales", controllers.GetMonthlyProductionAndSales)
+		api.GET("/metrics/monthly-production-sales", controllers.GetWeeklyProductionAndSales)
+		api.GET("/metrics/best-employee-sales-invoice", controllers.GetBestEmployeeSalesInvoice)
 
 		inv := api.Group("/inventory")
 		inv.Use(middlewares.UserIsInventoryUser())

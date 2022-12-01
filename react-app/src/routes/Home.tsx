@@ -8,6 +8,7 @@ import {
     EuiTitle,
 } from '@elastic/eui';
 import { useEffect, useState } from 'react';
+import BestEmployeePanel from '../components/home/BestEmployee';
 import LowStockPanel from '../components/home/LowStock';
 import ProductionVsSales from '../components/home/ProductionVsSales';
 import SoldStockMonthlyPanel from '../components/home/SoldStock';
@@ -88,6 +89,11 @@ const Home = () => {
                             <WeeklyRevenuePanel />
                         </EuiFlexItem>
                     ) : null}
+                    {inventoryUser || financeUser ? (
+                        <EuiFlexItem grow={true} style={{maxWidth: '300px'}}>
+                            <BestEmployeePanel />
+                        </EuiFlexItem>
+                    ): null}
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
         </>

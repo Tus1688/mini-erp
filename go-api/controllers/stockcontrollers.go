@@ -103,7 +103,7 @@ func GetMonthlySoldStock(c *gin.Context) {
 	database.Instance.Raw(`
 		select v.name, sum(i.quantity) * -1 as quantity 
 		from item_transaction_logs i, variants v
-		where created_at between DATE_FORMAT(NOW(),"%Y-%m-01") and LAST_DAY(NOW())
+		where created_at >=  DATE_SUB(now(), INTERVAL 30 DAY) AND created_at <= now()
 		and i.variant_refer = v.id and i.quantity < 0
 		group by variant_refer
 		order by sum(i.quantity) * -1 desc

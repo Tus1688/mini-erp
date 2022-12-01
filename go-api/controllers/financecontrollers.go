@@ -468,7 +468,7 @@ func GetWeeklyRevenue(c *gin.Context) {
 
 	// fill var date with 7 days ago from today
 	for i := 0; i < 7; i++ {
-		date = append(date, time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()-i, 0, 0, 0, 0, time.Local))
+		date = append(date, time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()-i, 0, 0, 0, 0, time.UTC))
 	}
 
 	database.Instance.Raw(`
@@ -506,14 +506,14 @@ func GetWeeklyRevenue(c *gin.Context) {
 	c.JSON(http.StatusOK, responseArr)
 }
 
-func GetMonthlyProductionAndSales(c *gin.Context) {
+func GetWeeklyProductionAndSales(c *gin.Context) {
 	var responseArr []models.APIFinanceMonthlyProductionAndSales
 	var date []time.Time
 	var production []monthlyProductionAndSalesHelper
 	var sales []monthlyProductionAndSalesHelper
 
 	for i := 0; i < 7; i++ {
-		date = append(date, time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()-i, 0, 0, 0, 0, time.Local))
+		date = append(date, time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()-i, 0, 0, 0, 0, time.UTC))
 	}
 
 	productionRecord := database.Instance.Raw(`

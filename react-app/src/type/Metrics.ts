@@ -3,3 +3,8 @@ export type ProductionVsSales = {
     production: number;
     sales: number;
 }
+
+export type BestEmployee = {
+    name: string;
+    total: number;
+}
