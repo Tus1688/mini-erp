@@ -42,64 +42,88 @@ const Home = () => {
                     </EuiTextColor>
                 </EuiText>
                 <EuiSpacer size='s' />
-                <EuiFlexGroup wrap={true} justifyContent='center'>
-                    {financeUser ? (
-                        <>
-                            <EuiFlexItem grow={false}>
-                                <TotalSalesInvoicePanel />
-                            </EuiFlexItem>
-                            <EuiFlexItem grow={false}>
-                                <TotalSalesInvoiceDraftPanel />
-                            </EuiFlexItem>
-                        </>
-                    ) : null}
-                    {inventoryUser ? (
-                        <>
-                            <EuiFlexItem grow={false}>
-                                <TotalVariantPanel />
-                            </EuiFlexItem>
-                            <EuiFlexItem grow={false}>
-                                <TotalProductionDraftPanel />
-                            </EuiFlexItem>
-                            <EuiFlexItem
-                                grow={true}
-                                style={{ maxWidth: '300px' }}
-                            >
-                                <LowStockPanel />
-                            </EuiFlexItem>
-                        </>
-                    ) : null}
-                    {inventoryUser || financeUser ? (
-                        <>
-                            <EuiFlexItem
-                                grow={true}
-                                style={{ maxWidth: '300px' }}
-                            >
-                                <SoldStockMonthlyPanel />
-                            </EuiFlexItem>
-                            <EuiFlexItem
-                                grow={true}
-                                style={{ maxWidth: '600px' }}
-                            >
-                                <ProductionVsSales />
-                            </EuiFlexItem>
-                        </>
-                    ) : null}
-                    {financeUser ? (
-                        <EuiFlexItem grow={true} style={{ maxWidth: '600px' }}>
-                            <WeeklyRevenuePanel />
-                        </EuiFlexItem>
-                    ) : null}
-                    {inventoryUser || financeUser ? (
-                        <EuiFlexItem grow={true} style={{ maxWidth: '300px' }}>
-                            <BestEmployeePanel />
-                        </EuiFlexItem>
-                    ) : null}
-                    {financeUser ? (
-                        <EuiFlexItem grow={true} style={{ maxWidth: '300px' }}>
-                            <BestCustomerPanel />
-                        </EuiFlexItem>
-                    ) : null}
+                <EuiFlexGroup
+                    wrap={true}
+                    justifyContent='center'
+                    direction='column'
+                >
+                    <EuiFlexItem>
+                        <EuiFlexGroup>
+                            {financeUser ? (
+                                <>
+                                    <EuiFlexItem grow={false}>
+                                        <TotalSalesInvoicePanel />
+                                    </EuiFlexItem>
+                                    <EuiFlexItem grow={false}>
+                                        <TotalSalesInvoiceDraftPanel />
+                                    </EuiFlexItem>
+                                </>
+                            ) : null}
+                            {inventoryUser ? (
+                                <>
+                                    <EuiFlexItem grow={false}>
+                                        <TotalVariantPanel />
+                                    </EuiFlexItem>
+                                    <EuiFlexItem grow={false}>
+                                        <TotalProductionDraftPanel />
+                                    </EuiFlexItem>
+                                </>
+                            ) : null}
+                        </EuiFlexGroup>
+                    </EuiFlexItem>
+
+                    <EuiFlexItem>
+                        <EuiFlexGroup wrap={true}>
+                            {inventoryUser ? (
+                                <EuiFlexItem
+                                    grow={true}
+                                    style={{ maxWidth: '300px' }}
+                                >
+                                    <LowStockPanel />
+                                </EuiFlexItem>
+                            ) : null}
+                            {inventoryUser || financeUser ? (
+                                <>
+                                    <EuiFlexItem
+                                        grow={true}
+                                        style={{ maxWidth: '300px' }}
+                                    >
+                                        <SoldStockMonthlyPanel />
+                                    </EuiFlexItem>
+                                    <EuiFlexItem
+                                        grow={true}
+                                        style={{ maxWidth: '600px' }}
+                                    >
+                                        <ProductionVsSales />
+                                    </EuiFlexItem>
+                                </>
+                            ) : null}
+                            {financeUser ? (
+                                <>
+                                <EuiFlexItem
+                                    grow={true}
+                                    style={{ maxWidth: '600px' }}
+                                >
+                                    <WeeklyRevenuePanel />
+                                </EuiFlexItem>
+                                <EuiFlexItem
+                                    grow={true}
+                                    style={{ maxWidth: '300px' }}
+                                >
+                                    <BestEmployeePanel />
+                                </EuiFlexItem>
+                                </>
+                            ) : null}
+                            {financeUser ? (
+                                <EuiFlexItem
+                                    grow={true}
+                                    style={{ maxWidth: '300px' }}
+                                >
+                                    <BestCustomerPanel />
+                                </EuiFlexItem>
+                            ) : null}
+                        </EuiFlexGroup>
+                    </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPageTemplate.Section>
         </>
