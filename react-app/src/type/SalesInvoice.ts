@@ -49,3 +49,8 @@ export type weeklyRevenue = {
     date: string;
     total: number;
 }
+
+export type BestCustomer = {
+    name: string;
+    total: number;
+}

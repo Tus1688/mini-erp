@@ -576,6 +576,30 @@ func GetWeeklyProductionAndSales(c *gin.Context) {
 	c.JSON(http.StatusOK, responseArr)
 }
 
+func GetBestCustomerSalesInvoice(c *gin.Context) {
+	var responseArr []models.APIFinanceBestCustomerSalesInvoice
+	database.Instance.Raw(`
+		select c.name, sum(t.total) as total from
+		(
+			select i.customer_refer as customer_id, sum(iid.total) as total from invoices i
+			left join invoice_items iid
+			on iid.invoice_refer = i.id
+			where i.date >=  DATE_SUB(now(), INTERVAL 30 DAY) AND i.date <= now()
+			group by 1
+		) as t, customers c
+		where c.id = t.customer_id
+		group by t.customer_id
+		order by 2 desc
+		limit 5;
+	`).Scan(&responseArr)
+
+	if responseArr == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No best customer found"})
+		return
+	}
+	c.JSON(http.StatusOK, responseArr)
+}
+
 type monthlyProductionAndSalesHelper struct {
 	Date     time.Time
 	Quantity int

@@ -128,6 +128,11 @@ type APIFinanceMonthlyProductionAndSales struct {
 	SalesQuantity      int       `json:"sales"`
 }
 
+type APIFinanceBestCustomerSalesInvoice struct {
+	Name  string `json:"name"`
+	Total int    `json:"total"`
+}
+
 func (t *TermOfPayment) BeforeCreate(tx *gorm.DB) (err error) {
 	var current TermOfPayment
 	database.Instance.Last(&current)

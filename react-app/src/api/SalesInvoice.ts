@@ -1,5 +1,6 @@
 import { Location, NavigateFunction } from 'react-router-dom';
 import {
+    BestCustomer,
     salesInvoiceOnCreate,
     salesInvoiceSpecific,
     weeklyRevenue,
@@ -261,6 +262,53 @@ export const fetchWeeklyRevenue = async ({
         }
         if (retry.status === 401 || retry.status === 403) {
             navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+    }
+};
+
+export const fetchBestCustomerSalesInvoice = async ({
+    location,
+    navigate,
+}: {
+    location: Location;
+    navigate: NavigateFunction;
+}): Promise<BestCustomer[] | undefined> => {
+    let baseUrl = '/api/v1/finance/best-customer';
+    const res = await fetch(baseUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token') || '',
+        },
+    });
+    if (res.status === 200) {
+        const data = await res.json();
+        return data;
+    }
+    if (res.status === 403) {
+        navigate('/login', { state: { from: location } });
+        return;
+    }
+    if (res.status === 401) {
+        const state = await getRefreshToken();
+        if (!state) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+        const retry = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: sessionStorage.getItem('token') || '',
+            },
+        });
+        if (retry.status === 200) {
+            const data = await retry.json();
+            return data;
+        }
+        if (retry.status === 401 || retry.status === 403) {
+            navigate('/login', { state: { from: location } });
             return;
         }
     }

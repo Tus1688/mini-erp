@@ -9,7 +9,7 @@ export const fetchProductionVsSalesMetrics = async ({
     location: Location;
     navigate: NavigateFunction;
 }): Promise<ProductionVsSales[] | undefined> => {
-    let baseUrl = '/api/v1/metrics/monthly-production-sales';
+    let baseUrl = '/api/v1/metrics/weekly-production-sales';
     const res = await fetch(baseUrl, {
         method: 'GET',
         headers: {
