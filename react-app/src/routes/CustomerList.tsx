@@ -10,6 +10,7 @@ import {
     EuiPageTemplate,
     EuiPopover,
     EuiPopoverTitle,
+    EuiProgress,
     EuiSpacer,
     EuiText,
     EuiTextColor,
@@ -43,20 +44,20 @@ const columns: EuiDataGridColumn[] = [
         initialWidth: 250,
         displayAsText: 'Name',
         schema: 'string',
-        isSortable: false
+        isSortable: false,
     },
     {
         id: 'tax_id',
         initialWidth: 200,
         displayAsText: 'Tax ID',
         schema: 'string',
-        isSortable: false
+        isSortable: false,
     },
     {
         id: 'address',
         displayAsText: 'Address',
         schema: 'string',
-        isSortable: false
+        isSortable: false,
     },
 ];
 
@@ -71,6 +72,7 @@ const CustomerList = () => {
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [customerCount, setCustomerCount] = useState<number>(0);
     const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(false);
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const fetchCustomer = async ({
         pageIndex,
@@ -104,7 +106,7 @@ const CustomerList = () => {
             const data = await res.json();
             return data;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -146,7 +148,7 @@ const CustomerList = () => {
             const data = await res.json();
             return data.count;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -355,6 +357,7 @@ const CustomerList = () => {
         let balancer: number;
         const fetchData = async (balancer: number) => {
             // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
+            setLoading(true);
             const last_id =
                 rData.length > 0 ? (rData[rData.length - 1].id as number) : 0;
             const count = await fetchCustomerCount();
@@ -363,6 +366,7 @@ const CustomerList = () => {
                 pageSize: pagination.pageSize * balancer,
                 lastId: last_id,
             });
+            setLoading(false);
             if (data) {
                 setData((rData) => [...rData, ...data]);
                 if (count) {
@@ -387,7 +391,6 @@ const CustomerList = () => {
             ]);
             console.log('fetching again');
         }
-        console.log(rData);
         // eslint-disable-next-line
     }, [pagination, fetchedPage, rData]);
 
@@ -439,6 +442,7 @@ const CustomerList = () => {
                     </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size='s' />
+                {isLoading ? <EuiProgress size='xs' color='primary' /> : null}
                 <EuiDataGrid
                     aria-label='Customer List'
                     trailingControlColumns={trailingControlColumns}

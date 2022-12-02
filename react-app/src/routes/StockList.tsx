@@ -6,6 +6,7 @@ import {
     EuiFlexItem,
     EuiGlobalToastList,
     EuiPageTemplate,
+    EuiProgress,
     EuiSpacer,
     EuiText,
     EuiTextColor,
@@ -47,6 +48,7 @@ const StockList = () => {
     });
     const [fetchedPageCity, setFetchedPageCity] = useState<number[]>([]);
     const [alreadyFetched, setAlreadyFetched] = useState<boolean>(false);
+    const [isLoading, setLoading] = useState<boolean>(false);
     const { addToast, getAllToasts, getNewId, removeToast } = useToast();
 
     const fetchStock = async (): Promise<
@@ -72,7 +74,7 @@ const StockList = () => {
             });
             return data;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -164,7 +166,9 @@ const StockList = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             const data = await fetchStock();
+            setLoading(false);
             if (data) {
                 // setData(data); data.expired_date map to localestring and data.quantity with thousand separator
                 setData(
@@ -221,6 +225,7 @@ const StockList = () => {
                     />
                 </EuiFlexGroup>
                 <EuiSpacer size='s' />
+                {isLoading ? <EuiProgress size='xs' color='primary' /> : null}
                 <EuiDataGrid
                     aria-label='City List'
                     columns={columns}

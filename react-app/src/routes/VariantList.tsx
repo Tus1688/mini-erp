@@ -10,6 +10,7 @@ import {
     EuiPageTemplate,
     EuiPopover,
     EuiPopoverTitle,
+    EuiProgress,
     EuiSpacer,
     EuiText,
     EuiTextColor,
@@ -50,6 +51,7 @@ const VariantList = () => {
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [variantCount, setVariantCount] = useState<number>(0);
+    const [isLoading, setLoading] = useState<boolean>(false);
     const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(false);
 
     const fetchVariant = async ({
@@ -84,7 +86,7 @@ const VariantList = () => {
             const data = await res.json();
             return data;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -112,7 +114,6 @@ const VariantList = () => {
             }
         }
     };
-
 
     const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -278,6 +279,7 @@ const VariantList = () => {
         // balancer will set to 3 - 1 = 2
         let balancer: number;
         const fetchData = async (balancer: number) => {
+            setLoading(true);
             // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
             const last_id =
                 rData.length > 0 ? (rData[rData.length - 1].id as number) : 0;
@@ -290,6 +292,7 @@ const VariantList = () => {
                 pageSize: pagination.pageSize * balancer,
                 lastId: last_id,
             });
+            setLoading(false);
             if (data) {
                 setData((rData) => [...rData, ...data]);
                 if (count) {
@@ -314,7 +317,6 @@ const VariantList = () => {
             ]);
             console.log('fetching again');
         }
-        console.log(rData);
         // eslint-disable-next-line
     }, [pagination, fetchedPage, rData]);
 
@@ -366,6 +368,7 @@ const VariantList = () => {
                     </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size='s' />
+                {isLoading ? <EuiProgress size='xs' color='primary' /> : null}
                 <EuiDataGrid
                     aria-label='Customer List'
                     trailingControlColumns={trailingControlColumns}

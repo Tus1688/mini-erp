@@ -10,6 +10,7 @@ import {
     EuiPageTemplate,
     EuiPopover,
     EuiPopoverTitle,
+    EuiProgress,
     EuiSpacer,
     EuiText,
     EuiTextColor,
@@ -49,6 +50,7 @@ const BatchList = () => {
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [variantCount, setVariantCount] = useState<number>(0);
     const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(false);
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const fetchBatch = async ({
         pageIndex,
@@ -82,7 +84,7 @@ const BatchList = () => {
             const data = await res.json();
             return data;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -124,7 +126,7 @@ const BatchList = () => {
             const data = await res.json();
             return data.count;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -318,6 +320,7 @@ const BatchList = () => {
         let balancer: number;
         const fetchData = async (balancer: number) => {
             // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
+            setLoading(true);
             const last_id =
                 rData.length > 0 ? (rData[rData.length - 1].id as number) : 0;
             const count = await fetchBatchCount();
@@ -326,14 +329,19 @@ const BatchList = () => {
                 pageSize: pagination.pageSize * balancer,
                 lastId: last_id,
             });
+            setLoading(false);
             if (data) {
                 // setData((rData) => [...rData, ...data]) and data.expired_date and data.created_at map it to local string
                 setData((rData) => [
                     ...rData,
                     ...data.map((d: any) => ({
                         ...d,
-                        expired_date: new Date(d.expired_date).toLocaleDateString('id-ID'),
-                        created_at: new Date(d.created_at).toLocaleString('id-ID'),
+                        expired_date: new Date(
+                            d.expired_date
+                        ).toLocaleDateString('id-ID'),
+                        created_at: new Date(d.created_at).toLocaleString(
+                            'id-ID'
+                        ),
                     })),
                 ]);
                 if (count) {
@@ -358,7 +366,6 @@ const BatchList = () => {
             ]);
             console.log('fetching again');
         }
-        console.log(rData);
         // eslint-disable-next-line
     }, [pagination, fetchedPage, rData]);
 
@@ -410,6 +417,7 @@ const BatchList = () => {
                     </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size='s' />
+                {isLoading ? <EuiProgress size='xs' color='primary' /> : null}
                 <EuiDataGrid
                     aria-label='Customer List'
                     trailingControlColumns={trailingControlColumns}

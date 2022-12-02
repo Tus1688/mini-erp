@@ -36,6 +36,7 @@ const UserList = () => {
     });
     const [selectedItems, setSelectedItems] = useState<Users>();
     const [editModalOpen, setEditModalOpen] = useState(false);
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const onTableChange = ({
         page,
@@ -185,13 +186,14 @@ const UserList = () => {
     ];
 
     useEffect(() => {
-        console.log('useEffect called');
+        console.log('fetching again');
+        setLoading(true);
         fetchUsers({
             location: location,
             navigate: navigate,
         }).then((data) => {
+            setLoading(false);
             setData(data);
-            console.log(data);
         });
     }, [location, navigate]);
 
@@ -229,10 +231,12 @@ const UserList = () => {
                                 iconType='refresh'
                                 onClick={() => {
                                     // refresh the data
+                                    setLoading(true);
                                     fetchUsers({
                                         location: location,
                                         navigate: navigate,
                                     }).then((data) => {
+                                        setLoading(false);
                                         setData(data);
                                         console.log(data);
                                     });
@@ -257,6 +261,7 @@ const UserList = () => {
                     }}
                     onChange={onTableChange}
                     noItemsMessage='No users found'
+                    loading={isLoading}
                 />
             </EuiPageTemplate.Section>
             {editModalOpen && (

@@ -10,6 +10,7 @@ import {
     EuiPageTemplate,
     EuiPopover,
     EuiPopoverTitle,
+    EuiProgress,
     EuiSpacer,
     EuiText,
     EuiTextColor,
@@ -64,7 +65,10 @@ const ProductionDraftList = () => {
     });
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [draftCount, setDraftCount] = useState<number>(0);
-    const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(createModal || false);
+    const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(
+        createModal || false
+    );
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const RowCellRender = (rowIndex: EuiDataGridCellValueElementProps) => {
         const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -230,6 +234,7 @@ const ProductionDraftList = () => {
     useEffect(() => {
         let balancer: number;
         const fetchData = async (balancer: number) => {
+            setLoading(true);
             const last_id =
                 rData.length > 0 ? (rData[rData.length - 1].id as number) : 0;
             const count = await fetchProductionDraftCount({
@@ -243,6 +248,7 @@ const ProductionDraftList = () => {
                 location: location,
                 navigate: navigate,
             });
+            setLoading(false);
             if (data) {
                 // setData((rData) => [...rData, ...data]);
                 setData(
@@ -253,9 +259,9 @@ const ProductionDraftList = () => {
                             created_at: new Date(
                                 item.created_at
                             ).toLocaleString('id-ID'),
-                        }
+                        };
                     })
-                )
+                );
                 if (count) {
                     setDraftCount(count);
                 }
@@ -275,7 +281,6 @@ const ProductionDraftList = () => {
             ]);
             console.log('fetching again');
         }
-        console.log(rData);
     }, [pagination, fetchedPage, rData, location, navigate]);
 
     return (
@@ -326,6 +331,7 @@ const ProductionDraftList = () => {
                     </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size='s' />
+                {isLoading ? <EuiProgress size='xs' color='primary' /> : null}
                 <EuiDataGrid
                     aria-label='Production Draft List'
                     columns={columns}

@@ -10,6 +10,7 @@ import {
     EuiPageTemplate,
     EuiPopover,
     EuiPopoverTitle,
+    EuiProgress,
     EuiSpacer,
     EuiText,
     EuiTextColor,
@@ -74,6 +75,7 @@ const SoDraftList = () => {
     const [fetchedPage, setFetchedPage] = useState<number[]>([]);
     const [soDraftCount, setSoDraftCount] = useState<number>(0);
     const [modalCreateOpen, setModalCreateOpen] = useState<boolean>(false);
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const fetchSODraft = async ({
         pageIndex,
@@ -107,7 +109,7 @@ const SoDraftList = () => {
             const data = await res.json();
             return data;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -263,7 +265,6 @@ const SoDraftList = () => {
                 )}
             </>
         );
- 
     };
 
     const trailingControlColumns: EuiDataGridControlColumn[] = [
@@ -335,6 +336,7 @@ const SoDraftList = () => {
         // balancer will set to 3 - 1 = 2
         let balancer: number;
         const fetchData = async (balancer: number) => {
+            setLoading(true);
             // const last_id is the last id of rData[rowIndex.rowIndex as number].id as number but if rData is empty then it is 0
             const last_id =
                 rData.length > 0 ? (rData[rData.length - 1].id as number) : 0;
@@ -347,6 +349,7 @@ const SoDraftList = () => {
                 pageSize: pagination.pageSize * balancer,
                 lastId: last_id,
             });
+            setLoading(false);
             if (data) {
                 setData((rData) => [
                     ...rData,
@@ -378,7 +381,6 @@ const SoDraftList = () => {
             ]);
             console.log('fetching again');
         }
-        console.log(rData);
         // eslint-disable-next-line
     }, [pagination, fetchedPage, rData]);
 
@@ -430,6 +432,7 @@ const SoDraftList = () => {
                     </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size='s' />
+                {isLoading ? <EuiProgress size='xs' color='primary' /> : null}
                 <EuiDataGrid
                     aria-label='Customer List'
                     trailingControlColumns={trailingControlColumns}
