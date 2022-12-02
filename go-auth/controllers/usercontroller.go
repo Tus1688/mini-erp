@@ -151,6 +151,7 @@ func Logout(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while logging out"})
 		return
 	}
+	c.SetSameSite(http.SameSiteStrictMode)
 	// send expired refresh_token, csrf_token, validate cookie to client to revoke prev cookies
 	c.SetCookie("refresh_token", "", -1, "/", os.Getenv("DOMAIN_NAME"), false, true)
 	c.SetCookie("csrf_token", "", -1, "/", os.Getenv("DOMAIN_NAME"), false, true)

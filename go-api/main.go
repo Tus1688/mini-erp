@@ -37,7 +37,7 @@ func loadEnv() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
-	router.Use(middlewares.SetCSP())
+	router.Use(middlewares.SetHeader())
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(middlewares.ValidateCsrf())
 	router.Use(middlewares.EnforceCsrf())
