@@ -1,4 +1,5 @@
 import {
+    EuiLoadingSpinner,
     EuiPanel,
     EuiSpacer,
     EuiText,
@@ -21,15 +22,18 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const BestEmployeePanel = () => {
     const [data, setData] = useState<ChartData<'doughnut', number[], string>>();
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     let location = useLocation();
     let navigate = useNavigate();
 
     useEffect(() => {
+        setLoading(true);
         fetchBestEmployeeMetrics({
             location: location,
             navigate: navigate,
         }).then((data) => {
+            setLoading(false);
             if (data) {
                 // map the array of data to the format that chartjs needs
                 const labels = data.map((item) => item.name);
@@ -70,7 +74,9 @@ const BestEmployeePanel = () => {
                     <h2>Best employees (30 days)</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
-                {data ? (
+                {isLoading ? (
+                    <EuiLoadingSpinner size='xl' />
+                ) : data ? (
                     <Doughnut data={data} />
                 ) : (
                     <>

@@ -1,5 +1,6 @@
 import {
     EuiButtonEmpty,
+    EuiLoadingSpinner,
     EuiPanel,
     EuiSpacer,
     EuiTextAlign,
@@ -11,14 +12,17 @@ import { fetchVariantCount } from '../../api/Variant';
 
 const TotalVariantPanel = () => {
     const [data, setData] = useState<number>(0);
+    const [isLoading, setLoading] = useState<boolean>(false);
     let location = useLocation();
     let navigate = useNavigate();
 
     useEffect(() => {
+        setLoading(true);
         fetchVariantCount({
             location: location,
             navigate: navigate,
         }).then((data) => {
+            setLoading(false);
             if (data) {
                 setData(data);
             }
@@ -31,15 +35,21 @@ const TotalVariantPanel = () => {
                     <h2>Total Variant</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
-                <EuiButtonEmpty
-                    onClick={() =>
-                        navigate('/variant-list', { state: { from: location } })
-                    }
-                >
-                    <EuiTitle size='m'>
-                        <h2>{data}</h2>
-                    </EuiTitle>
-                </EuiButtonEmpty>
+                {isLoading ? (
+                    <EuiLoadingSpinner size='xl' />
+                ) : (
+                    <EuiButtonEmpty
+                        onClick={() =>
+                            navigate('/variant-list', {
+                                state: { from: location },
+                            })
+                        }
+                    >
+                        <EuiTitle size='m'>
+                            <h2>{data}</h2>
+                        </EuiTitle>
+                    </EuiButtonEmpty>
+                )}
             </EuiTextAlign>
         </EuiPanel>
     );

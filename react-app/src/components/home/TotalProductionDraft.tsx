@@ -1,5 +1,6 @@
 import {
     EuiButtonEmpty,
+    EuiLoadingSpinner,
     EuiPanel,
     EuiSpacer,
     EuiTextAlign,
@@ -11,14 +12,17 @@ import { fetchProductionDraftCount } from '../../api/ProductionDraft';
 
 const TotalProductionDraftPanel = () => {
     const [data, setData] = useState<number>(0);
+    const [isLoading, setLoading] = useState<boolean>(false);
     let location = useLocation();
     let navigate = useNavigate();
 
     useEffect(() => {
+        setLoading(true);
         fetchProductionDraftCount({
             location: location,
             navigate: navigate,
         }).then((data) => {
+            setLoading(false);
             if (data) {
                 setData(data);
             }
@@ -31,17 +35,21 @@ const TotalProductionDraftPanel = () => {
                     <h2>Awaiting Production Approval</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
-                <EuiButtonEmpty
-                    onClick={() =>
-                        navigate('/production-draft', {
-                            state: { from: location },
-                        })
-                    }
-                >
-                    <EuiTitle size='m'>
-                        <h2>{data}</h2>
-                    </EuiTitle>
-                </EuiButtonEmpty>
+                {isLoading ? (
+                    <EuiLoadingSpinner size='xl' />
+                ) : (
+                    <EuiButtonEmpty
+                        onClick={() =>
+                            navigate('/production-draft', {
+                                state: { from: location },
+                            })
+                        }
+                    >
+                        <EuiTitle size='m'>
+                            <h2>{data}</h2>
+                        </EuiTitle>
+                    </EuiButtonEmpty>
+                )}
             </EuiTextAlign>
         </EuiPanel>
     );

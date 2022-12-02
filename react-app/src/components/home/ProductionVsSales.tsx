@@ -4,6 +4,7 @@ import {
     EuiTitle,
     EuiSpacer,
     EuiText,
+    EuiLoadingSpinner,
 } from '@elastic/eui';
 import {
     Chart as ChartJS,
@@ -33,15 +34,18 @@ ChartJS.register(
 
 const ProductionVsSales = () => {
     const [data, setData] = useState<ChartData<'line', number[], string>>();
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     let location = useLocation();
     let navigate = useNavigate();
 
     useEffect(() => {
+        setLoading(true);
         fetchProductionVsSalesMetrics({
             location: location,
             navigate: navigate,
         }).then((data) => {
+            setLoading(false);
             if (data) {
                 const labels = data.map((item) =>
                     new Date(item.date).toLocaleDateString('id-ID')
@@ -65,7 +69,7 @@ const ProductionVsSales = () => {
                             fill: false,
                             borderColor: 'rgb(53, 162, 235)',
                             backgroundColor: 'rgba(53, 162, 235, 0.5)',
-                            borderWidth: 1.5
+                            borderWidth: 1.5,
                         },
                     ],
                 });
@@ -80,7 +84,9 @@ const ProductionVsSales = () => {
                     <h2>Production vs Sales</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
-                {data ? (
+                {isLoading ? (
+                    <EuiLoadingSpinner size='xl' />
+                ) : data ? (
                     <Line data={data} />
                 ) : (
                     <>

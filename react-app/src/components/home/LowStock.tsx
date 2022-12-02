@@ -1,4 +1,6 @@
 import {
+    EuiLoadingChart,
+    EuiLoadingSpinner,
     EuiPanel,
     EuiSpacer,
     EuiText,
@@ -31,14 +33,17 @@ ChartJS.register(
 
 const LowStockPanel = () => {
     const [data, setData] = useState<ChartData<'bar', number[], string>>();
+    const [isLoading, setLoading] = useState<boolean>(false);
     let location = useLocation();
     let navigate = useNavigate();
 
     useEffect(() => {
+        setLoading(true);
         fetchStockLow({
             location: location,
             navigate: navigate,
         }).then((data) => {
+            setLoading(false);
             if (data) {
                 const labels = data.map((item) => item.variant_name);
                 const values = data.map((item) => item.quantity);
@@ -64,7 +69,9 @@ const LowStockPanel = () => {
                     <h2>Low Stock ({'<'}100pcs)</h2>
                 </EuiTitle>
                 <EuiSpacer size='l' />
-                {data ? (
+                {isLoading ? (
+                    <EuiLoadingSpinner size="xl" />
+                ) : data ? (
                     <Bar
                         // set height to fill parent container
                         height='300px'

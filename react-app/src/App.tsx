@@ -5,9 +5,7 @@ import {
     RouterProvider,
     useLocation,
 } from 'react-router-dom';
-import Root from './components/Root';
 import useTheme from './hooks/useTheme';
-import Login from './routes/Login';
 import useToken from './hooks/useToken';
 import React, { Suspense, useEffect, useState } from 'react';
 import { isAuthenticatedRequest } from './api/Authentication';
@@ -26,6 +24,8 @@ const SoDraftList = React.lazy(() => import('./routes/SODraftList'));
 const ProfileSettings = React.lazy(() => import('./routes/ProfileSettings'));
 const UserList = React.lazy(() => import('./routes/UserList'));
 const Home = React.lazy(() => import('./routes/Home'));
+const Root = React.lazy(() => import('./components/Root'));
+const Login = React.lazy(() => import('./routes/Login'));
 
 export default function App() {
     const { theme } = useTheme();
@@ -34,13 +34,19 @@ export default function App() {
     const router = createBrowserRouter([
         {
             path: '/login',
-            element: <Login setToken={setToken} />,
+            element: (
+                <Suspense fallback={<Loading />}>
+                    <Login setToken={setToken} />
+                </Suspense>
+            ),
         },
         {
             path: '/',
             element: (
                 <RequireAuth>
-                    <Root />
+                    <Suspense fallback={<Loading />}>
+                        <Root />
+                    </Suspense>
                 </RequireAuth>
             ),
             children: [
@@ -50,7 +56,7 @@ export default function App() {
                         <Suspense fallback={<Loading />}>
                             <Home />
                         </Suspense>
-                    )
+                    ),
                 },
                 {
                     path: '/customer-list',
@@ -122,7 +128,7 @@ export default function App() {
                         <Suspense fallback={<Loading />}>
                             <ProfileSettings />
                         </Suspense>
-                    )
+                    ),
                 },
                 {
                     path: '/users',
@@ -130,7 +136,7 @@ export default function App() {
                         <Suspense fallback={<Loading />}>
                             <UserList />
                         </Suspense>
-                    )
+                    ),
                 },
             ],
         },

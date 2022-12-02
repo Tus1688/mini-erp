@@ -1,4 +1,5 @@
 import {
+    EuiLoadingSpinner,
     EuiPanel,
     EuiSpacer,
     EuiText,
@@ -47,14 +48,17 @@ const WeeklyRevenuePanel = () => {
             },
         },
     };
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     let location = useLocation();
     let navigate = useNavigate();
     useEffect(() => {
+        setLoading(true);
         fetchWeeklyRevenue({
             location: location,
             navigate: navigate,
         }).then((data) => {
+            setLoading(false);
             if (data) {
                 const labels = data.map((item) =>
                     new Date(item.date).toLocaleDateString('id-ID')
@@ -68,7 +72,7 @@ const WeeklyRevenuePanel = () => {
                             data: data.map((item) => item.total),
                             borderColor: 'rgb(53, 162, 235)',
                             backgroundColor: 'rgba(53, 162, 235, 0.2)',
-                            borderWidth: 1.5
+                            borderWidth: 1.5,
                         },
                     ],
                 });
@@ -82,7 +86,9 @@ const WeeklyRevenuePanel = () => {
                     <h2>Weekly Revenue</h2>
                 </EuiTitle>
                 <EuiSpacer size='s' />
-                {data ? (
+                {isLoading ? (
+                    <EuiLoadingSpinner size='xl' />
+                ) : data ? (
                     <Line data={data} options={options} />
                 ) : (
                     <>
