@@ -1,5 +1,4 @@
 import {
-    EuiLoadingChart,
     EuiLoadingSpinner,
     EuiPanel,
     EuiSpacer,
