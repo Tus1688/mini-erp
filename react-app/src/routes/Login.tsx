@@ -105,6 +105,7 @@ const Login = ({ setToken }: { setToken: (userToken: string) => void }) => {
         sessionStorage.setItem('fin_a', token.fin_a.toString());
         sessionStorage.setItem('sys_a', token.sys_a.toString());
         sessionStorage.setItem('username', token.username);
+        sessionStorage.setItem('sideNavState', 'true')
         navigate(from, { replace: true });
     };
 

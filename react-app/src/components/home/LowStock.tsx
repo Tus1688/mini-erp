@@ -52,8 +52,8 @@ const LowStockPanel = () => {
                         {
                             label: 'Current Stock',
                             data: values,
-                            backgroundColor: ['rgba(54, 162, 235, 0.2)'],
-                            borderColor: ['rgba(54, 162, 235, 1)'],
+                            backgroundColor: 'rgba(54, 162, 239, 0.2)',
+                            borderColor: 'rgba(54, 162, 239, 1)',
                             borderWidth: 1,
                         },
                     ],

@@ -33,10 +33,6 @@ const Header = ({
     const { toggleLightMode, toggleDarkMode } = useTheme();
     const [isPopoverAvatarOpen, setPopoverAvatarOpen] = useState(false);
 
-    const onSettingButtonClick = () => {
-        setPopoverThemeOpen(!isPopoverThemeOpen);
-    };
-
     const closeSettingPopover = () => {
         setPopoverThemeOpen(false);
     };
@@ -51,27 +47,9 @@ const Header = ({
             iconType='gear'
             iconSize='m'
             color='text'
-            onClick={onSettingButtonClick}
+            onClick={() => setPopoverThemeOpen(!isPopoverThemeOpen)}
         />
     );
-
-    const toggleLightModeAndClose = () => {
-        closeSettingPopover();
-        toggleLightMode();
-        window.location.reload();
-    };
-
-    const toggleDarkModeAndClose = () => {
-        closeSettingPopover();
-        toggleDarkMode();
-        window.location.reload();
-    };
-
-    const toggleLogoutAndClose = async () => {
-        await logoutRequest();
-        closeAvatarPopover();
-        window.location.reload();
-    };
 
     const avatarButton = (
         <EuiButtonEmpty
@@ -86,11 +64,25 @@ const Header = ({
     );
 
     const settingItems = [
-        <EuiContextMenuItem key='light' onClick={toggleLightModeAndClose}>
+        <EuiContextMenuItem
+            key='light'
+            onClick={() => {
+                closeSettingPopover();
+                toggleLightMode();
+                window.location.reload();
+            }}
+        >
             <EuiIcon type='sun' style={{ marginRight: '1rem' }} />
             <EuiTextColor>Light</EuiTextColor>
         </EuiContextMenuItem>,
-        <EuiContextMenuItem key='dark' onClick={toggleDarkModeAndClose}>
+        <EuiContextMenuItem
+            key='dark'
+            onClick={() => {
+                closeSettingPopover();
+                toggleDarkMode();
+                window.location.reload();
+            }}
+        >
             <EuiIcon type='moon' style={{ marginRight: '1rem' }} />
             <EuiTextColor>Dark</EuiTextColor>
         </EuiContextMenuItem>,
@@ -107,7 +99,14 @@ const Header = ({
             <EuiIcon type='user' style={{ marginRight: '1rem' }} />
             <EuiTextColor>Profile Settings</EuiTextColor>
         </EuiContextMenuItem>,
-        <EuiContextMenuItem key='logout' onClick={toggleLogoutAndClose}>
+        <EuiContextMenuItem
+            key='logout'
+            onClick={() => {
+                logoutRequest();
+                closeAvatarPopover();
+                navigate('/login');
+            }}
+        >
             <EuiIcon type='exit' style={{ marginRight: '1rem' }} />
             <EuiTextColor>Logout</EuiTextColor>
         </EuiContextMenuItem>,
@@ -135,7 +134,7 @@ const Header = ({
             <EuiHeaderSection
                 grow={false}
                 style={{
-                    margin: '1rem 1.5rem',
+                    marginLeft: '1rem',
                 }}
             >
                 <EuiHeaderSectionItem>
@@ -144,16 +143,17 @@ const Header = ({
                         iconType='menu'
                         iconSize='m'
                         color='text'
-                        onClick={() => toggleSideNav(!sideNavState)}
+                        onClick={() => {
+                            toggleSideNav(!sideNavState);
+                            sessionStorage.setItem(
+                                'sideNavState',
+                                sideNavState ? 'false' : 'true'
+                            );
+                        }}
                     />
                 </EuiHeaderSectionItem>
             </EuiHeaderSection>
-            <EuiHeaderSection
-                grow={false}
-                style={{
-                    margin: '1rem 2rem',
-                }}
-            >
+            <EuiHeaderSection grow={false}>
                 <EuiHeaderSectionItem border='right'>
                     <EuiPopover
                         id='settings-popover'
@@ -224,11 +224,12 @@ const SideNavItem = () => {
     };
     return (
         <>
-            <EuiTitle size='xs'>
-                <h2>Bumbuventory</h2>
-            </EuiTitle>
+            <NavLink to='/'>
+                <EuiTitle size='xs'>
+                    <h2>Bumbuventory</h2>
+                </EuiTitle>
+            </NavLink>
             <EuiSpacer size='xl' />
-            <StyledNavLink url='/' label='Home' />
             <EuiAccordion
                 id='Customers'
                 buttonContent='Customer Management'
@@ -312,7 +313,9 @@ const SideNavItem = () => {
 };
 
 const Root = () => {
-    const [isSideNavOpen, setIsSideNavOpen] = useState(true);
+    const [isSideNavOpen, setIsSideNavOpen] = useState(
+        sessionStorage.getItem('sideNavState') === 'true'
+    );
 
     return (
         <>

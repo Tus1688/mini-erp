@@ -73,7 +73,7 @@ const Home = () => {
                     </EuiFlexItem>
 
                     <EuiFlexItem>
-                        <EuiFlexGroup wrap={true}>
+                        <EuiFlexGroup wrap={true} justifyContent='center'>
                             {inventoryUser ? (
                                 <EuiFlexItem
                                     grow={true}
