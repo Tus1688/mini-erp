@@ -46,7 +46,7 @@ func GetCustomer(c *gin.Context) {
 			Scan(&responseArr)
 
 		if responseArr == nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "No customer found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "No customer found, somebody might have deleted it"})
 			return
 		}
 
@@ -116,7 +116,7 @@ func UpdateCustomer(c *gin.Context) {
 	var check models.Customer
 	database.Instance.Model(&models.Customer{}).Where("id = ?", request.ID).First(&check)
 	if check.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Customer not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Customer not found, somebody might have deleted it"})
 		return
 	}
 	if check.Name == strings.ToLower(request.Name) && check.TaxID == request.TaxID &&
@@ -163,7 +163,7 @@ func DeleteCustomer(c *gin.Context) {
 		return
 	}
 	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Customer not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Customer not found, somebody might have deleted it"})
 		return
 	}
 

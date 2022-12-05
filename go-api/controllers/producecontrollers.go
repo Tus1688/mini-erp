@@ -150,7 +150,7 @@ func DeleteProductionDraft(c *gin.Context) {
 		return
 	}
 	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction log draft not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction log draft not found, somebody might have approved/deleted it"})
 		return
 	}
 
@@ -167,7 +167,7 @@ func ApproveProductionDraft(c *gin.Context) {
 	var draft models.ItemTransactionLogDraft
 	database.Instance.Model(&models.ItemTransactionLogDraft{}).Where("id = ?", request.ID).First(&draft)
 	if draft.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction log draft not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction log draft not found, somebody might have approved/deleted it"})
 		return
 	}
 	// delete those draft value

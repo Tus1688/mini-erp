@@ -28,7 +28,7 @@ func GetBatch(c *gin.Context) {
 			Where("b.id = ?", requestID.ID).Scan(&response)
 
 		if response.ID == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Batch not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "Batch not found, somebody might have deleted it"})
 			return
 		}
 		c.JSON(http.StatusOK, response)
@@ -107,7 +107,7 @@ func DeleteBatch(c *gin.Context) {
 		return
 	}
 	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Batch not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Batch not found, somebody might have deleted it"})
 		return
 	}
 
@@ -125,7 +125,7 @@ func UpdateBatch(c *gin.Context) {
 	var check models.Batch
 	database.Instance.Model(&models.Batch{}).Where("id = ?", request.ID).First(&check)
 	if check.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Batch not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Batch not found, somebody might have deleted it"})
 		return
 	}
 	if check.ExpiredDate == request.ExpiredDate {

@@ -26,7 +26,7 @@ func GetTOP(c *gin.Context) {
 		database.Instance.Model(&models.TermOfPayment{}).Where("id = ?", requestID.ID).
 			First(&response)
 		if response.ID == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error": "TOP not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "TOP not found, somebody might have deleted it"})
 			return
 		}
 		c.JSON(http.StatusOK, response)
@@ -102,7 +102,7 @@ func UpdateTOP(c *gin.Context) {
 	var check models.TermOfPayment
 	database.Instance.Model(&models.TermOfPayment{}).Where("id = ?", request.ID).First(&check)
 	if check.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "TOP not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "TOP not found, somebody might have deleted it"})
 		return
 	}
 	if request.Name == check.Name && request.DueDate == check.DueDate {
@@ -143,7 +143,7 @@ func DeleteTOP(c *gin.Context) {
 		return
 	}
 	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "TOP not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "TOP not found, somebody might have deleted it"})
 		return
 	}
 

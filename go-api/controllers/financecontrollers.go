@@ -171,7 +171,7 @@ func DeleteSalesInvoiceDraft(c *gin.Context) {
 	// delete from finance_item_transaction_log_drafts
 	fin_record := database.Instance.Where("invoice_draft_refer = ?", request.ID).Delete(&models.FinanceItemTransactionLogDraft{})
 	if fin_record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found, somebody might have approved/deleted it"})
 		return
 	}
 	if fin_record.Error != nil {
@@ -207,7 +207,7 @@ func ApproveSalesInvoiceDraft(c *gin.Context) {
 	var invoiceDraft models.InvoiceDraft
 	database.Instance.First(&invoiceDraft, request.ID)
 	if invoiceDraft.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found, somebody might have approved/deleted it"})
 		return
 	}
 
@@ -299,7 +299,7 @@ func GetSalesInvoiceDraft(c *gin.Context) {
 			group by 1;
 		`, requestID.ID).Scan(&invoiceDraft)
 		if invoiceDraft.ID == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found, somebody might have approved/deleted it"})
 			return
 		}
 
@@ -335,7 +335,7 @@ func GetSalesInvoiceDraft(c *gin.Context) {
 		`, "%"+strings.ToLower(requestSearch.Search)+"%").Scan(&invoiceDrafts)
 
 		if invoiceDrafts == nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "invoice draft not found, somebody might have approved/deleted it"})
 			return
 		}
 
@@ -389,7 +389,7 @@ func GetSalesInvoice(c *gin.Context) {
 			group by 1;
 		`, requestID.ID).Scan(&invoice)
 		if invoice.ID == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error": "invoice not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "invoice not found"}) // Sales invoice won't be deleted
 			return
 		}
 

@@ -28,7 +28,7 @@ func GetVariant(c *gin.Context) {
 			Where("variants.id = ?", requestID.ID).Scan(&response)
 
 		if response.ID == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error": "No variant found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "No variant found, somebody might have deleted it"})
 			return
 		}
 
@@ -111,7 +111,7 @@ func UpdateVariant(c *gin.Context) {
 	var check models.Variant
 	database.Instance.Model(&models.Variant{}).Where("id = ?", request.ID).First(&check)
 	if check.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Variant not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Variant not found, somebody might have deleted it"})
 		return
 	}
 	if check.Name == strings.ToLower(request.Name) && check.Description == strings.ToLower(request.Description) {
@@ -152,7 +152,7 @@ func DeleteVariant(c *gin.Context) {
 		return
 	}
 	if record.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Variant not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Variant not found, somebody might have deleted it"})
 		return
 	}
 
