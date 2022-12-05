@@ -193,6 +193,9 @@ const CustomerList = () => {
                     <CustomerModal
                         id={rData[rowIndex.rowIndex as number].id as number}
                         toggleModal={setIsModalOpen}
+                        setData={setData}
+                        setFetchedPage={setFetchedPage}
+                        setPagination={setPagination}
                     />
                 ) : null}
             </Fragment>
@@ -281,6 +284,9 @@ const CustomerList = () => {
                     <CustomerEditModal
                         toggleModal={setEditModalOpen}
                         id={rData[rowIndex.rowIndex as number].id as number}
+                        setFetchedPage={setFetchedPage}
+                        setPagination={setPagination}
+                        setData={setData}
                     />
                 ) : null}
             </div>

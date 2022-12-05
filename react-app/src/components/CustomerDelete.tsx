@@ -9,6 +9,7 @@ import {
     EuiModalHeaderTitle,
     EuiText,
 } from '@elastic/eui';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import useToast from '../hooks/useToast';
@@ -39,6 +40,8 @@ const CustomerDeleteModal = ({
 }) => {
     let location = useLocation();
     let navigate = useNavigate();
+    const [errorModal, setErrorModal] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
@@ -75,7 +78,13 @@ const CustomerDeleteModal = ({
             });
             return;
         }
-        if (res.status === 403 ) {
+        if (res.status === 404) {
+            let data = await res.json();
+            setErrorMessage(data.error);
+            setErrorModal(true);
+            return;
+        }
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -115,6 +124,12 @@ const CustomerDeleteModal = ({
                         </>
                     ),
                 });
+                return;
+            }
+            if (retry.status === 404) {
+                let data = await retry.json();
+                setErrorMessage(data.error);
+                setErrorModal(true);
                 return;
             }
             if (retry.status === 401 || retry.status === 403) {
@@ -157,6 +172,31 @@ const CustomerDeleteModal = ({
                 dismissToast={({ id }) => removeToast(id)}
                 toastLifeTimeMs={6000}
             />
+            {errorModal && (
+                <EuiModal onClose={() => setErrorModal(false)}>
+                    <EuiModalHeader>
+                        <EuiModalHeaderTitle>Error</EuiModalHeaderTitle>
+                    </EuiModalHeader>
+                    <EuiModalBody>{errorMessage}</EuiModalBody>
+                    <EuiModalFooter>
+                        <EuiButton
+                            onClick={() => {
+                                setErrorModal(false);
+                                toggleModal(false);
+                                setData([]);
+                                setFetchedPage([]);
+                                setPagination({
+                                    pageIndex: 0,
+                                    pageSize: 20,
+                                });
+                            }}
+                            color='danger'
+                        >
+                            I understand
+                        </EuiButton>
+                    </EuiModalFooter>
+                </EuiModal>
+            )}
         </EuiModal>
     );
 };

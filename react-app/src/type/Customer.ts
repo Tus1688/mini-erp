@@ -6,6 +6,7 @@ export type customerSpecific = {
     city_name: string;
     province_name: string;
     country_name: string;
+    error: string;
 };
 
 export type customerProps = {
