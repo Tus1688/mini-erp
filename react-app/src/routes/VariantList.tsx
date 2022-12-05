@@ -210,6 +210,9 @@ const VariantList = () => {
                     <VariantEditModal
                         toggleModal={setEditModalOpen}
                         id={rData[rowIndex.rowIndex as number].id as number}
+                        setFetchedPage={setFetchedPage}
+                        setPagination={setPagination}
+                        setData={setData}
                     />
                 )}
             </div>

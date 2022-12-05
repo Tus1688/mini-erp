@@ -8,6 +8,7 @@ import {
     EuiGlobalToastList,
     EuiModal,
     EuiModalBody,
+    EuiModalFooter,
     EuiModalHeader,
     EuiModalHeaderTitle,
     EuiSpacer,
@@ -20,14 +21,33 @@ import useToast from '../hooks/useToast';
 const VariantEditModal = ({
     id,
     toggleModal,
+    setFetchedPage,
+    setPagination,
+    setData, // from parent
 }: {
     id: number;
     toggleModal: (value: React.SetStateAction<boolean>) => void;
+    setFetchedPage: React.Dispatch<React.SetStateAction<number[]>>;
+    setPagination: React.Dispatch<
+        React.SetStateAction<{
+            pageIndex: number;
+            pageSize: number;
+        }>
+    >;
+    setData: React.Dispatch<
+        React.SetStateAction<
+            {
+                [key: string]: React.ReactNode;
+            }[]
+        >
+    >;
 }) => {
     let location = useLocation();
     let navigate = useNavigate();
     const [variantName, setVariantName] = useState<string>();
     const [description, setDescription] = useState<string>();
+    const [errorModal, setErrorModal] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
     useEffect(() => {
@@ -37,6 +57,11 @@ const VariantEditModal = ({
             location: location,
         }).then((data) => {
             if (data) {
+                if (data.error) {
+                    setErrorModal(true);
+                    setErrorMessage(data.error);
+                    return;
+                }
                 setVariantName(data.name);
                 setDescription(data.description);
             }
@@ -127,9 +152,33 @@ const VariantEditModal = ({
                 dismissToast={({ id }) => removeToast(id)}
                 toastLifeTimeMs={5000}
             />
+            {errorModal && (
+                <EuiModal onClose={() => setErrorModal(false)}>
+                    <EuiModalHeader>
+                        <EuiModalHeaderTitle>Error</EuiModalHeaderTitle>
+                    </EuiModalHeader>
+                    <EuiModalBody>{errorMessage}</EuiModalBody>
+                    <EuiModalFooter>
+                        <EuiButton
+                            onClick={() => {
+                                setErrorModal(false);
+                                toggleModal(false);
+                                setData([]);
+                                setFetchedPage([]);
+                                setPagination({
+                                    pageIndex: 0,
+                                    pageSize: 20,
+                                });
+                            }}
+                            color='danger'
+                        >
+                            I understand
+                        </EuiButton>
+                    </EuiModalFooter>
+                </EuiModal>
+            )}
         </EuiModal>
     );
 };
-
 
 export default VariantEditModal;

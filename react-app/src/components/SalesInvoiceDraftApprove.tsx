@@ -9,6 +9,7 @@ import {
     EuiModalHeaderTitle,
     EuiText,
 } from '@elastic/eui';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
 import useToast from '../hooks/useToast';
@@ -39,6 +40,8 @@ const SalesInvoiceDraftApprove = ({
 }) => {
     let location = useLocation();
     let navigate = useNavigate();
+    const [errorModal, setErrorModal] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
 
@@ -54,16 +57,8 @@ const SalesInvoiceDraftApprove = ({
         if (res.status === 404) {
             let data = await res.json();
 
-            addToast({
-                id: getNewId(),
-                title: 'Error',
-                color: 'danger',
-                text: (
-                    <>
-                        <p>{data.error}<br /> Somebody must have delete/approve it</p>
-                    </>
-                )
-            })
+            setErrorMessage(data.error);
+            setErrorModal(true);
         }
         if (res.status === 500) {
             let data = await res.json();
@@ -132,16 +127,8 @@ const SalesInvoiceDraftApprove = ({
             if (retry.status === 404) {
                 let data = await retry.json();
 
-                addToast({
-                    id: getNewId(),
-                    title: 'Error',
-                    color: 'danger',
-                    text: (
-                        <>
-                            <p>{data.error}<br /> Somebody must have delete/approve it</p>
-                        </>
-                    )
-                })
+                setErrorMessage(data.error);
+                setErrorModal(true);
             }
             if (retry.status === 401 || retry.status === 403) {
                 navigate('/login', { state: { from: location } });
@@ -174,6 +161,31 @@ const SalesInvoiceDraftApprove = ({
                     Yes, approve
                 </EuiButton>
             </EuiModalFooter>
+            {errorModal && (
+                <EuiModal onClose={() => setErrorModal(false)}>
+                    <EuiModalHeader>
+                        <EuiModalHeaderTitle>Error</EuiModalHeaderTitle>
+                    </EuiModalHeader>
+                    <EuiModalBody>{errorMessage}</EuiModalBody>
+                    <EuiModalFooter>
+                        <EuiButton
+                            onClick={() => {
+                                setErrorModal(false);
+                                toggleModal(false);
+                                setData([]);
+                                setFetchedPage([]);
+                                setPagination({
+                                    pageIndex: 0,
+                                    pageSize: 20,
+                                });
+                            }}
+                            color='danger'
+                        >
+                            I understand
+                        </EuiButton>
+                    </EuiModalFooter>
+                </EuiModal>
+            )}
             <EuiGlobalToastList
                 toasts={getAllToasts()}
                 dismissToast={({ id }) => removeToast(id)}

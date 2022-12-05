@@ -76,7 +76,7 @@ export const fetchTOPSpecific = async ({
             Authorization: sessionStorage.getItem('token') || '',
         },
     });
-    if (res.status === 200) {
+    if (res.status === 200 || res.status === 404) {
         const data = await res.json();
         return data;
     }
@@ -97,7 +97,7 @@ export const fetchTOPSpecific = async ({
                 Authorization: sessionStorage.getItem('token') || '',
             },
         });
-        if (retry.status === 200) {
+        if (retry.status === 200 || retry.status === 404) {
             const data = await retry.json();
             return data;
         }

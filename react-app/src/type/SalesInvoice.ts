@@ -16,6 +16,7 @@ export type salesInvoiceSpecific = {
     created_by: string;
     total: number;
     items: itemsProps[];
+    error: string;
 };
 
 // for creating new sales invoice (EuiBasicTable)

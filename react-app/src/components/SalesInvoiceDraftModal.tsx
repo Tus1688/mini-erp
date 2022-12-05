@@ -81,16 +81,25 @@ const SalesInvoiceDraftModal = ({
     const [data, setChildData] = useState<salesInvoiceSpecific>();
     const [items, setItems] = useState<Array<{ [key: string]: ReactNode }>>([]); // accountable for items in table
     const [approveModal, setApproveModal] = useState<boolean>(false);
+    const [errorModal, setErrorModal] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        console.log('here');
+        setLoading(true);
         fetchSalesInvoiceSpecific({
             id: id,
             navigate: navigate,
             location: location,
             draft: true,
         }).then((data) => {
+            setLoading(false);
             if (data) {
+                if (data.error) {
+                    setErrorMessage(data.error);
+                    setErrorModal(true);
+                    return;
+                }
                 setChildData(data);
                 setItems(
                     data.items.map((item) => {
@@ -118,45 +127,55 @@ const SalesInvoiceDraftModal = ({
             </EuiModalHeader>
             <EuiModalBody>
                 <EuiFlexGroup direction='row'>
-                    <EuiFlexItem>
-                        <FlyoutDescriptionList
-                            title='ID'
-                            description={data?.id}
-                        />
-                        <FlyoutDescriptionList
-                            title='Custome Name'
-                            description={data?.customer_name}
-                        />
-                        <FlyoutDescriptionList
-                            title='Term Of Payment'
-                            description={data?.top_name}
-                        />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                        <FlyoutDescriptionList
-                            title='Date'
-                            description={new Date(
-                                data?.date || ''
-                            ).toLocaleDateString('id-ID')}
-                        />
-                        <FlyoutDescriptionList
-                            title='Created By'
-                            description={data?.created_by}
-                        />
-                        <FlyoutDescriptionList
-                            title='Total'
-                            description={
-                                'Rp. ' + data?.total?.toLocaleString('id-ID')
-                            }
-                        />
-                    </EuiFlexItem>
+                    {data ? (
+                        <>
+                            <EuiFlexItem>
+                                <FlyoutDescriptionList
+                                    title='ID'
+                                    description={data.id}
+                                />
+                                <FlyoutDescriptionList
+                                    title='Custome Name'
+                                    description={data.customer_name}
+                                />
+                                <FlyoutDescriptionList
+                                    title='Term Of Payment'
+                                    description={data.top_name}
+                                />
+                            </EuiFlexItem>
+                            <EuiFlexItem>
+                                <FlyoutDescriptionList
+                                    title='Date'
+                                    description={new Date(
+                                        data.date || ''
+                                    ).toLocaleDateString('id-ID')}
+                                />
+                                <FlyoutDescriptionList
+                                    title='Created By'
+                                    description={data.created_by}
+                                />
+                                <FlyoutDescriptionList
+                                    title='Total'
+                                    description={
+                                        'Rp. ' +
+                                        data.total.toLocaleString('id-ID')
+                                    }
+                                />
+                            </EuiFlexItem>
+                        </>
+                    ) : null}
                 </EuiFlexGroup>
                 <EuiSpacer size='xl' />
-                <EuiBasicTable items={items} columns={columns} />
+                <EuiBasicTable items={items} columns={columns} loading={isLoading} />
             </EuiModalBody>
             <EuiModalFooter>
-                <EuiButtonEmpty onClick={() => toggleModal(false)}>Close</EuiButtonEmpty>
-                <EuiButton color='success' onClick={() => setApproveModal(!approveModal)}>
+                <EuiButtonEmpty onClick={() => toggleModal(false)}>
+                    Close
+                </EuiButtonEmpty>
+                <EuiButton
+                    color='success'
+                    onClick={() => setApproveModal(!approveModal)}
+                >
                     Approve
                 </EuiButton>
             </EuiModalFooter>
@@ -168,6 +187,31 @@ const SalesInvoiceDraftModal = ({
                     setPagination={setPagination}
                     setData={setData}
                 />
+            )}
+            {errorModal && (
+                <EuiModal onClose={() => setErrorModal(false)}>
+                    <EuiModalHeader>
+                        <EuiModalHeaderTitle>Error</EuiModalHeaderTitle>
+                    </EuiModalHeader>
+                    <EuiModalBody>{errorMessage}</EuiModalBody>
+                    <EuiModalFooter>
+                        <EuiButton
+                            onClick={() => {
+                                setErrorModal(false);
+                                toggleModal(false);
+                                setData([]);
+                                setFetchedPage([]);
+                                setPagination({
+                                    pageIndex: 0,
+                                    pageSize: 20,
+                                });
+                            }}
+                            color='danger'
+                        >
+                            I understand
+                        </EuiButton>
+                    </EuiModalFooter>
+                </EuiModal>
             )}
         </EuiModal>
     );

@@ -1,4 +1,18 @@
-import { EuiButton, EuiButtonEmpty, EuiDatePicker, EuiFlexGroup, EuiForm, EuiFormRow, EuiGlobalToastList, EuiModal, EuiModalBody, EuiModalHeader, EuiModalHeaderTitle, EuiSpacer } from '@elastic/eui';
+import {
+    EuiButton,
+    EuiButtonEmpty,
+    EuiDatePicker,
+    EuiFlexGroup,
+    EuiForm,
+    EuiFormRow,
+    EuiGlobalToastList,
+    EuiModal,
+    EuiModalBody,
+    EuiModalFooter,
+    EuiModalHeader,
+    EuiModalHeaderTitle,
+    EuiSpacer,
+} from '@elastic/eui';
 import moment from 'moment';
 import { Moment } from 'moment';
 import { useEffect, useState } from 'react';
@@ -9,13 +23,32 @@ import useToast from '../hooks/useToast';
 const BatchEditModal = ({
     id,
     toggleModal,
+    setFetchedPage,
+    setPagination,
+    setData, // from parent
 }: {
     id: number;
     toggleModal: (value: React.SetStateAction<boolean>) => void;
+    setFetchedPage: React.Dispatch<React.SetStateAction<number[]>>;
+    setPagination: React.Dispatch<
+        React.SetStateAction<{
+            pageIndex: number;
+            pageSize: number;
+        }>
+    >;
+    setData: React.Dispatch<
+        React.SetStateAction<
+            {
+                [key: string]: React.ReactNode;
+            }[]
+        >
+    >;
 }) => {
     let location = useLocation();
     let navigate = useNavigate();
     const [batchExpired, setBatchExpired] = useState<Moment | null>();
+    const [errorModal, setErrorModal] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
     const { addToast, getAllToasts, removeToast, getNewId } = useToast();
     useEffect(() => {
@@ -25,9 +58,14 @@ const BatchEditModal = ({
             location: location,
         }).then((data) => {
             if (data) {
-                let rawTZ:string = data.expired_date;
+                if (data.error) {
+                    setErrorModal(true);
+                    setErrorMessage(data.error);
+                    return;
+                }
+                let rawTZ: string = data.expired_date;
                 // utc offset is +7 (ASIA/JAKARTA)
-                let dt:Moment = moment(rawTZ).utcOffset(7);
+                let dt: Moment = moment(rawTZ).utcOffset(7);
                 setBatchExpired(dt);
             }
         });
@@ -35,7 +73,7 @@ const BatchEditModal = ({
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        let dtString:string = batchExpired?.toISOString() || '';
+        let dtString: string = batchExpired?.toISOString() || '';
         await patchBatch({
             id: id,
             expiredDate: dtString,
@@ -68,8 +106,8 @@ const BatchEditModal = ({
                 });
                 return;
             }
-        })
-    }
+        });
+    };
 
     return (
         <EuiModal onClose={() => toggleModal(false)}>
@@ -110,6 +148,31 @@ const BatchEditModal = ({
                 dismissToast={({ id }) => removeToast(id)}
                 toastLifeTimeMs={5000}
             />
+            {errorModal && (
+                <EuiModal onClose={() => setErrorModal(false)}>
+                    <EuiModalHeader>
+                        <EuiModalHeaderTitle>Error</EuiModalHeaderTitle>
+                    </EuiModalHeader>
+                    <EuiModalBody>{errorMessage}</EuiModalBody>
+                    <EuiModalFooter>
+                        <EuiButton
+                            onClick={() => {
+                                setErrorModal(false);
+                                toggleModal(false);
+                                setData([]);
+                                setFetchedPage([]);
+                                setPagination({
+                                    pageIndex: 0,
+                                    pageSize: 20,
+                                });
+                            }}
+                            color='danger'
+                        >
+                            I understand
+                        </EuiButton>
+                    </EuiModalFooter>
+                </EuiModal>
+            )}
         </EuiModal>
     );
 };

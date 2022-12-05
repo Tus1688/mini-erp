@@ -1,7 +1,6 @@
 import {
     EuiButton,
     EuiButtonEmpty,
-    EuiGlobalToastList,
     EuiModal,
     EuiModalBody,
     EuiModalFooter,
@@ -9,9 +8,9 @@ import {
     EuiModalHeaderTitle,
     EuiText,
 } from '@elastic/eui';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getRefreshToken } from '../api/Authentication';
-import useToast from '../hooks/useToast';
 
 const ProductionDraftDelete = ({
     id,
@@ -39,8 +38,8 @@ const ProductionDraftDelete = ({
 }) => {
     let location = useLocation();
     let navigate = useNavigate();
-
-    const { addToast, getAllToasts, removeToast, getNewId } = useToast();
+    const [errorModal, setErrorModal] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
     const deleteProductionDraft = async (id: number) => {
         let baseUrl = `/api/v1/inventory/production?id=${id}`;
@@ -54,16 +53,8 @@ const ProductionDraftDelete = ({
         if (res.status === 404) {
             let data = await res.json();
 
-            addToast({
-                id: getNewId(),
-                title: 'Error',
-                color: 'danger',
-                text: (
-                    <>
-                        <p>{data.error}<br /> Somebody must have delete/approve it</p>
-                    </>
-                )
-            })
+            setErrorMessage(data.error);
+            setErrorModal(true);
         }
         if (res.status === 200) {
             toggleModal(false);
@@ -75,7 +66,7 @@ const ProductionDraftDelete = ({
             });
             return;
         }
-        if (res.status === 403 ) {
+        if (res.status === 403) {
             navigate('/login', { state: { from: location } });
             return;
         }
@@ -104,17 +95,8 @@ const ProductionDraftDelete = ({
             }
             if (retry.status === 404) {
                 let data = await res.json();
-
-                addToast({
-                    id: getNewId(),
-                    title: 'Error',
-                    color: 'danger',
-                    text: (
-                        <>
-                            <p>{data.error}<br /> Somebody must have delete/approve it</p>
-                        </>
-                    )
-                })
+                setErrorMessage(data.error);
+                setErrorModal(true);
             }
             if (retry.status === 401 || retry.status === 403) {
                 navigate('/login', { state: { from: location } });
@@ -143,15 +125,39 @@ const ProductionDraftDelete = ({
                 <EuiButtonEmpty onClick={() => toggleModal(false)}>
                     Cancel
                 </EuiButtonEmpty>
-                <EuiButton onClick={() => deleteProductionDraft(id)} fill color='danger'>
+                <EuiButton
+                    onClick={() => deleteProductionDraft(id)}
+                    fill
+                    color='danger'
+                >
                     Yes, delete it!
                 </EuiButton>
             </EuiModalFooter>
-            <EuiGlobalToastList
-                toasts={getAllToasts()}
-                dismissToast={({ id }) => removeToast(id)}
-                toastLifeTimeMs={6000}
-            />
+            {errorModal && (
+                <EuiModal onClose={() => setErrorModal(false)}>
+                    <EuiModalHeader>
+                        <EuiModalHeaderTitle>Error</EuiModalHeaderTitle>
+                    </EuiModalHeader>
+                    <EuiModalBody>{errorMessage}</EuiModalBody>
+                    <EuiModalFooter>
+                        <EuiButton
+                            onClick={() => {
+                                setErrorModal(false);
+                                toggleModal(false);
+                                setData([]);
+                                setFetchedPage([]);
+                                setPagination({
+                                    pageIndex: 0,
+                                    pageSize: 20,
+                                });
+                            }}
+                            color='danger'
+                        >
+                            I understand
+                        </EuiButton>
+                    </EuiModalFooter>
+                </EuiModal>
+            )}
         </EuiModal>
     );
 };
