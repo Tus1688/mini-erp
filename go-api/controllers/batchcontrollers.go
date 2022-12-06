@@ -96,6 +96,7 @@ func CreateBatch(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Batch created successfully"})
+	database.Rdb.Incr(database.Rdb.Context(), "batch_count")
 }
 
 func DeleteBatch(c *gin.Context) {
@@ -120,6 +121,7 @@ func DeleteBatch(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Batch deleted successfully"})
+	database.Rdb.Decr(database.Rdb.Context(), "batch_count")
 }
 
 func UpdateBatch(c *gin.Context) {

@@ -9,13 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetStockCount(c *gin.Context) {
-	var count int64
-	database.Instance.Raw("select count(*) as count from ( select sum(quantity) from item_transaction_logs group by variant_refer, batch_refer ) d1;").
-		Scan(&count)
-	c.JSON(http.StatusOK, gin.H{"count": count})
-}
-
 func GetStock(c *gin.Context) {
 	var responseArr []models.APIInventoryStockReponse
 	var requestSearch models.APICommonSearch

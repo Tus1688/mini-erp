@@ -107,6 +107,7 @@ func CreateVariant(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Variant created successfully"})
+	database.Rdb.Incr(database.Rdb.Context(), "variant_count")
 }
 
 func UpdateVariant(c *gin.Context) {
@@ -165,4 +166,5 @@ func DeleteVariant(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Variant deleted successfully"})
+	database.Rdb.Decr(database.Rdb.Context(), "variant_count")
 }

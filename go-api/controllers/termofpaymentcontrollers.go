@@ -98,6 +98,7 @@ func CreateTOP(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "TOP created"})
+	database.Rdb.Incr(database.Rdb.Context(), "term_of_payment_count")
 }
 
 func UpdateTOP(c *gin.Context) {
@@ -156,4 +157,5 @@ func DeleteTOP(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "TOP deleted successfully"})
+	database.Rdb.Decr(database.Rdb.Context(), "term_of_payment_count")
 }

@@ -48,6 +48,7 @@ func CreateProductionDraft(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "successfully inserted item and stock logs to Draft"})
+	database.Rdb.Incr(database.Rdb.Context(), "production_draft_count")
 }
 
 func GetProductionDraft(c *gin.Context) {
@@ -163,6 +164,7 @@ func DeleteProductionDraft(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "successfully deleted item and stock logs in draft"})
+	database.Rdb.Decr(database.Rdb.Context(), "production_draft_count")
 }
 
 func ApproveProductionDraft(c *gin.Context) {
@@ -189,4 +191,6 @@ func ApproveProductionDraft(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "successfully approved item and stock logs"})
+	// only decr production draft count as we don't track inventory row
+	database.Rdb.Decr(database.Rdb.Context(), "production_draft_count")
 }

@@ -112,6 +112,7 @@ func CreateCustomer(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Customer created successfully"})
+	database.Rdb.Incr(database.Rdb.Context(), "customer_count")
 }
 
 func UpdateCustomer(c *gin.Context) {
@@ -176,4 +177,5 @@ func DeleteCustomer(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Customer deleted successfully"})
+	database.Rdb.Decr(database.Rdb.Context(), "customer_count")
 }

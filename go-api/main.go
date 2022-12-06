@@ -73,9 +73,6 @@ func initRouter() *gin.Engine {
 			inv.GET("/variant", controllers.GetVariant)
 			inv.POST("/variant", controllers.CreateVariant)
 
-			// real table
-			inv.GET("/stock-count", controllers.GetStockCount)
-
 			// draft table
 			inv.GET("/production-count", controllers.GetProductionDraftCount)
 			inv.GET("/production", controllers.GetProductionDraft)     // get item transaction log draft

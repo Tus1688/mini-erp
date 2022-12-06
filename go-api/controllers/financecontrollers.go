@@ -173,6 +173,7 @@ func CreateSalesInvoiceDraft(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "successfully created invoice"})
+	database.Rdb.Incr(database.Rdb.Context(), "sales_invoice_draft_count")
 }
 
 func DeleteSalesInvoiceDraft(c *gin.Context) {
@@ -208,6 +209,7 @@ func DeleteSalesInvoiceDraft(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "successfully deleted invoice"})
+	database.Rdb.Decr(database.Rdb.Context(), "sales_invoice_draft_count")
 }
 
 func ApproveSalesInvoiceDraft(c *gin.Context) {
@@ -294,6 +296,10 @@ func ApproveSalesInvoiceDraft(c *gin.Context) {
 	database.Instance.Where("invoice_draft_refer = ?", request.ID).Delete(&models.InvoiceItemDraft{})
 	// delete from invoice_drafts
 	database.Instance.Delete(&models.InvoiceDraft{}, request.ID)
+	// incr sales_invoice_count
+	database.Rdb.Incr(database.Rdb.Context(), "sales_invoice_count")
+	// decr sales_invoice_draft_count
+	database.Rdb.Decr(database.Rdb.Context(), "sales_invoice_draft_count")
 }
 
 func GetSalesInvoiceDraft(c *gin.Context) {
