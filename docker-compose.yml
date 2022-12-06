@@ -52,10 +52,21 @@ services:
     networks:
       - redis-auth
   
+  redismain:
+    image: redis:alpine
+    container_name: redis_main
+    restart: always
+    networks:
+      - redis-main
+
   go-api:
     build: ./go-api
     depends_on:
       - mysqlmain
+      - redismain
+    deploy:
+      mode: replicated
+      replicas: 2
     environment:
       GIN_MODE: release
       DB_HOST: mysqlmain
@@ -63,11 +74,15 @@ services:
       DB_USER: root
       DB_PASSWORD: ${DB_PASSWORD_MAIN}
       DB_NAME: ${DB_NAME_MAIN}
+      REDIS_HOST: redismain
+      REDIS_PASSWORD: ${REDISMAIN_PASSWORD}
+      REDIS_PORT: ${REDISMAIN_PORT}
       JWT_KEY: ${JWT_KEY}
     restart: always
     networks:
       - mysql-main
       - proxy
+      - redis-main
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.go-api.rule=Host(`${TRAEFIK_DOMAIN}`) && PathPrefix(`/api/v1`)"
@@ -88,8 +103,8 @@ services:
       DB_NAME: ${DB_NAME_AUTH}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       REDIS_HOST: redisauth
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDISAUTH_PASSWORD}
+      REDIS_PORT: ${REDISAUTH_PORT}
       JWT_KEY: ${JWT_KEY}
     restart: always
     networks:
@@ -121,6 +136,7 @@ networks:
   mysql-auth:
   mysql-main:
   redis-auth:
+  redis-main:
 
 volumes:
   mysql-auth:
