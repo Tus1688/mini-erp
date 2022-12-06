@@ -4,15 +4,23 @@ import (
 	"go-api/database"
 	"go-api/models"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetCustomerCount(c *gin.Context) {
-	var count int64
-	database.Instance.Table("customers").Count(&count)
-	c.JSON(http.StatusOK, gin.H{"count": count})
+	redisValue, redisErr := database.Rdb.Get(database.Rdb.Context(), "customer_count").Result()
+	if redisErr != nil {
+		var count int64
+		database.Instance.Table("customers").Count(&count)
+		c.JSON(http.StatusOK, gin.H{"count": count})
+		database.Rdb.Set(database.Rdb.Context(), "customer_count", count, 0)
+		return
+	}
+	redisValueInt, _ := strconv.Atoi(redisValue)
+	c.JSON(http.StatusOK, gin.H{"count": redisValueInt})
 }
 
 func GetCustomer(c *gin.Context) {

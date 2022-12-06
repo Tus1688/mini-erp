@@ -4,6 +4,7 @@ import (
 	"go-api/database"
 	"go-api/models"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -17,9 +18,16 @@ choose quantity
 */
 
 func GetProductionDraftCount(c *gin.Context) {
-	var count int64
-	database.Instance.Model(&models.ItemTransactionLogDraft{}).Count(&count)
-	c.JSON(http.StatusOK, gin.H{"count": count})
+	redisValue, redisErr := database.Rdb.Get(database.Rdb.Context(), "production_draft_count").Result()
+	if redisErr != nil {
+		var count int64
+		database.Instance.Model(&models.ItemTransactionLogDraft{}).Count(&count)
+		c.JSON(http.StatusOK, gin.H{"count": count})
+		database.Rdb.Set(database.Rdb.Context(), "production_draft_count", count, 0)
+		return
+	}
+	redisValueInt, _ := strconv.Atoi(redisValue)
+	c.JSON(http.StatusOK, gin.H{"count": redisValueInt})
 }
 
 func CreateProductionDraft(c *gin.Context) {

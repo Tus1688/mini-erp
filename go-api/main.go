@@ -2,6 +2,7 @@ package main
 
 import (
 	"go-api/auth"
+	"go-api/cache"
 	"go-api/controllers"
 	"go-api/database"
 	"go-api/middlewares"
@@ -18,6 +19,9 @@ func main() {
 	loadEnv()
 	database.MysqlConnect()
 	models.MigrateDB()
+
+	database.RedisConnect()
+	cache.CountAllRows()
 
 	router := initRouter()
 	router.Run(":6000")
@@ -70,8 +74,6 @@ func initRouter() *gin.Engine {
 			inv.POST("/variant", controllers.CreateVariant)
 
 			// real table
-			inv.GET("/item-transaction-log-count", controllers.GetItemTransactionLogCount)
-			inv.GET("/item-transaction-log", controllers.GetItemTransactionLogs) // transaction logs whether it's production or sales
 			inv.GET("/stock-count", controllers.GetStockCount)
 
 			// draft table

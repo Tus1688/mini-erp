@@ -20,15 +20,29 @@ type helperSelectStock struct {
 }
 
 func GetSalesInvoiceDraftCount(c *gin.Context) {
-	var count int64
-	database.Instance.Model(&models.InvoiceDraft{}).Count(&count)
-	c.JSON(http.StatusOK, gin.H{"count": count})
+	redisValue, redisErr := database.Rdb.Get(database.Rdb.Context(), "sales_invoice_draft_count").Result()
+	if redisErr != nil {
+		var count int64
+		database.Instance.Model(&models.InvoiceDraft{}).Count(&count)
+		c.JSON(http.StatusOK, gin.H{"count": count})
+		database.Rdb.Set(database.Rdb.Context(), "sales_invoice_draft_count", count, 0)
+		return
+	}
+	redisValueInt, _ := strconv.Atoi(redisValue)
+	c.JSON(http.StatusOK, gin.H{"count": redisValueInt})
 }
 
 func GetSalesInvoiceCount(c *gin.Context) {
-	var count int64
-	database.Instance.Model(&models.Invoice{}).Count(&count)
-	c.JSON(http.StatusOK, gin.H{"count": count})
+	redisValue, redisErr := database.Rdb.Get(database.Rdb.Context(), "sales_invoice_count").Result()
+	if redisErr != nil {
+		var count int64
+		database.Instance.Model(&models.Invoice{}).Count(&count)
+		c.JSON(http.StatusOK, gin.H{"count": count})
+		database.Rdb.Set(database.Rdb.Context(), "sales_invoice_count", count, 0)
+		return
+	}
+	redisValueInt, _ := strconv.Atoi(redisValue)
+	c.JSON(http.StatusOK, gin.H{"count": redisValueInt})
 }
 
 func CreateSalesInvoiceDraft(c *gin.Context) {
