@@ -2,6 +2,7 @@ package models
 
 import (
 	"go-api/database"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -14,6 +15,7 @@ type Customer struct {
 	CityName     string `gorm:"type:varchar(50);not null"`
 	ProvinceName string `gorm:"type:varchar(50);not null"`
 	CountryName  string `gorm:"type:varchar(50);not null"`
+	UpdatedAt    time.Time
 }
 
 type APICustomerCreate struct {
