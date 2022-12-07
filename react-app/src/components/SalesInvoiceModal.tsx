@@ -63,15 +63,17 @@ const SalesInvoiceModal = ({
     let navigate = useNavigate();
     const [data, setData] = useState<salesInvoiceSpecific>();
     const [items, setItems] = useState<Array<{ [key: string]: ReactNode }>>([]); // accountable for items in table
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        console.log('here');
+        setLoading(true);
         fetchSalesInvoiceSpecific({
             id: id,
             navigate: navigate,
             location: location,
             draft: false,
         }).then((data) => {
+            setLoading(false);
             if (data) {
                 setData(data);
                 setItems(
@@ -100,53 +102,64 @@ const SalesInvoiceModal = ({
             </EuiModalHeader>
             <EuiModalBody>
                 <EuiFlexGroup direction='row'>
-                    <EuiFlexItem>
-                        <FlyoutDescriptionList
-                            title='ID'
-                            description={data?.id}
-                        />
-                        <FlyoutDescriptionList
-                            title='Custome Name'
-                            description={data?.customer_name}
-                        />
-                        <FlyoutDescriptionList
-                            title='Term Of Payment'
-                            description={data?.top_name}
-                        />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                        <FlyoutDescriptionList
-                            title='Date'
-                            description={new Date(
-                                data?.date || ''
-                            ).toLocaleDateString('id-ID')}
-                        />
-                        <FlyoutDescriptionList
-                            title='Created By'
-                            description={data?.created_by}
-                        />
-                        <FlyoutDescriptionList
-                            title='Total'
-                            description={
-                                'Rp. ' + data?.total?.toLocaleString('id-ID')
-                            }
-                        />
-                    </EuiFlexItem>
+                    {data ? (
+                        <>
+                            <EuiFlexItem>
+                                <FlyoutDescriptionList
+                                    title='ID'
+                                    description={data.id}
+                                />
+                                <FlyoutDescriptionList
+                                    title='Custome Name'
+                                    description={data.customer_name}
+                                />
+                                <FlyoutDescriptionList
+                                    title='Term Of Payment'
+                                    description={data.top_name}
+                                />
+                            </EuiFlexItem>
+                            <EuiFlexItem>
+                                <FlyoutDescriptionList
+                                    title='Date'
+                                    description={new Date(
+                                        data.date || ''
+                                    ).toLocaleDateString('id-ID')}
+                                />
+                                <FlyoutDescriptionList
+                                    title='Created By'
+                                    description={data.created_by}
+                                />
+                                <FlyoutDescriptionList
+                                    title='Total'
+                                    description={
+                                        'Rp. ' +
+                                        data.total.toLocaleString('id-ID')
+                                    }
+                                />
+                            </EuiFlexItem>
+                        </>
+                    ) : null}
                 </EuiFlexGroup>
                 <EuiSpacer size='xl' />
-                <EuiBasicTable items={items} columns={columns} />
+                <EuiBasicTable
+                    items={items}
+                    columns={columns}
+                    loading={isLoading}
+                />
             </EuiModalBody>
             <EuiModalFooter>
-                <EuiButton iconType='download' color='text'>
-                    <PDFDownloadLink
-                        document={<SalesInvoicePdfDownload data={data} />}
-                        fileName={'invoice-' + data?.id + '.pdf'}
-                    >
-                        {({ loading }) =>
-                            loading ? 'Loading document...' : 'Download PDF'
-                        }
-                    </PDFDownloadLink>
-                </EuiButton>
+                {!isLoading ? (
+                    <EuiButton iconType='download' color='text'>
+                        <PDFDownloadLink
+                            document={<SalesInvoicePdfDownload data={data} />}
+                            fileName={'invoice-' + data?.id + '.pdf'}
+                        >
+                            {({ loading }) =>
+                                loading ? 'Loading document...' : 'Download PDF'
+                            }
+                        </PDFDownloadLink>
+                    </EuiButton>
+                ) : null}
                 <EuiButton onClick={() => toggleModal(false)}>Close</EuiButton>
             </EuiModalFooter>
         </EuiModal>
