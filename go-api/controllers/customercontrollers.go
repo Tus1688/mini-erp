@@ -48,7 +48,7 @@ func GetCustomer(c *gin.Context) {
 	if err := c.ShouldBindQuery(&requestSearch); err == nil {
 		query := "%" + strings.ToLower(requestSearch.Search) + "%"
 		database.Instance.Table("customers").
-			Select("customers.id, customers.name, customers.tax_id, customers.address").
+			Select("customers.id, customers.name, customers.tax_id, customers.address, customers.updated_at").
 			Where("customers.name LIKE ?", query).
 			Limit(10).
 			Scan(&responseArr)
@@ -71,7 +71,7 @@ func GetCustomer(c *gin.Context) {
 		}
 
 		database.Instance.Table("customers").
-			Select("customers.id, customers.name, customers.tax_id, customers.address").
+			Select("customers.id, customers.name, customers.tax_id, customers.address, customers.updated_at").
 			Where("customers.id > ?", anchor).
 			Limit(requestPaging.PageSize).
 			Scan(&responseArr)

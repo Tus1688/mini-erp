@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"go-api/auth"
 	"go-api/database"
 	"go-api/models"
 	"net/http"
@@ -24,8 +25,8 @@ func GetTOPCount(c *gin.Context) {
 }
 
 func GetTOP(c *gin.Context) {
-	var response models.APIFinanceTOP
-	var responseArr []models.APIFinanceTOP
+	var response models.APIFInanceTOPResponse
+	var responseArr []models.APIFInanceTOPResponse
 	var requestID models.APICommonQueryId
 	var requestPaging models.APICommonPagination
 	var requestSearch models.APICommonSearch
@@ -84,9 +85,15 @@ func CreateTOP(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
+	username, err := auth.GetUsernameFromToken(c.GetHeader("Authorization"))
+	if err != nil {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
 	record := database.Instance.Create(&models.TermOfPayment{
-		Name:    strings.ToLower(request.Name),
-		DueDate: request.DueDate,
+		Name:      strings.ToLower(request.Name),
+		DueDate:   request.DueDate,
+		CreatedBy: username,
 	})
 	if record.Error != nil {
 		if strings.Contains(record.Error.Error(), "1062") {
@@ -102,7 +109,7 @@ func CreateTOP(c *gin.Context) {
 }
 
 func UpdateTOP(c *gin.Context) {
-	var request models.APIFinanceTOP
+	var request models.APIFinanceTOPUpdate
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.Status(http.StatusBadRequest)
 		return

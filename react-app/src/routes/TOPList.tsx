@@ -34,6 +34,11 @@ const columns: EuiDataGridColumn[] = [
         displayAsText: 'Name',
     },
     {
+        id: 'created_by',
+        displayAsText: 'Created By',
+        initialWidth: 150,
+    },
+    {
         id: 'due_date',
         initialWidth: 150,
         displayAsText: 'Due Date',

@@ -59,6 +59,13 @@ const columns: EuiDataGridColumn[] = [
         schema: 'string',
         isSortable: false,
     },
+    {
+        id: 'updated_at',
+        displayAsText: 'Updated At',
+        schema: 'string',
+        isSortable: false,
+        initialWidth: 200,
+    }
 ];
 
 const CustomerList = () => {
@@ -374,7 +381,13 @@ const CustomerList = () => {
             });
             setLoading(false);
             if (data) {
-                setData((rData) => [...rData, ...data]);
+                setData((rData) => [
+                    ...rData,
+                    ...data.map((item: any) => ({
+                        ...item,
+                        updated_at: new Date(item.updated_at).toLocaleString('id-ID'),
+                    })),
+                ]);
                 if (count) {
                     setCustomerCount(count);
                 }

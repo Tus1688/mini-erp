@@ -111,10 +111,17 @@ type APIFinanceTOPCreate struct {
 }
 
 // for update request & get response
-type APIFinanceTOP struct {
+type APIFinanceTOPUpdate struct {
 	ID      int    `json:"id" binding:"required"`
 	Name    string `json:"name"`
 	DueDate int    `json:"due_date"`
+}
+
+type APIFInanceTOPResponse struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	DueDate   int    `json:"due_date"`
+	CreatedBy string `json:"created_by"`
 }
 
 type APIFinanceTotalRevenueCurrentWeek struct {

@@ -48,10 +48,11 @@ type APICustomerResponseSpecific struct {
 }
 
 type APICustomerResponse struct {
-	ID      int    `json:"id"`
-	Name    string `json:"name"`
-	TaxID   string `json:"tax_id"`
-	Address string `json:"address"`
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	TaxID     string    `json:"tax_id"`
+	Address   string    `json:"address"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (t *Customer) BeforeCreate(tx *gorm.DB) (err error) {
