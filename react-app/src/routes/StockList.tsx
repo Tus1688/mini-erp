@@ -70,7 +70,7 @@ const StockList = () => {
                 id: getNewId(),
                 title: 'Fully loaded',
                 color: 'primary',
-                text: <p>Took {(time2 - time1).toPrecision(2)}ms</p>,
+                text: <p>Took {(time2 - time1).toPrecision(6)}ms</p>,
             });
             return data;
         }
@@ -102,7 +102,7 @@ const StockList = () => {
                     id: getNewId(),
                     title: 'Fully loaded',
                     color: 'primary',
-                    text: <p>Took {(time2 - time1).toPrecision(2)}ms</p>,
+                    text: <p>Took {(time2 - time1).toPrecision(6)}ms</p>,
                 });
                 return data;
             }

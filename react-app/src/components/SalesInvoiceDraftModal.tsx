@@ -175,6 +175,7 @@ const SalesInvoiceDraftModal = ({
                 <EuiButton
                     color='success'
                     onClick={() => setApproveModal(!approveModal)}
+                    disabled={sessionStorage.getItem('fin_a') === 'false'}
                 >
                     Approve
                 </EuiButton>
