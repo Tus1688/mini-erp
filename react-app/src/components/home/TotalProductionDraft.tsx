@@ -1,5 +1,4 @@
 import {
-    EuiButtonEmpty,
     EuiLoadingSpinner,
     EuiPanel,
     EuiSpacer,
@@ -29,7 +28,12 @@ const TotalProductionDraftPanel = () => {
         });
     }, [location, navigate]);
     return (
-        <EuiPanel paddingSize='l'>
+        <EuiPanel
+            paddingSize='l'
+            onClick={() => {
+                navigate('/production-draft', { state: { from: location } });
+            }}
+        >
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
                     <h2>Awaiting Production Approval</h2>
@@ -38,17 +42,9 @@ const TotalProductionDraftPanel = () => {
                 {isLoading ? (
                     <EuiLoadingSpinner size='xl' />
                 ) : (
-                    <EuiButtonEmpty
-                        onClick={() =>
-                            navigate('/production-draft', {
-                                state: { from: location },
-                            })
-                        }
-                    >
-                        <EuiTitle size='m'>
-                            <h2>{data}</h2>
-                        </EuiTitle>
-                    </EuiButtonEmpty>
+                    <EuiTitle size='m'>
+                        <h2>{data}</h2>
+                    </EuiTitle>
                 )}
             </EuiTextAlign>
         </EuiPanel>

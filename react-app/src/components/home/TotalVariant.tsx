@@ -1,5 +1,4 @@
 import {
-    EuiButtonEmpty,
     EuiLoadingSpinner,
     EuiPanel,
     EuiSpacer,
@@ -29,7 +28,12 @@ const TotalVariantPanel = () => {
         });
     }, [location, navigate]);
     return (
-        <EuiPanel paddingSize='l'>
+        <EuiPanel
+            paddingSize='l'
+            onClick={() => {
+                navigate('/variant-list', { state: { from: location } });
+            }}
+        >
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
                     <h2>Total Variant</h2>
@@ -38,17 +42,9 @@ const TotalVariantPanel = () => {
                 {isLoading ? (
                     <EuiLoadingSpinner size='xl' />
                 ) : (
-                    <EuiButtonEmpty
-                        onClick={() =>
-                            navigate('/variant-list', {
-                                state: { from: location },
-                            })
-                        }
-                    >
-                        <EuiTitle size='m'>
-                            <h2>{data}</h2>
-                        </EuiTitle>
-                    </EuiButtonEmpty>
+                    <EuiTitle size='m'>
+                        <h2>{data}</h2>
+                    </EuiTitle>
                 )}
             </EuiTextAlign>
         </EuiPanel>

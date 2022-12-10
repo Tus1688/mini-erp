@@ -80,7 +80,12 @@ const WeeklyRevenuePanel = () => {
         });
     }, [location, navigate]);
     return (
-        <EuiPanel paddingSize='l'>
+        <EuiPanel
+            paddingSize='l'
+            onClick={() => {
+                navigate('/so-list');
+            }}
+        >
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
                     <h2>Weekly Revenue</h2>

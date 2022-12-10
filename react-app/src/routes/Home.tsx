@@ -112,15 +112,13 @@ const Home = () => {
                                 >
                                     <BestEmployeePanel />
                                 </EuiFlexItem>
-                                </>
-                            ) : null}
-                            {financeUser ? (
                                 <EuiFlexItem
                                     grow={true}
                                     style={{ maxWidth: '300px' }}
                                 >
                                     <BestCustomerPanel />
                                 </EuiFlexItem>
+                                </>
                             ) : null}
                         </EuiFlexGroup>
                     </EuiFlexItem>

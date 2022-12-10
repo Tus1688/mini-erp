@@ -62,14 +62,24 @@ const LowStockPanel = () => {
         });
     }, [location, navigate]);
     return (
-        <EuiPanel paddingSize='l'>
+        <EuiPanel
+            paddingSize='l'
+            onClick={() => {
+                navigate('/production-draft', {
+                    state: {
+                        from: location,
+                        createModal: true,
+                    },
+                });
+            }}
+        >
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
                     <h2>Low Stock ({'<'}100pcs)</h2>
                 </EuiTitle>
                 <EuiSpacer size='l' />
                 {isLoading ? (
-                    <EuiLoadingSpinner size="xl" />
+                    <EuiLoadingSpinner size='xl' />
                 ) : data ? (
                     <Bar
                         // set height to fill parent container
@@ -83,15 +93,6 @@ const LowStockPanel = () => {
                                 },
                             },
                         }}
-                        onClick={() => {
-                            navigate('/production-draft', {
-                                state: {
-                                    from: location,
-                                    createModal: true,
-                                },
-                            });
-                        }}
-                        style={{ cursor: 'pointer' }}
                     />
                 ) : (
                     <>

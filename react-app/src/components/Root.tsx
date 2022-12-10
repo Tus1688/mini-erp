@@ -230,18 +230,20 @@ const SideNavItem = () => {
                 </EuiTitle>
             </NavLink>
             <EuiSpacer size='xl' />
-            <EuiAccordion
-                id='Customers'
-                buttonContent='Customer Management'
-                arrowDisplay='none'
-            >
-                <div style={childAccordionItemStyle}>
-                    <StyledNavLink
-                        url='/customer-list'
-                        label='Customers list'
-                    />
-                </div>
-            </EuiAccordion>
+            {isFinanceUser ? (
+                <EuiAccordion
+                    id='Customers'
+                    buttonContent='Customer Management'
+                    arrowDisplay='none'
+                >
+                    <div style={childAccordionItemStyle}>
+                        <StyledNavLink
+                            url='/customer-list'
+                            label='Customers list'
+                        />
+                    </div>
+                </EuiAccordion>
+            ) : null}
 
             {isInventoryUser || isFinanceUser ? (
                 <EuiAccordion

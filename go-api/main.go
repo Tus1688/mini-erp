@@ -49,11 +49,15 @@ func initRouter() *gin.Engine {
 
 	api := router.Group("/api/v1")
 	{
-		api.GET("/customer-count", controllers.GetCustomerCount)
-		api.GET("/customer", controllers.GetCustomer)
-		api.POST("/customer", controllers.CreateCustomer)
-		api.DELETE("/customer", controllers.DeleteCustomer)
-		api.PATCH("/customer", controllers.UpdateCustomer)
+		cust := api.Group("/")
+		cust.Use(middlewares.UserIsFinanceUser())
+		{
+			cust.GET("/customer-count", controllers.GetCustomerCount)
+			cust.GET("/customer", controllers.GetCustomer)
+			cust.POST("/customer", controllers.CreateCustomer)
+			cust.DELETE("/customer", controllers.DeleteCustomer)
+			cust.PATCH("/customer", controllers.UpdateCustomer)
+		}
 
 		// so finance user can access available stocks
 		api.GET("/inventory/stock", controllers.GetStock)                         // get stock by batch and variant

@@ -1,5 +1,4 @@
 import {
-    EuiButtonEmpty,
     EuiLoadingSpinner,
     EuiPanel,
     EuiSpacer,
@@ -29,7 +28,12 @@ const TotalSalesInvoiceDraftPanel = () => {
         });
     }, [location, navigate]);
     return (
-        <EuiPanel paddingSize='l'>
+        <EuiPanel
+            paddingSize='l'
+            onClick={() => {
+                navigate('/so-draft-list', { state: { from: location } });
+            }}
+        >
             <EuiTextAlign textAlign='center'>
                 <EuiTitle size='xs'>
                     <h2>Awaiting Sales Invoice Approval</h2>
@@ -38,17 +42,9 @@ const TotalSalesInvoiceDraftPanel = () => {
                 {isLoading ? (
                     <EuiLoadingSpinner size='xl' />
                 ) : (
-                    <EuiButtonEmpty
-                        onClick={() =>
-                            navigate('/so-draft-list', {
-                                state: { from: location },
-                            })
-                        }
-                    >
-                        <EuiTitle size='m'>
-                            <h2>{data}</h2>
-                        </EuiTitle>
-                    </EuiButtonEmpty>
+                    <EuiTitle size='m'>
+                        <h2>{data}</h2>
+                    </EuiTitle>
                 )}
             </EuiTextAlign>
         </EuiPanel>
