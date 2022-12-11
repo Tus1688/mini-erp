@@ -37,6 +37,11 @@ func CreateProductionDraft(c *gin.Context) {
 		return
 	}
 
+	if request.Quantity <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Quantity must be greater than 0"})
+		return
+	}
+
 	transactionRecord := database.Instance.Create(&models.ItemTransactionLogDraft{
 		BatchRefer:   request.BatchRefer,
 		VariantRefer: request.VariantRefer,

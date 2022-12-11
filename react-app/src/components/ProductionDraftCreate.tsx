@@ -206,6 +206,7 @@ const ProductionDraftCreate = ({
                         <EuiFieldNumber
                             placeholder='100'
                             value={quantity}
+                            min={1}
                             onChange={(e) =>
                                 setQuantity(e.target.valueAsNumber)
                             }
