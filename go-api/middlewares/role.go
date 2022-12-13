@@ -30,7 +30,7 @@ func UserIsFinanceAdmin() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token not provided"})
 			return
 		}
-		err := auth.TokenIsInventoryAdmin(tokenString)
+		err := auth.TokenIsFinanceAdmin(tokenString)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
