@@ -454,7 +454,7 @@ const SalesInvoiceCreateModal = ({
                                     onChange={(e) =>
                                         setQuantity(e.target.valueAsNumber)
                                     }
-                                    min={0}
+                                    min={1}
                                     max={maxQuantity}
                                 />
                             </EuiFormRow>
