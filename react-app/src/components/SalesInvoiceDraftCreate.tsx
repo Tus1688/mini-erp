@@ -191,6 +191,7 @@ const SalesInvoiceCreateModal = ({
         if (
             selectedItems.length === 0 ||
             quantity === undefined ||
+            quantity <= 0 ||
             price === undefined ||
             discount === undefined
         ) {
@@ -199,7 +200,7 @@ const SalesInvoiceCreateModal = ({
         // selectedItems[0].value then split by - to get variant_id and batch_id
         let variant_name = selectedItems[0].label.split('[')[0].trim();
         let variant_id: number = parseInt(selectedItems[0].value.split('-')[0]);
-        let batch_id:number = parseInt(selectedItems[0].value.split('-')[1]);
+        let batch_id: number = parseInt(selectedItems[0].value.split('-')[1]);
         let total = price * quantity * (1 - discount / 100);
 
         setCarts((prev) => [
@@ -478,7 +479,11 @@ const SalesInvoiceCreateModal = ({
                 <EuiButtonEmpty onClick={() => toggleModal(false)}>
                     Cancel
                 </EuiButtonEmpty>
-                <EuiButton color='success' type='submit' onClick={() => handleCreate()}>
+                <EuiButton
+                    color='success'
+                    type='submit'
+                    onClick={() => handleCreate()}
+                >
                     Create
                 </EuiButton>
             </EuiModalFooter>
